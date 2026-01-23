@@ -315,7 +315,9 @@ async function processMultipleFiles(fileList) {
             }
         } else if (pathType === 'directory') {
             directories.push(itemPath);
-            const dirFiles = await processDirectory(itemPath, '', true);
+            // Only apply root level whitelist when processing project root (.)
+            const isRootLevel = (itemPath === '.' || itemPath === './');
+            const dirFiles = await processDirectory(itemPath, '', isRootLevel);
             allFiles = allFiles.concat(dirFiles);
         } else {
             console.warn(`Warning: Path does not exist: ${itemPath}`);
@@ -327,7 +329,9 @@ async function processMultipleFiles(fileList) {
         output += 'File Structure:\n';
         for (const dirPath of directories) {
             output += `\n${dirPath}/\n\`\`\`\n`;
-            const structure = await getFileStructure(dirPath, '', '', true);
+            // Only apply root level whitelist when processing project root (.)
+            const isRootLevel = (dirPath === '.' || dirPath === './');
+            const structure = await getFileStructure(dirPath, '', '', isRootLevel);
             output += structure + '\n\`\`\`\n';
         }
         output += '\n';
@@ -361,9 +365,10 @@ async function main() {
             console.log('');
             console.log('Examples:');
             console.log('  node script.js .');
+            console.log('  node script.js app  (process specific folder - no whitelist applied)');
             console.log('  node script.js --list files-to-process.txt');
             console.log('');
-            console.log('Whitelist approach - Only includes:');
+            console.log('Whitelist approach - Only applies when using "." :');
             console.log('  Folders:', Array.from(INCLUDED_FOLDERS).join(', '));
             console.log('  Root files:', Array.from(INCLUDED_ROOT_FILES).slice(0, 5).join(', '), '...');
             console.log('');
@@ -392,7 +397,7 @@ async function main() {
             return;
         }
         
-        console.log('Processing with whitelist approach...');
+        console.log('Processing files and directories...');
         console.log('Items to process:', fileList);
         
         const output = await processMultipleFiles(fileList);
@@ -411,5 +416,7 @@ main();
 
 // command to call this script
 // node prepare-for-claude .
+// or
+// node prepare-for-claude app
 // or
 // node prepare-for-claude --list prepare-for-claude-list.txt

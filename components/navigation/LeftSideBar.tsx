@@ -1,4 +1,3 @@
-// components/Navigation/LeftSideBar.tsx
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,8 +19,8 @@ interface NavItemProps {
 }
 
 const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => {
-  const isMobile = useMediaQuery('(max-width: 639px)');
-  const isTablet = useMediaQuery('(min-width: 640px) and (max-width: 1023px)');
+  const isMobile = useMediaQuery('(max-width:639px)');
+  const isTablet = useMediaQuery('(min-width:640px) and (max-width:1023px)');
   const Icon = item.icon;
 
   const handleClick = () => {
@@ -36,7 +35,9 @@ const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => 
       onClick={handleClick}
       className={cn(
         "flex items-center px-3 h-12 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800",
-        isActive ? "bg-gray-100 dark:bg-gray-800 text-blue-600" : "text-gray-700 dark:text-gray-300",
+        isActive
+          ? "bg-gray-100 dark:bg-gray-800 text-blue-600"
+          : "text-gray-700 dark:text-gray-300",
         openLeftSidebar ? "justify-start" : "justify-center"
       )}
     >
@@ -54,9 +55,12 @@ interface LeftSideBarProps {
 export default function LeftSideBar({ openLeftSidebar, onClose }: LeftSideBarProps) {
   const pathname = usePathname();
 
-  const navItems: NavItemType[] = [
+  const topNavItems: NavItemType[] = [
     { href: "/lobby", icon: Home, label: "Lobby" },
     { href: "/profile", icon: User, label: "Profile" },
+  ];
+
+  const bottomNavItems: NavItemType[] = [
     { href: "/support", icon: Headset, label: "Support" },
     { href: "/settings", icon: Settings, label: "Settings" },
   ];
@@ -64,8 +68,22 @@ export default function LeftSideBar({ openLeftSidebar, onClose }: LeftSideBarPro
   return (
     <aside className="h-full overflow-y-auto">
       <div className="flex flex-col h-full">
+        {/* Top navigation items */}
         <div className="flex-1 py-4">
-          {navItems.map((item, index) => (
+          {topNavItems.map((item, index) => (
+            <NavItem
+              key={index}
+              item={item}
+              isActive={pathname === item.href}
+              openLeftSidebar={openLeftSidebar}
+              onClose={onClose}
+            />
+          ))}
+        </div>
+
+        {/* Bottom navigation items */}
+        <div className="py-4 border-t border-gray-200 dark:border-gray-800">
+          {bottomNavItems.map((item, index) => (
             <NavItem
               key={index}
               item={item}
