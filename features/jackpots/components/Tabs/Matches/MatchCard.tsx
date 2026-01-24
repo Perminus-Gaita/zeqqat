@@ -90,7 +90,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
         })}
       </div>
 
-      <div className="mt-3 text-xs text-muted-foreground text-center">
+      <div className="mt-3 text-xs text-muted-foreground text-center" suppressHydrationWarning>
         {new Date(event.kickoffTime).toLocaleString()}
       </div>
     </div>

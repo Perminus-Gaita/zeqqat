@@ -7,29 +7,8 @@ File Structure:
 ├── app
 │   ├── (app)
 │   │   ├── jackpots
-│   │   │   └── client.jsx
-│   │   │   ├── components
-│   │   │   │   └── JackpotDetails.jsx
-│   │   │   │   ├── Tabs
-│   │   │   │   │   ├── Comments
-│   │   │   │   │   │   └── CommentItem.jsx
-│   │   │   │   │   │   └── index.jsx
-│   │   │   │   │   ├── Matches
-│   │   │   │   │   │   └── MatchCard.jsx
-│   │   │   │   │   │   └── index.jsx
-│   │   │   │   │   ├── Predictions
-│   │   │   │   │   │   └── PredictionItem.jsx
-│   │   │   │   │   │   └── index.jsx
-│   │   │   │   │   ├── Stats
-│   │   │   │   │   │   └── BellCurve.jsx
-│   │   │   │   │   │   └── index.jsx
-│   │   │   │   └── TabsHeader.jsx
-│   │   │   ├── hooks
-│   │   │   │   └── useJackpotApi.js
-│   │   │   └── page.jsx
-│   │   │   ├── utils
-│   │   │   │   └── constants.js
-│   │   │   │   └── helpers.js
+│   │   │   └── client.tsx
+│   │   │   └── page.tsx
 │   │   └── layout.tsx
 │   │   ├── lobby
 │   │   │   └── page.tsx
@@ -60,11 +39,37 @@ File Structure:
 │   │   └── tooltip.tsx
 └── components.json
 ├── features
+│   ├── jackpots
+│   │   ├── components
+│   │   │   └── JackpotDetails.tsx
+│   │   │   ├── Tabs
+│   │   │   │   ├── Comments
+│   │   │   │   │   └── CommentItem.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── Matches
+│   │   │   │   │   └── MatchCard.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── Predictions
+│   │   │   │   │   └── PredictionItem.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── Stats
+│   │   │   │   │   └── BellCurve.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   └── TabsHeader.tsx
+│   │   ├── hooks
+│   │   ├── types
+│   │   │   └── index.ts
+│   │   ├── utils
+│   │   │   └── constants.ts
+│   │   │   └── helpers.ts
+│   └── placeholder
 ├── hooks
 │   └── useMediaQuery.ts
 ├── lib
 │   └── utils.ts
 └── package.json
+├── scripts
+│   └── claude.sh
 └── tsconfig.json
 
 ```
@@ -117,79 +122,14 @@ next-env.d.ts
 
 ```
 
-File: app/(app)/jackpots/client.jsx
-```jsx
-"use client";import React,{useState,useCallback,useMemo}from "react";import{Loader2,AlertCircle,RefreshCw}from "lucide-react";import JackpotDetails from "./components/JackpotDetails";import TabsHeader from "./components/TabsHeader";import MatchesTab from "./components/Tabs/Matches";import PredictionsTab from "./components/Tabs/Predictions";import StatsTab from "./components/Tabs/Stats";import CommentsTab from "./components/Tabs/Comments";import{usePredictions,useComments,useStatistics,useJackpotDetails,}from "./hooks/useJackpotApi";const JackpotSkeleton=()=> ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen">{}<div className="p-4 border-b border-border"> <div className="animate-pulse space-y-3"> <div className="h-6 bg-muted rounded w-1/3" /> <div className="h-8 bg-muted rounded w-2/3" /> <div className="flex gap-4 mt-4"> <div className="h-16 bg-muted rounded flex-1" /> <div className="h-16 bg-muted rounded flex-1" /> </div> </div> </div>{}<div className="flex border-b border-border">{[1,2,3,4].map((i)=> ( <div key={i}className="flex-1 py-4 flex justify-center"> <div className="h-4 bg-muted rounded w-16 animate-pulse" /> </div> ))}</div>{}<div className="p-4 space-y-3">{[1,2,3].map((i)=> ( <div key={i}className="h-32 bg-muted rounded-xl animate-pulse" /> ))}</div> </div> </div> );const JackpotError=({error,onRetry})=> ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen flex items-center justify-center p-8"> <div className="text-center"> <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" /> <h2 className="text-lg font-semibold text-foreground mb-2"> Failed to load jackpot </h2> <p className="text-sm text-muted-foreground mb-4">{error || "Something went wrong. Please try again."}</p> <button onClick={onRetry}className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors" > <RefreshCw className="w-4 h-4" /> Try Again </button> </div> </div> </div> );export default function JackpotTracker({jackpotId:propJackpotId}){const [activeTab,setActiveTab]=useState("matches");const [localPicks,setLocalPicks]=useState({});const jackpotId=propJackpotId || "latest";const{data:jackpot,loading:jackpotLoading,error:jackpotError,refetch:refetchJackpot,}=useJackpotDetails(jackpotId);const{predictions,userPrediction,loading:predictionsLoading,submitting:predictionsSubmitting,createPrediction,updatePrediction,deletePrediction,}=usePredictions(jackpot?._id);const{comments,loading:commentsLoading,submitting:commentsSubmitting,createComment,deleteComment,}=useComments(jackpot?._id);const{stats,loading:statsLoading}=useStatistics(jackpot?._id);const userPicks=useMemo(()=>{if (!userPrediction?.picks) return localPicks;const picksMap={};userPrediction.picks.forEach((pick)=>{const pickLabel=pick.pick==="1" ? "Home":pick.pick==="X" ? "Draw":"Away";picksMap[pick.gameNumber]=pickLabel;});return{...picksMap,...localPicks};},[userPrediction,localPicks]);const handlePickSelect=useCallback((eventNumber,pick)=>{setLocalPicks((prev)=> ({...prev,[eventNumber]:pick,}));},[]);const handleSavePrediction=useCallback(async ()=>{const allPicks={...userPicks,...localPicks};const picksArray=Object.entries(allPicks).map(([gameNumber,pick])=> ({gameNumber:parseInt(gameNumber),pick:pick==="Home" ? "1":pick==="Draw" ? "X":"2",}));if (picksArray.length===0) return;if (userPrediction){await updatePrediction(userPrediction._id,picksArray);}else{await createPrediction(picksArray);}setLocalPicks({});},[userPicks,localPicks,userPrediction,createPrediction,updatePrediction]);const handleAddComment=useCallback( async (text)=>{if (!text.trim()) return;await createComment(text);},[createComment] );const handleDeleteComment=useCallback( async (commentId)=>{await deleteComment(commentId);},[deleteComment] );const hasUnsavedPicks=Object.keys(localPicks).length > 0;if (jackpotLoading){return <JackpotSkeleton />;}if (jackpotError || !jackpot){return <JackpotError error={jackpotError}onRetry={refetchJackpot}/>;}return ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen">{}<JackpotDetails jackpot={jackpot}/>{}<TabsHeader activeTab={activeTab}setActiveTab={setActiveTab}/>{}<div className="animate-in fade-in duration-200">{activeTab==="matches" && ( <MatchesTab events={jackpot.events}predictions={userPicks}onSelect={handlePickSelect}hasUnsavedPicks={hasUnsavedPicks}onSavePrediction={handleSavePrediction}isSaving={predictionsSubmitting}jackpotStatus={jackpot.jackpotStatus}/> )}{activeTab==="predictions" && ( <PredictionsTab predictions={predictions}jackpot={jackpot}loading={predictionsLoading}/> )}{activeTab==="stats" && ( <StatsTab jackpot={jackpot}communityPredictions={predictions}stats={stats}loading={statsLoading}/> )}{activeTab==="comments" && ( <CommentsTab comments={comments}loading={commentsLoading}submitting={commentsSubmitting}onAddComment={handleAddComment}onDeleteComment={handleDeleteComment}/> )}</div> </div> </div> );}
+File: app/(app)/jackpots/client.tsx
+```tsx
+"use client";import React,{useState}from "react";import{Loader2,AlertCircle,RefreshCw}from "lucide-react";import JackpotDetails from "@/features/jackpots/components/JackpotDetails";import TabsHeader from "@/features/jackpots/components/TabsHeader";import MatchesTab from "@/features/jackpots/components/Tabs/Matches";import PredictionsTab from "@/features/jackpots/components/Tabs/Predictions";import StatsTab from "@/features/jackpots/components/Tabs/Stats";import CommentsTab from "@/features/jackpots/components/Tabs/Comments";import type{Jackpot,Prediction,Comment,Statistics,TabType,LocalPicks,LocalPick}from "@/features/jackpots/types";const DUMMY_JACKPOT:Jackpot={_id:"jp001",jackpotHumanId:"12345",site:"SportPesa",totalPrizePool:250000000,currencySign:"KSH",jackpotStatus:"Open",isLatest:true,finished:new Date().toISOString(),bettingClosesAt:new Date(Date.now() + 86400000).toISOString(),events:[{eventNumber:1,competitorHome:"Arsenal",competitorAway:"Chelsea",odds:{home:2.1,draw:3.2,away:3.8},kickoffTime:new Date(Date.now() + 3600000).toISOString(),competition:"Premier League",},{eventNumber:2,competitorHome:"Manchester United",competitorAway:"Liverpool",odds:{home:2.5,draw:3.1,away:2.9},kickoffTime:new Date(Date.now() + 7200000).toISOString(),competition:"Premier League",},{eventNumber:3,competitorHome:"Barcelona",competitorAway:"Real Madrid",odds:{home:2.3,draw:3.0,away:3.2},kickoffTime:new Date(Date.now() + 10800000).toISOString(),competition:"La Liga",},{eventNumber:4,competitorHome:"Bayern Munich",competitorAway:"Borussia Dortmund",odds:{home:1.9,draw:3.5,away:4.2},kickoffTime:new Date(Date.now() + 14400000).toISOString(),competition:"Bundesliga",},{eventNumber:5,competitorHome:"Juventus",competitorAway:"AC Milan",odds:{home:2.2,draw:3.0,away:3.5},kickoffTime:new Date(Date.now() + 18000000).toISOString(),competition:"Serie A",},],prizes:[{jackpotType:"17/17",prize:150000000,winners:0},{jackpotType:"16/17",prize:50000000,winners:2},{jackpotType:"15/17",prize:25000000,winners:15},{jackpotType:"14/17",prize:10000000,winners:45},],};const DUMMY_PREDICTIONS:Prediction[]=[{_id:"pred1",jackpotId:"jp001",userId:"user1",username:"JohnDoe",picks:[{gameNumber:1,pick:"1"},{gameNumber:2,pick:"X"},{gameNumber:3,pick:"2"},{gameNumber:4,pick:"1"},{gameNumber:5,pick:"X"},],score:3,createdAt:new Date(Date.now() - 3600000).toISOString(),updatedAt:new Date(Date.now() - 3600000).toISOString(),},{_id:"pred2",jackpotId:"jp001",userId:"user2",username:"JaneSmith",picks:[{gameNumber:1,pick:"1"},{gameNumber:2,pick:"2"},{gameNumber:3,pick:"1"},{gameNumber:4,pick:"1"},{gameNumber:5,pick:"2"},],score:2,createdAt:new Date(Date.now() - 7200000).toISOString(),updatedAt:new Date(Date.now() - 7200000).toISOString(),},{_id:"pred3",jackpotId:"jp001",userId:"user3",username:"MikeJones",picks:[{gameNumber:1,pick:"X"},{gameNumber:2,pick:"1"},{gameNumber:3,pick:"2"},{gameNumber:4,pick:"2"},{gameNumber:5,pick:"1"},],score:4,createdAt:new Date(Date.now() - 10800000).toISOString(),updatedAt:new Date(Date.now() - 10800000).toISOString(),},];const DUMMY_COMMENTS:Comment[]=[{_id:"com1",jackpotId:"jp001",userId:"user1",username:"JohnDoe",text:"Arsenal are looking strong this season! Going with them.",createdAt:new Date(Date.now() - 1800000).toISOString(),updatedAt:new Date(Date.now() - 1800000).toISOString(),},{_id:"com2",jackpotId:"jp001",userId:"user3",username:"MikeJones",text:"The El Clasico will be a draw,I can feel it!",createdAt:new Date(Date.now() - 3600000).toISOString(),updatedAt:new Date(Date.now() - 3600000).toISOString(),},{_id:"com3",jackpotId:"jp001",userId:"user2",username:"JaneSmith",text:"Bayern are unstoppable at home. Easy win for them.",createdAt:new Date(Date.now() - 5400000).toISOString(),updatedAt:new Date(Date.now() - 5400000).toISOString(),},];const DUMMY_STATS:Statistics={homeWins:8,draws:4,awayWins:5,averageHomeOdds:2.1,averageDrawOdds:3.2,averageAwayOdds:3.4,totalMatches:17,};const JackpotSkeleton=()=> ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen"> <div className="p-4 border-b border-border"> <div className="animate-pulse space-y-3"> <div className="h-6 bg-muted rounded w-1/3" /> <div className="h-8 bg-muted rounded w-2/3" /> <div className="flex gap-4 mt-4"> <div className="h-16 bg-muted rounded flex-1" /> <div className="h-16 bg-muted rounded flex-1" /> </div> </div> </div> <div className="flex border-b border-border">{[1,2,3,4].map((i)=> ( <div key={i}className="flex-1 py-4 flex justify-center"> <div className="h-4 bg-muted rounded w-16 animate-pulse" /> </div> ))}</div> <div className="p-4 space-y-3">{[1,2,3].map((i)=> ( <div key={i}className="h-32 bg-muted rounded-xl animate-pulse" /> ))}</div> </div> </div> );interface JackpotErrorProps{error:string | null;onRetry:()=> void;}const JackpotError:React.FC<JackpotErrorProps>=({error,onRetry})=> ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen flex items-center justify-center p-8"> <div className="text-center"> <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" /> <h2 className="text-lg font-semibold text-foreground mb-2"> Failed to load jackpot </h2> <p className="text-sm text-muted-foreground mb-4">{error || "Something went wrong. Please try again."}</p> <button onClick={onRetry}className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors" > <RefreshCw className="w-4 h-4" /> Try Again </button> </div> </div> </div> );interface JackpotTrackerProps{jackpotId?:string;}export default function JackpotTracker({jackpotId="latest"}:JackpotTrackerProps){const [activeTab,setActiveTab]=useState<TabType>("matches");const [localPicks,setLocalPicks]=useState<LocalPicks>({});const [predictions,setPredictions]=useState<Prediction[]>(DUMMY_PREDICTIONS);const [comments,setComments]=useState<Comment[]>(DUMMY_COMMENTS);const jackpot=DUMMY_JACKPOT;const stats=DUMMY_STATS;const loading=false;const error=null;const userPicks:LocalPicks={...localPicks};const handlePickSelect=(eventNumber:number,pick:LocalPick)=>{setLocalPicks((prev)=> ({...prev,[eventNumber]:pick,}));};const handleSavePrediction=()=>{console.log("Saving prediction:",localPicks);alert("Prediction saved! (This is dummy data)");setLocalPicks({});};const handleAddComment=(text:string)=>{const newComment:Comment={_id:"12345678",jackpotId:jackpot._id,userId:"currentUser",username:"You",text,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),};setComments([newComment,...comments]);};const handleDeleteComment=(commentId:string)=>{setComments(comments.filter((c)=> c._id !==commentId));};const hasUnsavedPicks=Object.keys(localPicks).length > 0;if (loading){return <JackpotSkeleton />;}if (error || !jackpot){return <JackpotError error={error}onRetry={()=> window.location.reload()}/>;}return ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen"> <JackpotDetails jackpot={jackpot}/> <TabsHeader activeTab={activeTab}setActiveTab={setActiveTab}/> <div className="animate-in fade-in duration-200">{activeTab==="matches" && ( <MatchesTab events={jackpot.events}predictions={userPicks}onSelect={handlePickSelect}hasUnsavedPicks={hasUnsavedPicks}onSavePrediction={handleSavePrediction}isSaving={false}jackpotStatus={jackpot.jackpotStatus}/> )}{activeTab==="predictions" && ( <PredictionsTab predictions={predictions}jackpot={jackpot}loading={false}/> )}{activeTab==="stats" && ( <StatsTab jackpot={jackpot}communityPredictions={predictions}stats={stats}loading={false}/> )}{activeTab==="comments" && ( <CommentsTab comments={comments}loading={false}submitting={false}onAddComment={handleAddComment}onDeleteComment={handleDeleteComment}currentUserId="currentUser" /> )}</div> </div> </div> );}
 ```
 
-File: app/(app)/jackpots/components/JackpotDetails.jsx
-```jsx
-"use client";import React from 'react';import{formatDate}from '../utils/helpers';const JackpotDetails=({jackpot})=>{const isOpen=jackpot.jackpotStatus==='Open';const formatFullAmount=(amount)=>{return new Intl.NumberFormat('en-KE').format(Math.round(amount));};return ( <div className="p-4 border-b border-border">{}<div className="text-xs text-muted-foreground mb-3 text-center"> Jackpot #{jackpot.jackpotHumanId}•{formatDate(jackpot.finished)}</div>{}<div className="bg-gradient-to-br from-green-500/15 to-green-600/5 border border-green-500/30 rounded-xl p-6 text-center">{}<div className="text-sm text-green-500/80 font-medium mb-2">{jackpot.site}MEGA Jackpot Pro{jackpot.events.length}</div>{}<div className="text-2xl md:text-3xl font-bold text-green-500">{jackpot.currencySign}{formatFullAmount(jackpot.totalPrizePool)}</div> </div>{}<div className="flex items-center justify-center gap-2 flex-wrap mt-3"> <span className={`px-3 py-1 rounded text-xs font-semibold ${isOpen ? 'bg-green-500/20 text-green-500':'bg-muted text-muted-foreground'}`}>{jackpot.jackpotStatus.toUpperCase()}</span>{jackpot.isLatest && ( <span className="bg-primary/20 text-primary px-3 py-1 rounded text-xs font-semibold"> LATEST </span> )}</div> </div> );};export default JackpotDetails;
-```
-
-File: app/(app)/jackpots/components/Tabs/Comments/CommentItem.jsx
-```jsx
-"use client";import React,{useState}from "react";import{MessageSquare,Share2,Trash2,MoreHorizontal}from "lucide-react";import{formatTimeAgo,generateAvatar}from "../../../utils/helpers";const CommentItem=({comment,onDelete})=>{const [showMenu,setShowMenu]=useState(false);const user=comment.userId ||{};const userName=user.name || "Anonymous";const userInitial=userName.charAt(0).toUpperCase();const profilePicture=user.profilePicture;const timestamp=comment.createdAt || comment.timestamp;const handleDelete=async ()=>{if (window.confirm("Are you sure you want to delete this comment?")){await onDelete(comment._id);}setShowMenu(false);};return ( <div className="flex gap-3 py-3 relative">{}{profilePicture ? ( <img src={profilePicture}alt={userName}className="w-8 h-8 rounded-full object-cover flex-shrink-0" /> ):( <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" style={{background:generateAvatar(userName)}}>{userInitial}</div> )}{}<div className="flex-1 min-w-0">{}<div className="flex items-center gap-2 mb-1"> <span className="text-sm font-semibold text-foreground hover:underline cursor-pointer">{userName}</span> <span className="text-xs text-muted-foreground">•</span> <span className="text-xs text-muted-foreground">{formatTimeAgo(timestamp)}</span>{}<div className="ml-auto relative"> <button onClick={()=> setShowMenu(!showMenu)}className="p-1 rounded-full hover:bg-muted transition-colors" > <MoreHorizontal className="w-4 h-4 text-muted-foreground" /> </button>{}{showMenu && ( <> <div className="fixed inset-0 z-10" onClick={()=> setShowMenu(false)}/> <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg py-1 z-20 min-w-[120px]"> <button onClick={handleDelete}className="w-full px-3 py-2 text-left text-sm text-red-500 hover:bg-muted flex items-center gap-2" > <Trash2 className="w-4 h-4" /> Delete </button> </div> </> )}</div> </div>{}<p className="text-sm text-foreground leading-relaxed mb-2">{comment.text}</p>{}<div className="flex items-center gap-4"> <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"> <MessageSquare className="w-4 h-4" /> Reply </button> <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"> <Share2 className="w-4 h-4" /> Share </button> </div> </div> </div> );};export default CommentItem;
-```
-
-File: app/(app)/jackpots/components/Tabs/Comments/index.jsx
-```jsx
-"use client";import React,{useState}from "react";import{MessageSquare,Loader2}from "lucide-react";import CommentItem from "./CommentItem";import{generateAvatar}from "../../../utils/helpers";const CommentsTab=({comments,loading,submitting,onAddComment,onDeleteComment,})=>{const [isExpanded,setIsExpanded]=useState(false);const [newComment,setNewComment]=useState("");const handleSubmit=async (e)=>{e.preventDefault();if (!newComment.trim() || submitting) return;await onAddComment(newComment);setNewComment("");setIsExpanded(false);};if (loading){return ( <div className="p-8 flex flex-col items-center justify-center"> <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" /> <p className="text-muted-foreground text-sm">Loading comments...</p> </div> );}return ( <div className="p-4">{}<div className="mb-6"> <div className={`border border-border rounded-lg bg-card transition-all ${isExpanded ? "ring-2 ring-primary":"hover:border-muted-foreground"}`}>{!isExpanded ? ( <div className="flex items-center gap-3 p-3 cursor-text" onClick={()=> setIsExpanded(true)}> <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0" style={{background:generateAvatar("User")}}> U </div> <span className="text-muted-foreground text-sm"> Add a comment... </span> </div> ):( <form onSubmit={handleSubmit}className="p-3"> <textarea placeholder="What are your thoughts?" value={newComment}onChange={(e)=> setNewComment(e.target.value)}className="w-full bg-transparent text-foreground text-sm py-2 outline-none resize-none min-h-[80px] placeholder:text-muted-foreground" rows={3}autoFocus disabled={submitting}/> <div className="flex justify-end gap-2 pt-2 border-t border-border mt-2"> <button type="button" onClick={()=>{setIsExpanded(false);setNewComment("");}}className="px-4 py-1.5 rounded-full text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors" disabled={submitting}> Cancel </button> <button type="submit" disabled={!newComment.trim() || submitting}className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${newComment.trim() && !submitting ? "bg-primary text-primary-foreground hover:bg-primary/90":"bg-muted text-muted-foreground cursor-not-allowed"}`}>{submitting && ( <Loader2 className="w-3 h-3 animate-spin" /> )}Comment </button> </div> </form> )}</div> </div>{}{comments.length===0 ? ( <div className="py-12 text-center"> <MessageSquare className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" /> <p className="text-muted-foreground text-sm">No comments yet</p> <p className="text-muted-foreground/60 text-xs mt-1"> Be the first to share your thoughts! </p> </div> ):( <div className="divide-y divide-border">{comments.map((comment)=> ( <CommentItem key={comment._id}comment={comment}onDelete={onDeleteComment}/> ))}</div> )}</div> );};export default CommentsTab;
-```
-
-File: app/(app)/jackpots/components/Tabs/Matches/index.jsx
-```jsx
-"use client";import React from "react";import{Save,Loader2}from "lucide-react";import MatchCard from "./MatchCard";const MatchesTab=({events,predictions,onSelect,hasUnsavedPicks,onSavePrediction,isSaving,jackpotStatus,})=>{const isOpen=jackpotStatus==="Open";const picksCount=Object.keys(predictions).length;const totalGames=events.length;const isComplete=picksCount===totalGames;return ( <div className="relative">{}<div className="p-4 space-y-3 pb-24">{events.map((event)=> ( <MatchCard key={event.eventNumber}event={event}prediction={predictions[event.eventNumber]}onSelect={onSelect}/> ))}</div>{}{isOpen && ( <div className="sticky bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent"> <div className="bg-card border border-border rounded-xl p-4 shadow-lg">{}<div className="flex items-center justify-between mb-3"> <span className="text-sm text-muted-foreground">{picksCount}of{totalGames}picks made </span> <span className={`text-sm font-medium ${isComplete ? "text-green-500":"text-primary"}`}>{Math.round((picksCount / totalGames) * 100)}% </span> </div>{}<div className="h-2 bg-muted rounded-full mb-4 overflow-hidden"> <div className={`h-full rounded-full transition-all duration-300 ${isComplete ? "bg-green-500":"bg-primary"}`}style={{width:`${(picksCount / totalGames) * 100}%`}}/> </div>{}<button onClick={onSavePrediction}disabled={!hasUnsavedPicks || isSaving || picksCount===0}className={`w-full py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 ${hasUnsavedPicks && !isSaving && picksCount > 0 ? "bg-primary text-primary-foreground hover:bg-primary/90":"bg-muted text-muted-foreground cursor-not-allowed"}`}>{isSaving ? ( <> <Loader2 className="w-4 h-4 animate-spin" /> Saving... </> ):( <> <Save className="w-4 h-4" />{hasUnsavedPicks ? "Save Prediction":picksCount===0 ? "Make your picks to save":"All picks saved"}</> )}</button>{hasUnsavedPicks && ( <p className="text-xs text-center text-muted-foreground mt-2"> You have unsaved changes </p> )}</div> </div> )}{}{!isOpen && ( <div className="sticky bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent"> <div className="bg-muted/50 border border-border rounded-xl p-4 text-center"> <p className="text-sm text-muted-foreground"> This jackpot is closed. You can no longer make predictions. </p> </div> </div> )}</div> );};export default MatchesTab;
-```
-
-File: app/(app)/jackpots/components/Tabs/Matches/MatchCard.jsx
-```jsx
-"use client";import React from "react";import{countryFlags,teamCountry}from "../../../utils/constants";import{formatMatchDate}from "../../../utils/helpers";const MatchCard=({event,prediction,onSelect})=>{const isFinished=event.resultPick !==null;const country=teamCountry[event.competitorHome] || "England";const flag=countryFlags[country] || "🏳️";const [homeScore,awayScore]=event.score ? event.score.split(":"):[null,null];const getButtonStyle=(pick)=>{const isSelected=prediction===pick;const isResult=event.resultPick===pick;let baseClasses="p-3 rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all border";if (isFinished && isResult){return `${baseClasses}bg-green-500/15 border-green-500 text-green-500`;}else if (isFinished && isSelected && !isResult){return `${baseClasses}bg-red-500/15 border-red-500 text-red-500`;}else if (isSelected && !isFinished){return `${baseClasses}bg-primary/15 border-primary text-primary`;}return `${baseClasses}bg-muted/50 border-border text-muted-foreground hover:bg-muted`;};return ( <div className="bg-card border border-border rounded-xl overflow-hidden">{}<div className="px-4 py-3 border-b border-border flex items-center gap-3 text-sm text-muted-foreground"> <span className="bg-primary/15 text-primary px-3 py-1 rounded-md font-semibold text-xs">{event.eventNumber}</span> <span className="text-xs">{formatMatchDate(event.kickoffTime)}</span> <span className="ml-auto text-xs">{flag}{country}</span> </div>{}<div className="p-4 flex items-center justify-center gap-3"> <span className="flex-1 text-right text-sm font-medium text-foreground truncate">{event.competitorHome}</span> <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg text-muted-foreground text-sm font-semibold">{isFinished ? ( <> <span>{homeScore}</span> <span>-</span> <span>{awayScore}</span> </> ):( <span>vs</span> )}</div> <span className="flex-1 text-left text-sm font-medium text-foreground truncate">{event.competitorAway}</span> </div>{}<div className="grid grid-cols-3 gap-2 px-4 pb-4">{["Home","Draw","Away"].map((pick)=>{const odds=event.odds?.[pick.toLowerCase()] || "-";return ( <button key={pick}onClick={()=> !isFinished && onSelect?.(event.eventNumber,pick)}disabled={isFinished}className={getButtonStyle(pick)}> <span className="text-xs font-medium uppercase opacity-70">{pick==="Home" ? "1":pick==="Draw" ? "X":"2"}</span> <span className="text-base font-bold">{odds}</span> </button> );})}</div> </div> );};export default MatchCard;
-```
-
-File: app/(app)/jackpots/components/Tabs/Predictions/index.jsx
-```jsx
-"use client";import React from "react";import{Loader2,Users}from "lucide-react";import PredictionItem from "./PredictionItem";const PredictionsTab=({predictions,jackpot,loading})=>{if (loading){return ( <div className="p-8 flex flex-col items-center justify-center"> <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" /> <p className="text-muted-foreground text-sm">Loading predictions...</p> </div> );}if (!predictions || predictions.length===0){return ( <div className="p-8 text-center"> <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" /> <p className="text-muted-foreground text-sm font-medium"> No predictions yet </p> <p className="text-muted-foreground/60 text-xs mt-1"> Be the first to make your picks! </p> </div> );}return ( <div>{}<div className="px-4 py-3 border-b border-border bg-muted/30"> <p className="text-sm text-muted-foreground"> <span className="font-semibold text-foreground">{predictions.length}</span>{" "}prediction{predictions.length !==1 ? "s":""}shared </p> </div>{}<div>{predictions.map((pred)=> ( <PredictionItem key={pred._id}prediction={pred}jackpot={jackpot}/> ))}</div> </div> );};export default PredictionsTab;
-```
-
-File: app/(app)/jackpots/components/Tabs/Predictions/PredictionItem.jsx
-```jsx
-"use client";import React from 'react';import{formatTimeAgo,generateAvatar}from '../../../utils/helpers';const PredictionItem=({prediction,jackpot})=>{const isFinished=jackpot.jackpotStatus==='Finished';const calculateScore=()=>{if (!isFinished) return null;let correct=0;jackpot.events.forEach(event=>{if (prediction.picks[event.eventNumber]===event.resultPick) correct++;});return correct;};const score=calculateScore();const getScoreBadgeStyle=()=>{if (score >=13) return 'bg-green-500 text-white';if (score >=10) return 'bg-yellow-500 text-black';return 'bg-muted text-foreground';};return ( <div className="p-4 border-b border-border flex gap-3">{}<div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" style={{background:generateAvatar(prediction.username)}}>{prediction.username.charAt(0).toUpperCase()}</div>{}<div className="flex-1 min-w-0">{}<div className="flex items-center gap-1 mb-2 flex-wrap"> <span className="font-semibold text-sm text-foreground">{prediction.username}</span> <span className="text-muted-foreground text-sm"> @{prediction.username.toLowerCase().replace(/\s/g,'_')}</span> <span className="text-muted-foreground text-sm">·</span> <span className="text-muted-foreground text-sm">{formatTimeAgo(prediction.timestamp)}</span>{score !==null && ( <span className={`ml-auto px-3 py-1 rounded-full text-xs font-bold ${getScoreBadgeStyle()}`}>{score}/17 </span> )}</div>{}<div className="flex flex-wrap gap-2">{Object.entries(prediction.picks) .sort((a,b)=> Number(a[0]) - Number(b[0])) .map(([num,pick])=>{const event=jackpot.events[num - 1];const isCorrect=isFinished && event?.resultPick===pick;const pickLabel=pick==='Home' ? '1':pick==='Draw' ? 'X':'2';return ( <div key={num}className={`relative px-3 py-2 rounded-lg text-base font-bold border min-w-[44px] text-center ${!isFinished ? 'bg-primary/10 text-primary border-primary/30':isCorrect ? 'bg-green-500/15 text-green-500 border-green-500/40':'bg-red-500/15 text-red-500 border-red-500/40'}`}>{}<span className="absolute top-0.5 left-1 text-[9px] opacity-60">{num}</span>{}{pickLabel}</div> );})}</div> </div> </div> );};export default PredictionItem;
-```
-
-File: app/(app)/jackpots/components/Tabs/Stats/BellCurve.jsx
-```jsx
-"use client";import React,{useState,useRef,useCallback,useEffect}from 'react';const BellCurve=({totalGames:initialGames=17})=>{const [hoveredPoint,setHoveredPoint]=useState(null);const [lockedPoint,setLockedPoint]=useState(null);const [cursorPosition,setCursorPosition]=useState(null);const [totalGames,setTotalGames]=useState(initialGames);const svgRef=useRef(null);const width=1200;const height=500;const padding=60;const calculateOddsData=useCallback((n)=>{const data=[];const choose=(n,k)=>{if (k > n) return 0;if (k===0 || k===n) return 1;let result=1;for (let i=1;i <=k;i++){result *=(n - i + 1) / i;}return result;};for (let k=0;k <=n;k++){const combinations=choose(n,k) * Math.pow(2,n - k);const totalCombinations=Math.pow(3,n);const percentage=(combinations / totalCombinations) * 100;const odds=Math.round(totalCombinations / combinations);let status='NO PRIZE';if (k===n){status='MEGA JACKPOT';}else if (k >=Math.max(n - 5,Math.ceil(n * 0.7))){status='BONUS';}data.push({score:k,percentage:percentage,odds:odds,combinations:combinations,status:status});}return data;},[]);const oddsData=calculateOddsData(totalGames);const maxPercentage=Math.max(...oddsData.map(d=> d.percentage));useEffect(()=>{if (!lockedPoint && !hoveredPoint){const peakPoint=oddsData.reduce((max,d)=> d.percentage > max.percentage ? d:max);const peakIndex=oddsData.findIndex(d=> d.score===peakPoint.score);const x=padding + (peakIndex / (oddsData.length - 1)) * (width - 2 * padding);const y=height - padding - (peakPoint.percentage / maxPercentage) * (height - 2 * padding);setHoveredPoint({x,y,data:peakPoint});}},[totalGames,oddsData,lockedPoint,hoveredPoint,maxPercentage]);const createCurvePath=()=>{const points=oddsData.map((d,i)=>{const x=padding + (i / (oddsData.length - 1)) * (width - 2 * padding);const y=height - padding - (d.percentage / maxPercentage) * (height - 2 * padding);return{x,y,data:d};});let path=`M ${points[0].x}${points[0].y}`;for (let i=0;i < points.length - 1;i++){const current=points[i];const next=points[i + 1];const controlX=(current.x + next.x) / 2;const controlY=(current.y + next.y) / 2;path +=` Q ${controlX}${current.y},${controlX}${controlY}`;path +=` Q ${controlX}${next.y},${next.x}${next.y}`;}return{path,points};};const{path:curvePath,points}=createCurvePath();const createAreaPath=()=>{const baseY=height - padding;return `${curvePath}L ${width - padding}${baseY}L ${padding}${baseY}Z`;};const handleMouseMove=(e)=>{if (lockedPoint) return;if (!svgRef.current) return;const svgRect=svgRef.current.getBoundingClientRect();const scaleX=width / svgRect.width;const scaleY=height / svgRect.height;const mouseX=(e.clientX - svgRect.left) * scaleX;const mouseY=(e.clientY - svgRect.top) * scaleY;if (mouseX < padding || mouseX > width - padding || mouseY < 0 || mouseY > height){setCursorPosition(null);return;}setCursorPosition({x:mouseX,y:mouseY});let closestPoint=null;let minDistance=Infinity;points.forEach(point=>{const distance=Math.abs(point.x - mouseX);if (distance < minDistance){minDistance=distance;closestPoint=point;}});if (closestPoint && minDistance < 50){setHoveredPoint(closestPoint);}};const handleClick=(e)=>{if (!svgRef.current) return;const svgRect=svgRef.current.getBoundingClientRect();const scaleX=width / svgRect.width;const mouseX=(e.clientX - svgRect.left) * scaleX;let closestPoint=null;let minDistance=Infinity;points.forEach(point=>{const distance=Math.abs(point.x - mouseX);if (distance < minDistance){minDistance=distance;closestPoint=point;}});if (closestPoint && minDistance < 50){if (lockedPoint?.data.score===closestPoint.data.score){setLockedPoint(null);}else{setLockedPoint(closestPoint);setHoveredPoint(closestPoint);}}else{setLockedPoint(null);}};const handleMouseLeave=()=>{if (!lockedPoint){setCursorPosition(null);const peakPoint=oddsData.reduce((max,d)=> d.percentage > max.percentage ? d:max);const peakIndex=oddsData.findIndex(d=> d.score===peakPoint.score);const x=padding + (peakIndex / (oddsData.length - 1)) * (width - 2 * padding);const y=height - padding - (peakPoint.percentage / maxPercentage) * (height - 2 * padding);setHoveredPoint({x,y,data:peakPoint});}};const getColorForScore=(score)=>{if (score===totalGames) return '#fbbf24';if (score >=Math.max(totalGames - 5,Math.ceil(totalGames * 0.7))) return '#a855f7';if (score >=Math.ceil(totalGames * 0.5)) return '#3b82f6';return '#10b981';};const activePoint=lockedPoint || hoveredPoint;const formatPercentage=(percentage)=>{if (percentage===0) return "0.00";if (percentage >=1){return percentage.toFixed(2);}let str=percentage.toFixed(20);let dotIndex=str.indexOf('.');let nonZeroCount=0;let lastNonZeroIndex=dotIndex;for (let i=dotIndex + 1;i < str.length;i++){if (str[i] !=='0'){nonZeroCount++;lastNonZeroIndex=i;if (nonZeroCount >=2) break;}}let decimalPlaces=lastNonZeroIndex - dotIndex;return percentage.toFixed(decimalPlaces);};return ( <div className="bg-card border border-border rounded-xl overflow-hidden">{}<div className="px-4 py-3 border-b border-border"> <h3 className="font-semibold text-foreground text-center">Probability Distribution</h3> <p className="text-xs text-muted-foreground text-center mt-1"> Tap any point to see odds for that score </p> </div>{}{activePoint && ( <div className="px-4 py-3 border-b-2" style={{borderColor:getColorForScore(activePoint.data.score)}}> <div className="flex justify-center items-center gap-6 flex-wrap">{}<div className="text-center"> <div className="text-xs text-muted-foreground">Score</div> <div className="text-sm font-bold" style={{color:getColorForScore(activePoint.data.score)}}>{activePoint.data.score}/{totalGames}</div> </div>{}<div className="text-center"> <div className="text-xs text-muted-foreground">Odds</div> <div className="text-sm font-bold text-purple-400"> 1 in{activePoint.data.odds.toLocaleString()}</div> </div>{}<div className="text-center"> <div className="text-xs text-muted-foreground">Probability</div> <div className="text-sm font-bold text-foreground">{formatPercentage(activePoint.data.percentage)}% </div> </div>{}<div className="text-center"> <div className="text-xs text-muted-foreground">Prize</div> <div className={`px-3 py-1 rounded-lg text-xs font-bold ${activePoint.data.status==='MEGA JACKPOT' ? 'bg-yellow-500 text-black':activePoint.data.status==='BONUS' ? 'bg-purple-500 text-white':'bg-muted text-foreground'}`}>{activePoint.data.status}{lockedPoint && ' 🔒'}</div> </div> </div> </div> )}{}<div className="p-2"> <svg ref={svgRef}width="100%" height={height}viewBox={`0 0 ${width}${height}`}onMouseMove={handleMouseMove}onMouseLeave={handleMouseLeave}onClick={handleClick}className="cursor-pointer" preserveAspectRatio="xMidYMid meet" > <defs> <linearGradient id="curveGradient" x1="0%" y1="0%" x2="0%" y2="100%"> <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" /> <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" /> </linearGradient> <filter id="glow"> <feGaussianBlur stdDeviation="4" result="coloredBlur"/> <feMerge> <feMergeNode in="coloredBlur"/> <feMergeNode in="SourceGraphic"/> </feMerge> </filter> </defs>{}{[0,25,50,75,100].map((percent)=>{const y=height - padding - (percent / 100) * (height - 2 * padding);return ( <g key={percent}> <line x1={padding}y1={y}x2={width - padding}y2={y}stroke="hsl(var(--border))" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" /> <text x={padding - 15}y={y + 5}fill="hsl(var(--muted-foreground))" fontSize="14" textAnchor="end" >{percent}% </text> </g> );})}{}{oddsData.map((d,i)=>{const x=padding + (i / (oddsData.length - 1)) * (width - 2 * padding);const isActive=activePoint?.data.score===d.score;const showLabel=totalGames <=13 || i % 2===0;return ( <g key={i}> <line x1={x}y1={height - padding}x2={x}y2={height - padding + 6}stroke={isActive ? getColorForScore(d.score):"hsl(var(--muted-foreground))"}strokeWidth={isActive ? "2":"1"}/>{showLabel && ( <text x={x}y={height - padding + 22}fill={isActive ? getColorForScore(d.score):"hsl(var(--muted-foreground))"}fontSize="14" fontWeight={isActive ? "bold":"normal"}textAnchor="middle" >{d.score}</text> )}</g> );})}<path d={createAreaPath()}fill="url(#curveGradient)" /> <path d={curvePath}fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />{cursorPosition && !lockedPoint && ( <line x1={cursorPosition.x}y1={0}x2={cursorPosition.x}y2={height - padding}stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.3" pointerEvents="none" /> )}{activePoint && ( <g> <line x1={activePoint.x}y1={activePoint.y}x2={activePoint.x}y2={height - padding}stroke={getColorForScore(activePoint.data.score)}strokeWidth="6" opacity="0.3" filter="url(#glow)" /> <line x1={activePoint.x}y1={activePoint.y}x2={activePoint.x}y2={height - padding}stroke={getColorForScore(activePoint.data.score)}strokeWidth="2.5" strokeDasharray="6 3" opacity="0.9" >{!lockedPoint && ( <animate attributeName="stroke-dashoffset" from="0" to="18" dur="1s" repeatCount="indefinite" /> )}</line> <line x1={padding}y1={activePoint.y}x2={activePoint.x}y2={activePoint.y}stroke={getColorForScore(activePoint.data.score)}strokeWidth="1.5" strokeDasharray="3 3" opacity="0.5" /> </g> )}{points.map((point,i)=>{const isActive=activePoint?.data.score===point.data.score;const isLocked=lockedPoint?.data.score===point.data.score;const color=getColorForScore(point.data.score);return ( <g key={i}>{isActive && ( <circle cx={point.x}cy={point.y}r={18}fill="none" stroke={color}strokeWidth="1.5" opacity="0.3" > <animate attributeName="r" from="18" to="24" dur="1.5s" repeatCount="indefinite" /> <animate attributeName="opacity" from="0.3" to="0" dur="1.5s" repeatCount="indefinite" /> </circle> )}<circle cx={point.x}cy={point.y}r={isActive ? 9:5}fill={color}stroke="hsl(var(--background))" strokeWidth={isActive ? "2.5":"1.5"}style={{filter:isActive ? 'drop-shadow(0 0 8px rgba(255,255,255,0.8))':'none',cursor:'pointer',transition:'all 0.2s ease-out'}}/>{isLocked && ( <text x={point.x}y={point.y - 14}fontSize="12" textAnchor="middle">🔒</text> )}{(point.data.status==='MEGA JACKPOT' || point.data.status==='BONUS') && ( <circle cx={point.x}cy={point.y}r={isActive ? 14:10}fill="none" stroke={color}strokeWidth="1.5" opacity="0.4" style={{transition:'all 0.2s ease-out'}}/> )}</g> );})}{}<text x={width / 2}y={height - 5}fill="hsl(var(--muted-foreground))" fontSize="14" textAnchor="middle" fontWeight="600"> Number of Correct Predictions </text> <text x={20}y={height / 2}fill="hsl(var(--muted-foreground))" fontSize="14" textAnchor="middle" fontWeight="600" transform={`rotate(-90,20,${height / 2})`}> Probability (%) </text> </svg> </div>{}<div className="px-4 pb-4" style={{marginTop:'-10px'}}> <input type="range" min="5" max="20" value={totalGames}onChange={(e)=>{setTotalGames(parseInt(e.target.value));setLockedPoint(null);}}className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-500" style={{background:`linear-gradient(to right,#3b82f6 0%,#3b82f6 ${((totalGames - 5) / 15) * 100}%,hsl(var(--muted)) ${((totalGames - 5) / 15) * 100}%,hsl(var(--muted)) 100%)`}}/> <div className="flex justify-between text-xs text-muted-foreground mt-1"> <span>5</span> <span className="text-foreground font-semibold">{totalGames}</span> <span>20</span> </div> </div> </div> );};export default BellCurve;
-```
-
-File: app/(app)/jackpots/components/Tabs/Stats/index.jsx
-```jsx
-"use client";import React from 'react';import{TrendingUp,BarChart3,Target,Users,Trophy}from 'lucide-react';import{formatCurrency}from '../../../utils/helpers';import BellCurve from './BellCurve';const StatsTab=({jackpot,communityPredictions})=>{const isFinished=jackpot.jackpotStatus==='Finished';const homeWins=jackpot.events.filter(e=> e.resultPick==='Home').length;const draws=jackpot.events.filter(e=> e.resultPick==='Draw').length;const awayWins=jackpot.events.filter(e=> e.resultPick==='Away').length;const communityStats={home:0,draw:0,away:0};communityPredictions.forEach(pred=>{Object.values(pred.picks).forEach(pick=>{if (pick==='Home') communityStats.home++;else if (pick==='Draw') communityStats.draw++;else communityStats.away++;});});const totalCommunityPicks=communityStats.home + communityStats.draw + communityStats.away;const avgOdds={home:(jackpot.events.reduce((sum,e)=> sum + (e.odds?.home || 0),0) / jackpot.events.length).toFixed(2),draw:(jackpot.events.reduce((sum,e)=> sum + (e.odds?.draw || 0),0) / jackpot.events.length).toFixed(2),away:(jackpot.events.reduce((sum,e)=> sum + (e.odds?.away || 0),0) / jackpot.events.length).toFixed(2)};const highestOddsMatches=[...jackpot.events] .sort((a,b)=>{const maxA=Math.max(a.odds?.home || 0,a.odds?.draw || 0,a.odds?.away || 0);const maxB=Math.max(b.odds?.home || 0,b.odds?.draw || 0,b.odds?.away || 0);return maxB - maxA;}) .slice(0,3);return ( <div className="p-4 space-y-4">{}{!isFinished && ( <BellCurve totalGames={jackpot.events.length}/> )}{}{isFinished && ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <BarChart3 className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Result Distribution</h3> </div> <div className="flex h-10 rounded-lg overflow-hidden mb-3"> <div className="bg-green-500 flex items-center justify-center text-sm font-bold text-green-950" style={{width:`${(homeWins / jackpot.events.length) * 100}%`}}>{homeWins}H </div> <div className="bg-yellow-500 flex items-center justify-center text-sm font-bold text-yellow-950" style={{width:`${(draws / jackpot.events.length) * 100}%`}}>{draws}D </div> <div className="bg-blue-500 flex items-center justify-center text-sm font-bold text-blue-950" style={{width:`${(awayWins / jackpot.events.length) * 100}%`}}>{awayWins}A </div> </div> <div className="grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground"> <div>Home Wins:{homeWins}</div> <div>Draws:{draws}</div> <div>Away Wins:{awayWins}</div> </div> </div> )}{}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Trophy className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Prize Breakdown</h3> </div> <div className="space-y-3">{jackpot.prizes.map((prize)=>{const isGrand=prize.jackpotType==='17/17';return ( <div key={prize.jackpotType}className={`rounded-lg p-3 ${isGrand ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30':'bg-muted/50'}`}> <div className="flex justify-between items-center"> <div> <div className={`text-xs font-medium mb-0.5 ${isGrand ? 'text-yellow-500':'text-muted-foreground'}`}>{isGrand ? '🏆 GRAND JACKPOT':`${prize.jackpotType}Correct`}</div> <div className={`text-base font-bold ${isGrand ? 'text-yellow-500':'text-foreground'}`}> KSH{formatCurrency(prize.prize)}</div> </div> <div className={`px-3 py-1.5 rounded-lg text-center ${isGrand ? 'bg-yellow-500/20':'bg-background'}`}> <div className={`text-base font-bold ${isGrand ? 'text-yellow-500':'text-foreground'}`}>{prize.winners}</div> <div className={`text-[10px] ${isGrand ? 'text-yellow-500/70':'text-muted-foreground'}`}> winners </div> </div> </div> </div> );})}</div> </div>{}{totalCommunityPicks > 0 && ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Users className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Community Picks</h3> </div> <div className="grid grid-cols-3 gap-3"> <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20"> <div className="text-2xl font-bold text-green-500">{Math.round((communityStats.home / totalCommunityPicks) * 100)}% </div> <div className="text-xs text-muted-foreground mt-1">Home</div> </div> <div className="text-center p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20"> <div className="text-2xl font-bold text-yellow-500">{Math.round((communityStats.draw / totalCommunityPicks) * 100)}% </div> <div className="text-xs text-muted-foreground mt-1">Draw</div> </div> <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20"> <div className="text-2xl font-bold text-primary">{Math.round((communityStats.away / totalCommunityPicks) * 100)}% </div> <div className="text-xs text-muted-foreground mt-1">Away</div> </div> </div> </div> )}{}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <TrendingUp className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Average Odds</h3> </div> <div className="grid grid-cols-3 gap-3"> <div className="text-center p-3 bg-muted rounded-lg"> <div className="text-xl font-bold text-foreground">{avgOdds.home}</div> <div className="text-xs text-muted-foreground mt-1">Home</div> </div> <div className="text-center p-3 bg-muted rounded-lg"> <div className="text-xl font-bold text-foreground">{avgOdds.draw}</div> <div className="text-xs text-muted-foreground mt-1">Draw</div> </div> <div className="text-center p-3 bg-muted rounded-lg"> <div className="text-xl font-bold text-foreground">{avgOdds.away}</div> <div className="text-xs text-muted-foreground mt-1">Away</div> </div> </div> </div>{}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Target className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Highest Odds Matches</h3> </div> <div className="space-y-3">{highestOddsMatches.map(match=>{const maxOdds=Math.max(match.odds?.home || 0,match.odds?.draw || 0,match.odds?.away || 0);const maxOddsType=match.odds?.home===maxOdds ? 'Home':match.odds?.draw===maxOdds ? 'Draw':'Away';return ( <div key={match.eventNumber}className="flex items-center justify-between p-3 bg-muted/50 rounded-lg" > <div className="flex items-center gap-3"> <span className="bg-primary/15 text-primary px-2 py-1 rounded text-xs font-semibold"> #{match.eventNumber}</span> <span className="text-sm text-foreground truncate">{match.competitorHome}vs{match.competitorAway}</span> </div> <div className="text-right"> <div className="text-sm font-bold text-foreground">{maxOdds.toFixed(2)}</div> <div className="text-xs text-muted-foreground">{maxOddsType}</div> </div> </div> );})}</div> </div>{}<div className="grid grid-cols-2 gap-3"> <div className="bg-card border border-border rounded-xl p-4 text-center"> <div className="text-2xl font-bold text-foreground">{jackpot.events.length}</div> <div className="text-xs text-muted-foreground mt-1">Total Matches</div> </div> <div className="bg-card border border-border rounded-xl p-4 text-center"> <div className="text-2xl font-bold text-foreground">{communityPredictions.length}</div> <div className="text-xs text-muted-foreground mt-1">Predictions</div> </div> </div> </div> );};export default StatsTab;
-```
-
-File: app/(app)/jackpots/components/TabsHeader.jsx
-```jsx
-"use client";import React from 'react';const TabsHeader=({activeTab,setActiveTab})=>{const tabs=[{id:'matches',label:'Matches'},{id:'predictions',label:'Predictions'},{id:'stats',label:'Stats'},{id:'comments',label:'Comments'}];return ( <div className="flex border-b border-border bg-card sticky top-0 z-10">{tabs.map(tab=> ( <button key={tab.id}onClick={()=> setActiveTab(tab.id)}className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab===tab.id ? 'text-foreground':'text-muted-foreground hover:text-foreground'}`}>{tab.label}{activeTab===tab.id && ( <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-14 h-1 bg-primary rounded-t-full" /> )}</button> ))}</div> );};export default TabsHeader;
-```
-
-File: app/(app)/jackpots/hooks/useJackpotApi.js
-```js
-"use client";import{useState,useEffect,useCallback}from "react";const API_BASE="/api/jackpot";export function useJackpotDetails(jackpotId){const [data,setData]=useState(null);const [loading,setLoading]=useState(true);const [error,setError]=useState(null);const fetchDetails=useCallback(async ()=>{if (!jackpotId){setLoading(false);return;}try{setLoading(true);setError(null);let url=`${API_BASE}/details`;if (jackpotId !=="latest"){url +=`?jackpotId=${jackpotId}`;}else{url +=`?limit=1`;}const response=await fetch(url);const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch jackpot details");}const jackpotData=Array.isArray(result.data) ? result.data[0]:result.data;if (!jackpotData){throw new Error("No jackpot found");}setData(jackpotData);}catch (err){setError(err.message);setData(null);}finally{setLoading(false);}},[jackpotId]);useEffect(()=>{fetchDetails();},[fetchDetails]);return{data,loading,error,refetch:fetchDetails};}export function usePredictions(jackpotId){const [predictions,setPredictions]=useState([]);const [userPrediction,setUserPrediction]=useState(null);const [loading,setLoading]=useState(false);const [error,setError]=useState(null);const [submitting,setSubmitting]=useState(false);const fetchPredictions=useCallback(async ()=>{if (!jackpotId) return;try{setLoading(true);const response=await fetch( `${API_BASE}/predictions?jackpotId=${jackpotId}` );const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch predictions");}setPredictions(result.data || []);setError(null);}catch (err){setError(err.message);}finally{setLoading(false);}},[jackpotId]);const fetchUserPrediction=useCallback(async ()=>{if (!jackpotId) return;try{const response=await fetch( `${API_BASE}/predictions?jackpotId=${jackpotId}` );const result=await response.json();if (response.ok && result.data?.length > 0){setUserPrediction(result.data[0]);}}catch (err){console.error("Error fetching user prediction:",err);}},[jackpotId]);const createPrediction=useCallback( async (picks)=>{if (!jackpotId) return null;try{setSubmitting(true);const response=await fetch(`${API_BASE}/predictions`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jackpotId,picks}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to create prediction");}setUserPrediction(result.data);await fetchPredictions();return result.data;}catch (err){setError(err.message);return null;}finally{setSubmitting(false);}},[jackpotId,fetchPredictions] );const updatePrediction=useCallback( async (predictionId,picks)=>{try{setSubmitting(true);const response=await fetch(`${API_BASE}/predictions`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({predictionId,picks}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to update prediction");}setUserPrediction(result.data);await fetchPredictions();return result.data;}catch (err){setError(err.message);return null;}finally{setSubmitting(false);}},[fetchPredictions] );const deletePrediction=useCallback( async (predictionId)=>{try{setSubmitting(true);const response=await fetch(`${API_BASE}/predictions`,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({predictionId}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to delete prediction");}setUserPrediction(null);await fetchPredictions();return true;}catch (err){setError(err.message);return false;}finally{setSubmitting(false);}},[fetchPredictions] );useEffect(()=>{if (jackpotId){fetchPredictions();fetchUserPrediction();}},[jackpotId,fetchPredictions,fetchUserPrediction]);return{predictions,userPrediction,loading,error,submitting,createPrediction,updatePrediction,deletePrediction,refetch:fetchPredictions,};}export function useComments(jackpotId){const [comments,setComments]=useState([]);const [loading,setLoading]=useState(false);const [error,setError]=useState(null);const [submitting,setSubmitting]=useState(false);const fetchComments=useCallback(async ()=>{if (!jackpotId) return;try{setLoading(true);const response=await fetch( `${API_BASE}/comments?jackpotId=${jackpotId}` );const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch comments");}setComments(result.data || []);setError(null);}catch (err){setError(err.message);}finally{setLoading(false);}},[jackpotId]);const createComment=useCallback( async (text)=>{if (!jackpotId || !text.trim()) return null;try{setSubmitting(true);const response=await fetch(`${API_BASE}/comments`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jackpotId,text}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to create comment");}setComments((prev)=> [result.data,...prev]);return result.data;}catch (err){setError(err.message);return null;}finally{setSubmitting(false);}},[jackpotId] );const deleteComment=useCallback(async (commentId)=>{try{setSubmitting(true);const response=await fetch(`${API_BASE}/comments`,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({commentId}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to delete comment");}setComments((prev)=> prev.filter((c)=> c._id !==commentId));return true;}catch (err){setError(err.message);return false;}finally{setSubmitting(false);}},[]);useEffect(()=>{if (jackpotId){fetchComments();}},[jackpotId,fetchComments]);return{comments,loading,error,submitting,createComment,deleteComment,refetch:fetchComments,};}export function useStatistics(jackpotId){const [stats,setStats]=useState(null);const [loading,setLoading]=useState(false);const [error,setError]=useState(null);const fetchStats=useCallback(async ()=>{if (!jackpotId) return;try{setLoading(true);const response=await fetch( `${API_BASE}/statistics?jackpotId=${jackpotId}` );const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch statistics");}setStats(result.data);setError(null);}catch (err){setError(err.message);}finally{setLoading(false);}},[jackpotId]);useEffect(()=>{if (jackpotId){fetchStats();}},[jackpotId,fetchStats]);return{stats,loading,error,refetch:fetchStats};}
-```
-
-File: app/(app)/jackpots/page.jsx
-```jsx
-import Client from "./client";export const metadata={title:"Wufwuf Jackpot Tracker",description:"Track SportPesa Mega Jackpot results,view match outcomes,share predictions with the community,and analyze winning patterns. Free jackpot tracker for Kenya!",keywords:[ "sportpesa jackpot","mega jackpot results","jackpot predictions","sportpesa results","kenya jackpot","jackpot tracker","betting tips kenya","sportpesa mega jackpot","jackpot analysis","football predictions kenya","midweek jackpot","jackpot winners",],openGraph:{title:"SportPesa Jackpot Tracker:Results,Predictions & Analysis | Wufwuf",description:"Never miss a jackpot result! Track SportPesa Mega Jackpot matches,share your predictions,see community picks,and analyze winning patterns on Wufwuf.",type:"website",url:"https:image:"https:siteName:"Wufwuf",},twitter:{card:"summary_large_image",title:"SportPesa Jackpot Tracker:Live Results & Predictions",description:"Track Mega Jackpot results,share predictions & compete with the community! 🎯 #SportPesa #Jackpot #Kenya #BettingTips #Wufwuf",creator:"@Wufwuf",images:["https:},alternates:{canonical:"https:},robots:{index:true,follow:true,nocache:true,googleBot:{index:true,follow:true,"max-video-preview":-1,"max-image-preview":"large","max-snippet":-1,},},};export default function JackpotsPage(){return <Client />;}
-```
-
-File: app/(app)/jackpots/utils/constants.js
-```js
-export const countryFlags={'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Spain':'🇪🇸','Germany':'🇩🇪','Italy':'🇮🇹','France':'🇫🇷','Portugal':'🇵🇹','Netherlands':'🇳🇱','Belgium':'🇧🇪','Turkey':'🇹🇷','Cyprus':'🇨🇾','Israel':'🇮🇱','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿'};export const teamCountry={'Sunderland AFC':'England','Crystal Palace':'England','Swansea City':'England','Birmingham City':'England','Manchester United':'England','Liverpool FC':'England','Arsenal FC':'England','Chelsea FC':'England','Fulham FC':'England','Brighton & Hove Albion':'England','Hertha BSC':'Germany','Schalke 04':'Germany','VfL Bochum':'Germany','SV Darmstadt 98':'Germany','Holstein Kiel':'Germany','SC Paderborn 07':'Germany','FC Augsburg':'Germany','SC Freiburg':'Germany','Real Betis Seville':'Spain','Villarreal CF':'Spain','CD Mirandes':'Spain','FC Andorra':'Spain','Getafe CF':'Spain','Valencia CF':'Spain','Racing Santander':'Spain','UD Las Palmas':'Spain','Kocaelispor':'Turkey','Trabzonspor':'Turkey','Genclerbirligi SK':'Turkey','Samsunspor':'Turkey','FCV Dender EH':'Belgium','Royal Antwerp FC':'Belgium','Santa Clara Azores':'Portugal','FC Famalicao':'Portugal','FC Nantes':'France','Paris FC':'France','Apollon Limassol':'Cyprus','APOEL Nikosia':'Cyprus','Maccabi Haifa FC':'Israel','Maccabi Tel Aviv FC':'Israel',};export const jackpotData={jackpotId:"5d86d823-dad8-4ab9-aa6e-c2af3d406b7e",jackpotHumanId:164,jackpotStatus:"Finished",site:"SportPesa",finished:"2026-01-18T20:56:03.396Z",currencySign:"KSH",isLatest:true,totalPrizePool:366899365.93,events:[{eventNumber:1,kickoffTime:"2026-01-17T15:00:00Z",competitorHome:"Sunderland AFC",competitorAway:"Crystal Palace",resultPick:"Home",score:"2:1",odds:{home:2.10,draw:3.40,away:3.25}},{eventNumber:2,kickoffTime:"2026-01-17T17:30:00Z",competitorHome:"Swansea City",competitorAway:"Birmingham City",resultPick:"Draw",score:"1:1",odds:{home:2.45,draw:3.20,away:2.90}},{eventNumber:3,kickoffTime:"2026-01-17T19:30:00Z",competitorHome:"Hertha BSC",competitorAway:"Schalke 04",resultPick:"Draw",score:"0:0",odds:{home:2.30,draw:3.30,away:3.00}},{eventNumber:4,kickoffTime:"2026-01-17T20:00:00Z",competitorHome:"Real Betis Seville",competitorAway:"Villarreal CF",resultPick:"Home",score:"2:0",odds:{home:2.55,draw:3.10,away:2.85}},{eventNumber:5,kickoffTime:"2026-01-18T12:30:00Z",competitorHome:"VfL Bochum",competitorAway:"SV Darmstadt 98",resultPick:"Draw",score:"3:3",odds:{home:2.20,draw:3.45,away:3.10}},{eventNumber:6,kickoffTime:"2026-01-18T12:30:00Z",competitorHome:"Holstein Kiel",competitorAway:"SC Paderborn 07",resultPick:"Home",score:"2:0",odds:{home:2.15,draw:3.35,away:3.20}},{eventNumber:7,kickoffTime:"2026-01-18T13:00:00Z",competitorHome:"CD Mirandes",competitorAway:"FC Andorra",resultPick:"Away",score:"1:2",odds:{home:2.40,draw:3.25,away:2.95}},{eventNumber:8,kickoffTime:"2026-01-18T13:00:00Z",competitorHome:"Getafe CF",competitorAway:"Valencia CF",resultPick:"Away",score:"0:1",odds:{home:2.60,draw:3.05,away:2.80}},{eventNumber:9,kickoffTime:"2026-01-18T14:00:00Z",competitorHome:"Kocaelispor",competitorAway:"Trabzonspor",resultPick:"Away",score:"1:2",odds:{home:3.20,draw:3.30,away:2.15}},{eventNumber:10,kickoffTime:"2026-01-18T14:00:00Z",competitorHome:"Genclerbirligi SK",competitorAway:"Samsunspor",resultPick:"Draw",score:"1:1",odds:{home:2.75,draw:3.15,away:2.65}},{eventNumber:11,kickoffTime:"2026-01-18T15:00:00Z",competitorHome:"FCV Dender EH",competitorAway:"Royal Antwerp FC",resultPick:"Home",score:"1:0",odds:{home:3.40,draw:3.25,away:2.10}},{eventNumber:12,kickoffTime:"2026-01-18T15:15:00Z",competitorHome:"Racing Santander",competitorAway:"UD Las Palmas",resultPick:"Home",score:"4:1",odds:{home:2.85,draw:3.20,away:2.50}},{eventNumber:13,kickoffTime:"2026-01-18T15:30:00Z",competitorHome:"Santa Clara Azores",competitorAway:"FC Famalicao",resultPick:"Away",score:"0:1",odds:{home:2.50,draw:3.30,away:2.80}},{eventNumber:14,kickoffTime:"2026-01-18T16:15:00Z",competitorHome:"FC Nantes",competitorAway:"Paris FC",resultPick:"Away",score:"1:2",odds:{home:2.25,draw:3.40,away:3.05}},{eventNumber:15,kickoffTime:"2026-01-18T16:30:00Z",competitorHome:"FC Augsburg",competitorAway:"SC Freiburg",resultPick:"Draw",score:"2:2",odds:{home:2.90,draw:3.25,away:2.45}},{eventNumber:16,kickoffTime:"2026-01-18T17:00:00Z",competitorHome:"Apollon Limassol",competitorAway:"APOEL Nikosia",resultPick:"Home",score:"2:1",odds:{home:2.35,draw:3.30,away:2.95}},{eventNumber:17,kickoffTime:"2026-01-18T18:30:00Z",competitorHome:"Maccabi Haifa FC",competitorAway:"Maccabi Tel Aviv FC",resultPick:"Home",score:"4:1",odds:{home:2.70,draw:3.20,away:2.60}}],prizes:[{jackpotType:"17/17",prize:113971243.68,winners:0},{jackpotType:"16/17",prize:123398540.87,winners:2},{jackpotType:"15/17",prize:92219280.05,winners:18},{jackpotType:"14/17",prize:25489124.86,winners:156},{jackpotType:"13/17",prize:11821176.47,winners:1243}]};
-```
-
-File: app/(app)/jackpots/utils/helpers.js
-```js
-export const formatCurrency=(amount)=>{if (amount >=1000000) return `${(amount / 1000000).toFixed(1)}M`;if (amount >=1000) return `${(amount / 1000).toFixed(0)}K`;return new Intl.NumberFormat('en-KE').format(amount);};export const formatDate=(dateStr)=>{const date=new Date(dateStr);return date.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});};export const formatMatchDate=(dateStr)=>{const date=new Date(dateStr);return `${date.toLocaleDateString('en-GB',{weekday:'long'})}${date.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'})}- ${date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;};export const formatTimeAgo=(dateStr)=>{const now=new Date();const date=new Date(dateStr);const diff=Math.floor((now - date) / 1000);if (diff < 60) return 'now';if (diff < 3600) return `${Math.floor(diff / 60)}m`;if (diff < 86400) return `${Math.floor(diff / 3600)}h`;return `${Math.floor(diff / 86400)}d`;};export const generateAvatar=(name)=>{const colors=[ ['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140'],['#a18cd1','#fbc2eb'] ];const color=colors[name.charCodeAt(0) % colors.length];return `linear-gradient(135deg,${color[0]},${color[1]})`;};
+File: app/(app)/jackpots/page.tsx
+```tsx
+import{Metadata}from 'next';import Client from './client';export const metadata:Metadata={title:"Wufwuf Jackpot Tracker",description:"Track SportPesa Mega Jackpot results,view match outcomes,share predictions with the community,and analyze winning patterns. Free jackpot tracker for Kenya!",keywords:[ "sportpesa jackpot","mega jackpot results","jackpot predictions","sportpesa results","kenya jackpot","jackpot tracker","betting tips kenya","sportpesa mega jackpot","jackpot analysis","football predictions kenya","midweek jackpot","jackpot winners",],openGraph:{title:"SportPesa Jackpot Tracker:Results,Predictions & Analysis | Wufwuf",description:"Never miss a jackpot result! Track SportPesa Mega Jackpot matches,share your predictions,see community picks,and analyze winning patterns on Wufwuf.",type:"website",url:"https:images:[{url:"https:}],siteName:"Wufwuf",},twitter:{card:"summary_large_image",title:"SportPesa Jackpot Tracker:Live Results & Predictions",description:"Track Mega Jackpot results,share predictions & compete with the community! 🎯 #SportPesa #Jackpot #Kenya #BettingTips #Wufwuf",creator:"@Wufwuf",images:["https:},alternates:{canonical:"https:},robots:{index:true,follow:true,nocache:true,googleBot:{index:true,follow:true,"max-video-preview":-1,'max-image-preview':"large",'max-snippet':-1,},},};export default function JackpotsPage(){return <Client />;}
 ```
 
 File: app/(app)/layout.tsx
@@ -314,6 +254,76 @@ File: components/ui/tooltip.tsx
 "use client" import * as React from "react" import * as TooltipPrimitive from "@radix-ui/react-tooltip" import{cn}from "@/lib/utils" function TooltipProvider({delayDuration=0,...props}:React.ComponentProps<typeof TooltipPrimitive.Provider>){return ( <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration}{...props}/> )}function Tooltip({...props}:React.ComponentProps<typeof TooltipPrimitive.Root>){return ( <TooltipProvider> <TooltipPrimitive.Root data-slot="tooltip"{...props}/> </TooltipProvider> )}function TooltipTrigger({...props}:React.ComponentProps<typeof TooltipPrimitive.Trigger>){return <TooltipPrimitive.Trigger data-slot="tooltip-trigger"{...props}/>}function TooltipContent({className,sideOffset=0,children,...props}:React.ComponentProps<typeof TooltipPrimitive.Content>){return ( <TooltipPrimitive.Portal> <TooltipPrimitive.Content data-slot="tooltip-content" sideOffset={sideOffset}className={cn( "bg-foreground text-background animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",className )}{...props}>{children}<TooltipPrimitive.Arrow className="bg-foreground fill-foreground z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" /> </TooltipPrimitive.Content> </TooltipPrimitive.Portal> )}export{Tooltip,TooltipTrigger,TooltipContent,TooltipProvider}
 ```
 
+File: features/jackpots/components/JackpotDetails.tsx
+```tsx
+"use client";import React from 'react';import{formatDate}from '../utils/helpers';import type{Jackpot}from '../types';interface JackpotDetailsProps{jackpot:Jackpot;}const JackpotDetails:React.FC<JackpotDetailsProps>=({jackpot})=>{const isOpen=jackpot.jackpotStatus==='Open';const formatFullAmount=(amount:number)=>{return new Intl.NumberFormat('en-KE').format(Math.round(amount));};return ( <div className="p-4 border-b border-border"> <div className="text-xs text-muted-foreground mb-3 text-center"> Jackpot #{jackpot.jackpotHumanId}•{formatDate(jackpot.finished)}</div> <div className="bg-gradient-to-br from-green-500/15 to-green-600/5 border border-green-500/30 rounded-xl p-6 text-center"> <div className="text-sm text-green-500/80 font-medium mb-2">{jackpot.site}MEGA Jackpot Pro{jackpot.events.length}</div> <div className="text-2xl md:text-3xl font-bold text-green-500">{jackpot.currencySign}{formatFullAmount(jackpot.totalPrizePool)}</div> </div> <div className="flex items-center justify-center gap-2 flex-wrap mt-3"> <span className={`px-3 py-1 rounded text-xs font-semibold ${isOpen ? 'bg-green-500/20 text-green-500':'bg-muted text-muted-foreground'}`}>{jackpot.jackpotStatus.toUpperCase()}</span>{jackpot.isLatest && ( <span className="bg-primary/20 text-primary px-3 py-1 rounded text-xs font-semibold"> LATEST </span> )}</div> </div> );};export default JackpotDetails;
+```
+
+File: features/jackpots/components/Tabs/Comments/CommentItem.tsx
+```tsx
+"use client";import React from 'react';import{Trash2}from 'lucide-react';import type{Comment}from '../../../types';interface CommentItemProps{comment:Comment;onDelete?:(commentId:string)=> void;canDelete?:boolean;}const CommentItem:React.FC<CommentItemProps>=({comment,onDelete,canDelete=false,})=>{const formatTime=(dateString:string)=>{const date=new Date(dateString);const now=new Date();const diffInMs=now.getTime() - date.getTime();const diffInMinutes=Math.floor(diffInMs / (1000 * 60));const diffInHours=Math.floor(diffInMs / (1000 * 60 * 60));const diffInDays=Math.floor(diffInMs / (1000 * 60 * 60 * 24));if (diffInMinutes < 1) return 'Just now';if (diffInMinutes < 60) return `${diffInMinutes}m ago`;if (diffInHours < 24) return `${diffInHours}h ago`;if (diffInDays < 7) return `${diffInDays}d ago`;return date.toLocaleDateString();};return ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-start justify-between gap-3"> <div className="flex items-start gap-3 flex-1"> <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0"> <span className="text-sm font-bold text-primary">{comment.username?.[0]?.toUpperCase() || 'U'}</span> </div> <div className="flex-1 min-w-0"> <div className="flex items-center gap-2 mb-1"> <span className="text-sm font-semibold text-foreground">{comment.username || 'Anonymous'}</span> <span className="text-xs text-muted-foreground">{formatTime(comment.createdAt)}</span> </div> <p className="text-sm text-foreground whitespace-pre-wrap break-words">{comment.text}</p> </div> </div>{canDelete && onDelete && ( <button onClick={()=> onDelete(comment._id)}className="text-muted-foreground hover:text-red-500 transition-colors p-1" aria-label="Delete comment" > <Trash2 className="w-4 h-4" /> </button> )}</div> </div> );};export default CommentItem;
+```
+
+File: features/jackpots/components/Tabs/Comments/index.tsx
+```tsx
+"use client";import React,{useState}from 'react';import{Loader2,Send}from 'lucide-react';import CommentItem from './CommentItem';import type{Comment}from '../../../types';import{MAX_COMMENT_LENGTH}from '../../../utils/constants';interface CommentsTabProps{comments:Comment[];loading?:boolean;submitting?:boolean;onAddComment?:(text:string)=> void;onDeleteComment?:(commentId:string)=> void;currentUserId?:string;}const CommentsTab:React.FC<CommentsTabProps>=({comments,loading=false,submitting=false,onAddComment,onDeleteComment,currentUserId,})=>{const [commentText,setCommentText]=useState('');const handleSubmit=(e:React.FormEvent)=>{e.preventDefault();if (commentText.trim() && onAddComment){onAddComment(commentText.trim());setCommentText('');}};const canDelete=(comment:Comment):boolean=>{return Boolean(currentUserId && comment.userId===currentUserId);};return ( <div className="p-4 space-y-4">{onAddComment && ( <form onSubmit={handleSubmit}className="bg-card border border-border rounded-xl p-4"> <textarea value={commentText}onChange={(e)=> setCommentText(e.target.value.slice(0,MAX_COMMENT_LENGTH))}placeholder="Share your thoughts..." className="w-full bg-background border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none" rows={3}maxLength={MAX_COMMENT_LENGTH}disabled={submitting}/> <div className="flex items-center justify-between mt-2"> <span className="text-xs text-muted-foreground">{commentText.length}/{MAX_COMMENT_LENGTH}</span> <button type="submit" disabled={!commentText.trim() || submitting}className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" >{submitting ? ( <> <Loader2 className="w-4 h-4 animate-spin" /> Posting... </> ):( <> <Send className="w-4 h-4" /> Post </> )}</button> </div> </form> )}{loading ? ( <div className="flex items-center justify-center p-12"> <Loader2 className="w-8 h-8 animate-spin text-primary" /> </div> ):comments.length===0 ? ( <div className="flex flex-col items-center justify-center p-12 text-center"> <div className="text-muted-foreground mb-2">No comments yet</div> <div className="text-sm text-muted-foreground"> Be the first to share your thoughts! </div> </div> ):( <div className="space-y-3"> <div className="text-sm text-muted-foreground mb-2">{comments.length}{comments.length===1 ? 'comment':'comments'}</div>{comments.map((comment)=> ( <CommentItem key={comment._id}comment={comment}onDelete={onDeleteComment}canDelete={canDelete(comment)}/> ))}</div> )}</div> );};export default CommentsTab;
+```
+
+File: features/jackpots/components/Tabs/Matches/index.tsx
+```tsx
+"use client";import React from 'react';import{Loader2}from 'lucide-react';import MatchCard from './MatchCard';import type{JackpotEvent,LocalPicks,LocalPick}from '../../../types';interface MatchesTabProps{events:JackpotEvent[];predictions?:LocalPicks;onSelect?:(eventNumber:number,pick:LocalPick)=> void;hasUnsavedPicks?:boolean;onSavePrediction?:()=> void;isSaving?:boolean;jackpotStatus?:string;}const MatchesTab:React.FC<MatchesTabProps>=({events,predictions={},onSelect,hasUnsavedPicks=false,onSavePrediction,isSaving=false,jackpotStatus='Open',})=>{const isFinished=jackpotStatus==='Finished' || jackpotStatus==='Closed';return ( <div className="p-4 space-y-4">{hasUnsavedPicks && !isFinished && ( <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm p-3 rounded-xl border border-border shadow-lg"> <button onClick={onSavePrediction}disabled={isSaving}className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50" >{isSaving ? ( <> <Loader2 className="w-4 h-4 animate-spin" /> Saving... </> ):( 'Save Prediction' )}</button> </div> )}{events.map((event)=> ( <MatchCard key={event.eventNumber}event={event}prediction={predictions[event.eventNumber]}onSelect={onSelect}isFinished={isFinished}/> ))}</div> );};export default MatchesTab;
+```
+
+File: features/jackpots/components/Tabs/Matches/MatchCard.tsx
+```tsx
+"use client";import React from 'react';import type{JackpotEvent,LocalPick}from '../../../types';interface MatchCardProps{event:JackpotEvent;prediction?:LocalPick;onSelect?:(eventNumber:number,pick:LocalPick)=> void;isFinished?:boolean;}const MatchCard:React.FC<MatchCardProps>=({event,prediction,onSelect,isFinished=false,})=>{const getButtonStyle=(pick:LocalPick)=>{const isSelected=prediction===pick;const baseStyle="flex flex-col items-center justify-center p-2 rounded-lg transition-all";if (isFinished){if (event.result){const resultMap:Record<'1' | 'X' | '2',LocalPick>={'1':'Home','X':'Draw','2':'Away'};const correctPick=resultMap[event.result];if (pick===correctPick){return `${baseStyle}bg-green-500/20 border-2 border-green-500 text-green-500`;}}return `${baseStyle}bg-muted/50 text-muted-foreground cursor-not-allowed`;}if (isSelected){return `${baseStyle}bg-primary text-primary-foreground border-2 border-primary`;}return `${baseStyle}bg-muted hover:bg-muted/70 text-foreground border-2 border-transparent`;};return ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center justify-between mb-3"> <span className="bg-primary/15 text-primary px-2 py-1 rounded text-xs font-semibold"> #{event.eventNumber}</span> <span className="text-xs text-muted-foreground">{event.competition}</span> </div> <div className="mb-4"> <div className="text-sm font-semibold text-foreground mb-1">{event.competitorHome}</div> <div className="text-xs text-muted-foreground mb-1">vs</div> <div className="text-sm font-semibold text-foreground">{event.competitorAway}</div> </div>{isFinished && event.score && ( <div className="mb-3 text-center"> <div className="text-xs text-muted-foreground mb-1">Final Score</div> <div className="text-lg font-bold text-primary">{event.score.home}-{event.score.away}</div> </div> )}<div className="grid grid-cols-3 gap-2">{(['Home','Draw','Away'] as LocalPick[]).map((pick)=>{const odds=event.odds[pick.toLowerCase() as keyof typeof event.odds] || '-';return ( <button key={pick}onClick={()=> !isFinished && onSelect?.(event.eventNumber,pick)}disabled={isFinished}className={getButtonStyle(pick)}> <span className="text-xs font-medium uppercase opacity-70">{pick==='Home' ? '1':pick==='Draw' ? 'X':'2'}</span> <span className="text-base font-bold">{odds}</span> </button> );})}</div> <div className="mt-3 text-xs text-muted-foreground text-center">{new Date(event.kickoffTime).toLocaleString()}</div> </div> );};export default MatchCard;
+```
+
+File: features/jackpots/components/Tabs/Predictions/index.tsx
+```tsx
+"use client";import React from 'react';import{Loader2}from 'lucide-react';import PredictionItem from './PredictionItem';import type{Prediction,Jackpot}from '../../../types';interface PredictionsTabProps{predictions:Prediction[];jackpot:Jackpot;loading?:boolean;}const PredictionsTab:React.FC<PredictionsTabProps>=({predictions,jackpot,loading=false,})=>{if (loading){return ( <div className="flex items-center justify-center p-12"> <Loader2 className="w-8 h-8 animate-spin text-primary" /> </div> );}if (predictions.length===0){return ( <div className="flex flex-col items-center justify-center p-12 text-center"> <div className="text-muted-foreground mb-2">No predictions yet</div> <div className="text-sm text-muted-foreground"> Be the first to make a prediction! </div> </div> );}return ( <div className="p-4 space-y-4"> <div className="text-sm text-muted-foreground mb-2">{predictions.length}{predictions.length===1 ? 'prediction':'predictions'}</div>{predictions.map((prediction)=> ( <PredictionItem key={prediction._id}prediction={prediction}events={jackpot.events}/> ))}</div> );};export default PredictionsTab;
+```
+
+File: features/jackpots/components/Tabs/Predictions/PredictionItem.tsx
+```tsx
+"use client";import React from 'react';import{Trophy}from 'lucide-react';import type{Prediction,JackpotEvent}from '../../../types';interface PredictionItemProps{prediction:Prediction;events:JackpotEvent[];}const PredictionItem:React.FC<PredictionItemProps>=({prediction,events})=>{const calculateScore=()=>{if (!prediction.picks) return 0;let correct=0;prediction.picks.forEach((pick)=>{const event=events.find(e=> e.eventNumber===pick.gameNumber);if (event?.result===pick.pick){correct++;}});return correct;};const score=prediction.score ?? calculateScore();const totalMatches=events.length;return ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center justify-between mb-3"> <div className="flex items-center gap-2"> <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"> <span className="text-sm font-bold text-primary">{prediction.username?.[0]?.toUpperCase() || 'U'}</span> </div> <div> <div className="text-sm font-semibold text-foreground">{prediction.username || 'Anonymous'}</div> <div className="text-xs text-muted-foreground">{new Date(prediction.createdAt).toLocaleDateString()}</div> </div> </div> <div className="text-right"> <div className="flex items-center gap-1 text-primary"> <Trophy className="w-4 h-4" /> <span className="text-lg font-bold">{score}/{totalMatches}</span> </div> <div className="text-xs text-muted-foreground">Correct</div> </div> </div> <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">{prediction.picks.map((pick)=>{const event=events.find(e=> e.eventNumber===pick.gameNumber);const isCorrect=event?.result===pick.pick;const hasResult=!!event?.result;return ( <div key={pick.gameNumber}className={`text-center p-2 rounded-lg ${hasResult ? isCorrect ? 'bg-green-500/20 border border-green-500/30 text-green-500':'bg-red-500/20 border border-red-500/30 text-red-500':'bg-muted/50 border border-border text-muted-foreground'}`}> <div className="text-xs opacity-70">#{pick.gameNumber}</div> <div className="text-sm font-bold">{pick.pick}</div> </div> );})}</div> </div> );};export default PredictionItem;
+```
+
+File: features/jackpots/components/Tabs/Stats/BellCurve.tsx
+```tsx
+"use client";import React from 'react';import type{Statistics}from '../../../types';interface BellCurveProps{stats:Statistics;}const BellCurve:React.FC<BellCurveProps>=({stats})=>{const total=stats.homeWins + stats.draws + stats.awayWins;const homePercent=(stats.homeWins / total) * 100;const drawPercent=(stats.draws / total) * 100;const awayPercent=(stats.awayWins / total) * 100;return ( <div className="space-y-3"> <div> <div className="flex justify-between text-xs mb-1"> <span className="text-green-500 font-medium">Home Wins</span> <span className="text-foreground font-bold">{stats.homeWins}({homePercent.toFixed(1)}%)</span> </div> <div className="h-8 bg-muted rounded-lg overflow-hidden"> <div className="h-full bg-green-500 transition-all duration-500" style={{width:`${homePercent}%`}}/> </div> </div> <div> <div className="flex justify-between text-xs mb-1"> <span className="text-yellow-500 font-medium">Draws</span> <span className="text-foreground font-bold">{stats.draws}({drawPercent.toFixed(1)}%)</span> </div> <div className="h-8 bg-muted rounded-lg overflow-hidden"> <div className="h-full bg-yellow-500 transition-all duration-500" style={{width:`${drawPercent}%`}}/> </div> </div> <div> <div className="flex justify-between text-xs mb-1"> <span className="text-blue-500 font-medium">Away Wins</span> <span className="text-foreground font-bold">{stats.awayWins}({awayPercent.toFixed(1)}%)</span> </div> <div className="h-8 bg-muted rounded-lg overflow-hidden"> <div className="h-full bg-blue-500 transition-all duration-500" style={{width:`${awayPercent}%`}}/> </div> </div> <div className="pt-3 border-t border-border"> <div className="grid grid-cols-3 gap-2 text-center text-xs"> <div> <div className="text-muted-foreground">Avg Home</div> <div className="font-bold text-foreground">{stats.averageHomeOdds.toFixed(2)}</div> </div> <div> <div className="text-muted-foreground">Avg Draw</div> <div className="font-bold text-foreground">{stats.averageDrawOdds.toFixed(2)}</div> </div> <div> <div className="text-muted-foreground">Avg Away</div> <div className="font-bold text-foreground">{stats.averageAwayOdds.toFixed(2)}</div> </div> </div> </div> </div> );};export default BellCurve;
+```
+
+File: features/jackpots/components/Tabs/Stats/index.tsx
+```tsx
+"use client";import React from 'react';import{Loader2,TrendingUp,Trophy}from 'lucide-react';import BellCurve from './BellCurve';import type{Jackpot,Prediction,Statistics}from '../../../types';import{formatCurrency}from '../../../utils/helpers';interface StatsTabProps{jackpot:Jackpot;communityPredictions:Prediction[];stats?:Statistics | null;loading?:boolean;}const StatsTab:React.FC<StatsTabProps>=({jackpot,communityPredictions,stats,loading=false,})=>{if (loading){return ( <div className="flex items-center justify-center p-12"> <Loader2 className="w-8 h-8 animate-spin text-primary" /> </div> );}return ( <div className="p-4 space-y-4">{stats && ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <TrendingUp className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Outcome Distribution</h3> </div> <BellCurve stats={stats}/> </div> )}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Trophy className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Prize Breakdown</h3> </div> <div className="space-y-3">{jackpot.prizes.map((prize)=>{const isGrand=prize.jackpotType==='17/17';return ( <div key={prize.jackpotType}className={`rounded-lg p-3 ${isGrand ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30':'bg-muted/50'}`}> <div className="flex justify-between items-center"> <div> <div className={`text-xs font-medium mb-0.5 ${isGrand ? 'text-yellow-500':'text-muted-foreground'}`}>{isGrand ? '🏆 GRAND JACKPOT':`${prize.jackpotType}Correct`}</div> <div className={`text-base font-bold ${isGrand ? 'text-yellow-500':'text-foreground'}`}> KSH{formatCurrency(prize.prize)}</div> </div> <div className={`px-3 py-1.5 rounded-lg text-center ${isGrand ? 'bg-yellow-500/20':'bg-background'}`}> <div className={`text-base font-bold ${isGrand ? 'text-yellow-500':'text-foreground'}`}>{prize.winners}</div> <div className={`text-[10px] ${isGrand ? 'text-yellow-500/70':'text-muted-foreground'}`}>{prize.winners===1 ? 'Winner':'Winners'}</div> </div> </div> </div> );})}</div> </div> <div className="grid grid-cols-2 gap-3"> <div className="bg-card border border-border rounded-xl p-4 text-center"> <div className="text-2xl font-bold text-foreground">{jackpot.events.length}</div> <div className="text-xs text-muted-foreground mt-1">Total Matches</div> </div> <div className="bg-card border border-border rounded-xl p-4 text-center"> <div className="text-2xl font-bold text-foreground">{communityPredictions.length}</div> <div className="text-xs text-muted-foreground mt-1">Predictions</div> </div> </div> </div> );};export default StatsTab;
+```
+
+File: features/jackpots/components/TabsHeader.tsx
+```tsx
+"use client";import React from 'react';import type{TabType}from '../types';interface TabsHeaderProps{activeTab:TabType;setActiveTab:(tab:TabType)=> void;}const TabsHeader:React.FC<TabsHeaderProps>=({activeTab,setActiveTab})=>{const tabs:{id:TabType;label:string}[]=[{id:'matches',label:'Matches'},{id:'predictions',label:'Predictions'},{id:'stats',label:'Stats'},{id:'comments',label:'Comments'}];return ( <div className="flex border-b border-border bg-card sticky top-0 z-10">{tabs.map(tab=> ( <button key={tab.id}onClick={()=> setActiveTab(tab.id)}className={`flex-1 py-4 text-sm font-medium transition-colors relative \${activeTab===tab.id ? 'text-foreground':'text-muted-foreground hover:text-foreground'}`}>{tab.label}{activeTab===tab.id && ( <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-14 h-1 bg-primary rounded-t-full" /> )}</button> ))}</div> );};export default TabsHeader;
+```
+
+File: features/jackpots/types/index.ts
+```ts
+export interface JackpotEvent{eventNumber:number;competitorHome:string;competitorAway:string;odds:{home:number;draw:number;away:number};result?:'1' | 'X' | '2';score?:{home:number;away:number};kickoffTime:string;competition:string;}export interface JackpotPrize{jackpotType:string;prize:number;winners:number;}export interface Jackpot{_id:string;jackpotHumanId:string;site:string;totalPrizePool:number;currencySign:string;jackpotStatus:'Open' | 'Closed' | 'Finished';isLatest:boolean;finished:string;bettingClosesAt:string;events:JackpotEvent[];prizes:JackpotPrize[];}export interface PredictionPick{gameNumber:number;pick:'1' | 'X' | '2';}export interface Prediction{_id:string;jackpotId:string;userId:string;username?:string;picks:PredictionPick[];score?:number;createdAt:string;updatedAt:string;}export interface Comment{_id:string;jackpotId:string;userId:string;username?:string;text:string;createdAt:string;updatedAt:string;}export interface Statistics{homeWins:number;draws:number;awayWins:number;averageHomeOdds:number;averageDrawOdds:number;averageAwayOdds:number;totalMatches:number;}export type LocalPick='Home' | 'Draw' | 'Away';export interface LocalPicks{[eventNumber:number]:LocalPick;}export type TabType='matches' | 'predictions' | 'stats' | 'comments';
+```
+
+File: features/jackpots/utils/constants.ts
+```ts
+import type{TabType}from '../types';export const TABS:{id:TabType;label:string}[]=[{id:'matches',label:'Matches'},{id:'predictions',label:'Predictions'},{id:'stats',label:'Stats'},{id:'comments',label:'Comments'},];export const MAX_COMMENT_LENGTH=500;
+```
+
+File: features/jackpots/utils/helpers.ts
+```ts
+import type{Jackpot}from '../types';export function formatDate(dateString:string):string{const date=new Date(dateString);const now=new Date();const diffInMs=now.getTime() - date.getTime();const diffInDays=Math.floor(diffInMs / (1000 * 60 * 60 * 24));if (diffInDays===0) return "Today";if (diffInDays===1) return "Yesterday";if (diffInDays < 7) return `${diffInDays}days ago`;return date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:date.getFullYear() !==now.getFullYear() ? 'numeric':undefined,});}export function formatCurrency(amount:number):string{return new Intl.NumberFormat('en-KE').format(Math.round(amount));}
+```
+
+File: features/placeholder
+```
+
+```
+
 File: hooks/useMediaQuery.ts
 ```ts
 import{useState,useEffect}from 'react';export function useMediaQuery(query:string):boolean{const [matches,setMatches]=useState<boolean>(false);useEffect(()=>{const media=window.matchMedia(query);setMatches(media.matches);const listener=()=> setMatches(media.matches);media.addEventListener('change',listener);return ()=> media.removeEventListener('change',listener);},[query]);return matches;}
@@ -407,6 +417,901 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+```
+
+File: scripts/claude.sh
+```sh
+#!/bin/bash
+
+# Navigate to project root (adjust if needed)
+cd "$(dirname "$0")"
+
+echo "🚀 Creating TypeScript files for features/jackpots..."
+
+# ============================================
+# types/index.ts
+# ============================================
+cat > features/jackpots/types/index.ts << 'EOF'
+// Jackpot Types
+export interface JackpotEvent {
+  eventNumber: number;
+  competitorHome: string;
+  competitorAway: string;
+  odds: {
+    home: number;
+    draw: number;
+    away: number;
+  };
+  result?: '1' | 'X' | '2';
+  score?: {
+    home: number;
+    away: number;
+  };
+  kickoffTime: string;
+  competition: string;
+}
+
+export interface JackpotPrize {
+  jackpotType: string;
+  prize: number;
+  winners: number;
+}
+
+export interface Jackpot {
+  _id: string;
+  jackpotHumanId: string;
+  site: string;
+  totalPrizePool: number;
+  currencySign: string;
+  jackpotStatus: 'Open' | 'Closed' | 'Finished';
+  isLatest: boolean;
+  finished: string;
+  bettingClosesAt: string;
+  events: JackpotEvent[];
+  prizes: JackpotPrize[];
+}
+
+// Prediction Types
+export interface PredictionPick {
+  gameNumber: number;
+  pick: '1' | 'X' | '2';
+}
+
+export interface Prediction {
+  _id: string;
+  jackpotId: string;
+  userId: string;
+  username?: string;
+  picks: PredictionPick[];
+  score?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Comment Types
+export interface Comment {
+  _id: string;
+  jackpotId: string;
+  userId: string;
+  username?: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Statistics Types
+export interface Statistics {
+  homeWins: number;
+  draws: number;
+  awayWins: number;
+  averageHomeOdds: number;
+  averageDrawOdds: number;
+  averageAwayOdds: number;
+  totalMatches: number;
+}
+
+// Local Pick Type (for UI state)
+export type LocalPick = 'Home' | 'Draw' | 'Away';
+
+export interface LocalPicks {
+  [eventNumber: number]: LocalPick;
+}
+
+// API Response Types
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+export interface ApiError {
+  success: false;
+  message: string;
+  error?: string;
+}
+
+// Hook Return Types
+export interface UseJackpotDetailsReturn {
+  data: Jackpot | null;
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+export interface UsePredictionsReturn {
+  predictions: Prediction[];
+  userPrediction: Prediction | null;
+  loading: boolean;
+  error: string | null;
+  submitting: boolean;
+  createPrediction: (picks: PredictionPick[]) => Promise<Prediction | null>;
+  updatePrediction: (predictionId: string, picks: PredictionPick[]) => Promise<Prediction | null>;
+  deletePrediction: (predictionId: string) => Promise<boolean>;
+}
+
+export interface UseCommentsReturn {
+  comments: Comment[];
+  loading: boolean;
+  error: string | null;
+  submitting: boolean;
+  createComment: (text: string) => Promise<Comment | null>;
+  deleteComment: (commentId: string) => Promise<boolean>;
+  refetch: () => Promise<void>;
+}
+
+export interface UseStatisticsReturn {
+  stats: Statistics | null;
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+// Tab Types
+export type TabType = 'matches' | 'predictions' | 'stats' | 'comments';
+
+// SEO Types
+export interface JackpotJsonLd {
+  '@context': string;
+  '@type': string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  offers?: {
+    '@type': string;
+    price: string;
+    priceCurrency: string;
+  };
+}
+EOF
+
+echo "✅ Created types/index.ts"
+
+# ============================================
+# utils/helpers.ts
+# ============================================
+cat > features/jackpots/utils/helpers.ts << 'EOF'
+import type { Jackpot, JackpotJsonLd } from '../types';
+
+/**
+ * Format a date string to a readable format
+ * @param dateString - ISO date string
+ * @returns Formatted date string
+ */
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  // If within the last week, show relative time
+  if (diffInDays === 0) return "Today";
+  if (diffInDays === 1) return "Yesterday";
+  if (diffInDays < 7) return `${diffInDays} days ago`;
+
+  // Otherwise show formatted date
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+  });
+}
+
+/**
+ * Format currency with thousand separators
+ * @param amount - Amount to format
+ * @returns Formatted currency string
+ */
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-KE').format(Math.round(amount));
+}
+
+/**
+ * Format full currency amount
+ * @param amount - Amount to format
+ * @returns Formatted full amount string
+ */
+export function formatFullAmount(amount: number): string {
+  return new Intl.NumberFormat('en-KE').format(Math.round(amount));
+}
+
+/**
+ * Convert local pick ('Home', 'Draw', 'Away') to API format ('1', 'X', '2')
+ * @param pick - Local pick
+ * @returns API pick format
+ */
+export function convertToApiPick(pick: 'Home' | 'Draw' | 'Away'): '1' | 'X' | '2' {
+  if (pick === 'Home') return '1';
+  if (pick === 'Draw') return 'X';
+  return '2';
+}
+
+/**
+ * Convert API pick ('1', 'X', '2') to local format ('Home', 'Draw', 'Away')
+ * @param pick - API pick
+ * @returns Local pick format
+ */
+export function convertToLocalPick(pick: '1' | 'X' | '2'): 'Home' | 'Draw' | 'Away' {
+  if (pick === '1') return 'Home';
+  if (pick === 'X') return 'Draw';
+  return 'Away';
+}
+
+/**
+ * Calculate time remaining until jackpot closes
+ * @param closingDate - ISO date string of when betting closes
+ * @returns Object with days, hours, and minutes remaining
+ */
+export function getTimeRemaining(closingDate: string): { days: number; hours: number; minutes: number; isExpired: boolean } {
+  const now = new Date().getTime();
+  const closing = new Date(closingDate).getTime();
+  const diff = closing - now;
+
+  if (diff <= 0) {
+    return { days: 0, hours: 0, minutes: 0, isExpired: true };
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  return { days, hours, minutes, isExpired: false };
+}
+
+/**
+ * Generate JSON-LD structured data for SEO
+ * @param jackpot - Jackpot data
+ * @returns JSON-LD object
+ */
+export function generateJackpotJsonLd(jackpot: Jackpot): JackpotJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: `${jackpot.site} Mega Jackpot Pro ${jackpot.events.length} #${jackpot.jackpotHumanId}`,
+    description: `Track SportPesa Mega Jackpot results, view match outcomes, and share predictions. Prize pool: ${jackpot.currencySign} ${formatFullAmount(jackpot.totalPrizePool)}`,
+    startDate: jackpot.events[0]?.kickoffTime || new Date().toISOString(),
+    endDate: jackpot.bettingClosesAt,
+    ...(jackpot.totalPrizePool && {
+      offers: {
+        '@type': 'Offer',
+        price: jackpot.totalPrizePool.toString(),
+        priceCurrency: 'KES',
+      },
+    }),
+  };
+}
+
+/**
+ * Truncate text to a maximum length
+ * @param text - Text to truncate
+ * @param maxLength - Maximum length
+ * @returns Truncated text with ellipsis if needed
+ */
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + '...';
+}
+
+/**
+ * Get status color based on jackpot status
+ * @param status - Jackpot status
+ * @returns Tailwind color class
+ */
+export function getStatusColor(status: 'Open' | 'Closed' | 'Finished'): string {
+  switch (status) {
+    case 'Open':
+      return 'text-green-500 bg-green-500/20';
+    case 'Closed':
+      return 'text-yellow-500 bg-yellow-500/20';
+    case 'Finished':
+      return 'text-muted-foreground bg-muted';
+    default:
+      return 'text-muted-foreground bg-muted';
+  }
+}
+EOF
+
+echo "✅ Created utils/helpers.ts"
+
+# ============================================
+# utils/constants.ts
+# ============================================
+cat > features/jackpots/utils/constants.ts << 'EOF'
+import type { TabType } from '../types';
+
+/**
+ * Available tabs in the jackpot tracker
+ */
+export const TABS: { id: TabType; label: string }[] = [
+  { id: 'matches', label: 'Matches' },
+  { id: 'predictions', label: 'Predictions' },
+  { id: 'stats', label: 'Stats' },
+  { id: 'comments', label: 'Comments' },
+];
+
+/**
+ * Pick options for betting
+ */
+export const PICK_OPTIONS = ['Home', 'Draw', 'Away'] as const;
+
+/**
+ * API pick format
+ */
+export const API_PICKS = ['1', 'X', '2'] as const;
+
+/**
+ * Maximum characters for comments
+ */
+export const MAX_COMMENT_LENGTH = 500;
+
+/**
+ * Prediction update debounce time in ms
+ */
+export const PREDICTION_DEBOUNCE_TIME = 500;
+
+/**
+ * Default jackpot ID (for latest jackpot)
+ */
+export const DEFAULT_JACKPOT_ID = 'latest';
+
+/**
+ * Animation durations (in ms)
+ */
+export const ANIMATION = {
+  FADE_IN: 200,
+  SLIDE_IN: 300,
+  BOUNCE: 400,
+} as const;
+
+/**
+ * Jackpot status values
+ */
+export const JACKPOT_STATUS = {
+  OPEN: 'Open',
+  CLOSED: 'Closed',
+  FINISHED: 'Finished',
+} as const;
+
+/**
+ * Colors for different stats
+ */
+export const STAT_COLORS = {
+  HOME: {
+    bg: 'bg-green-500',
+    text: 'text-green-950',
+    border: 'border-green-500',
+  },
+  DRAW: {
+    bg: 'bg-yellow-500',
+    text: 'text-yellow-950',
+    border: 'border-yellow-500',
+  },
+  AWAY: {
+    bg: 'bg-blue-500',
+    text: 'text-blue-950',
+    border: 'border-blue-500',
+  },
+} as const;
+
+/**
+ * Error messages
+ */
+export const ERROR_MESSAGES = {
+  FAILED_TO_LOAD: 'Failed to load jackpot',
+  FAILED_TO_SAVE: 'Failed to save prediction',
+  FAILED_TO_COMMENT: 'Failed to post comment',
+  NETWORK_ERROR: 'Network error. Please check your connection.',
+  GENERIC: 'Something went wrong. Please try again.',
+} as const;
+
+/**
+ * Success messages
+ */
+export const SUCCESS_MESSAGES = {
+  PREDICTION_SAVED: 'Prediction saved successfully!',
+  COMMENT_POSTED: 'Comment posted successfully!',
+  DELETED: 'Deleted successfully!',
+} as const;
+
+/**
+ * Cache times (in seconds)
+ */
+export const CACHE_TIME = {
+  JACKPOT_DETAILS: 60,
+  PREDICTIONS: 30,
+  COMMENTS: 10,
+  STATISTICS: 60,
+} as const;
+
+/**
+ * SEO Meta data defaults
+ */
+export const SEO_DEFAULTS = {
+  SITE_NAME: 'Wufwuf',
+  BASE_URL: 'https://wufwuf.io',
+  TWITTER_HANDLE: '@Wufwuf',
+  DEFAULT_IMAGE: '/og-jackpot.png',
+} as const;
+EOF
+
+echo "✅ Created utils/constants.ts"
+
+# ============================================
+# hooks/useJackpotApi.ts
+# ============================================
+cat > features/jackpots/hooks/useJackpotApi.ts << 'EOF'
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import type {
+  Jackpot,
+  Prediction,
+  PredictionPick,
+  Comment,
+  Statistics,
+  UseJackpotDetailsReturn,
+  UsePredictionsReturn,
+  UseCommentsReturn,
+  UseStatisticsReturn,
+  ApiResponse,
+} from "../types";
+
+// Base API URL - points to our Next.js API routes
+const API_BASE = "/api/jackpot";
+
+/**
+ * Custom hook for fetching jackpot details
+ * @param jackpotId - The jackpot ID or "latest" to fetch the most recent jackpot
+ */
+export function useJackpotDetails(jackpotId: string): UseJackpotDetailsReturn {
+  const [data, setData] = useState<Jackpot | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDetails = useCallback(async () => {
+    if (!jackpotId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      let url = `${API_BASE}/details`;
+
+      if (jackpotId !== "latest") {
+        url += `?jackpotId=${jackpotId}`;
+      } else {
+        url += `?limit=1`;
+      }
+
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result: ApiResponse<Jackpot | Jackpot[]> = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to fetch jackpot details");
+      }
+
+      const jackpotData = Array.isArray(result.data)
+        ? result.data[0]
+        : result.data;
+
+      if (!jackpotData) {
+        throw new Error("No jackpot found");
+      }
+
+      setData(jackpotData);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [jackpotId]);
+
+  useEffect(() => {
+    fetchDetails();
+  }, [fetchDetails]);
+
+  return { data, loading, error, refetch: fetchDetails };
+}
+
+/**
+ * Custom hook for fetching and managing predictions
+ * @param jackpotId - The jackpot ID (MongoDB ObjectId)
+ */
+export function usePredictions(jackpotId?: string): UsePredictionsReturn {
+  const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [userPrediction, setUserPrediction] = useState<Prediction | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchPredictions = useCallback(async () => {
+    if (!jackpotId) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${API_BASE}/predictions?jackpotId=${jackpotId}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result: ApiResponse<Prediction[]> = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to fetch predictions");
+      }
+
+      setPredictions(result.data || []);
+      setError(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [jackpotId]);
+
+  const fetchUserPrediction = useCallback(async () => {
+    if (!jackpotId) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/predictions?jackpotId=${jackpotId}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result: ApiResponse<Prediction[]> = await response.json();
+
+      if (result.success && result.data?.length > 0) {
+        setUserPrediction(result.data[0]);
+      }
+    } catch (err) {
+      console.error("Error fetching user prediction:", err);
+    }
+  }, [jackpotId]);
+
+  const createPrediction = useCallback(
+    async (picks: PredictionPick[]): Promise<Prediction | null> => {
+      if (!jackpotId) return null;
+
+      try {
+        setSubmitting(true);
+        const response = await fetch(`${API_BASE}/predictions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jackpotId, picks }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result: ApiResponse<Prediction> = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || "Failed to create prediction");
+        }
+
+        setUserPrediction(result.data);
+        await fetchPredictions();
+        return result.data;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        setError(errorMessage);
+        return null;
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [jackpotId, fetchPredictions]
+  );
+
+  const updatePrediction = useCallback(
+    async (predictionId: string, picks: PredictionPick[]): Promise<Prediction | null> => {
+      try {
+        setSubmitting(true);
+        const response = await fetch(`${API_BASE}/predictions`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ predictionId, picks }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result: ApiResponse<Prediction> = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || "Failed to update prediction");
+        }
+
+        setUserPrediction(result.data);
+        await fetchPredictions();
+        return result.data;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        setError(errorMessage);
+        return null;
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [fetchPredictions]
+  );
+
+  const deletePrediction = useCallback(
+    async (predictionId: string): Promise<boolean> => {
+      try {
+        setSubmitting(true);
+        const response = await fetch(`${API_BASE}/predictions`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ predictionId }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result: ApiResponse<{ deleted: boolean }> = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || "Failed to delete prediction");
+        }
+
+        setUserPrediction(null);
+        await fetchPredictions();
+        return true;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        setError(errorMessage);
+        return false;
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [fetchPredictions]
+  );
+
+  useEffect(() => {
+    if (jackpotId) {
+      fetchPredictions();
+      fetchUserPrediction();
+    }
+  }, [jackpotId, fetchPredictions, fetchUserPrediction]);
+
+  return {
+    predictions,
+    userPrediction,
+    loading,
+    error,
+    submitting,
+    createPrediction,
+    updatePrediction,
+    deletePrediction,
+  };
+}
+
+/**
+ * Custom hook for fetching and managing comments
+ * @param jackpotId - The jackpot ID (MongoDB ObjectId)
+ */
+export function useComments(jackpotId?: string): UseCommentsReturn {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchComments = useCallback(async () => {
+    if (!jackpotId) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${API_BASE}/comments?jackpotId=${jackpotId}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result: ApiResponse<Comment[]> = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to fetch comments");
+      }
+
+      setComments(result.data || []);
+      setError(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [jackpotId]);
+
+  const createComment = useCallback(
+    async (text: string): Promise<Comment | null> => {
+      if (!jackpotId) return null;
+
+      try {
+        setSubmitting(true);
+        const response = await fetch(`${API_BASE}/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jackpotId, text }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result: ApiResponse<Comment> = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || "Failed to create comment");
+        }
+
+        setComments((prev) => [result.data, ...prev]);
+        return result.data;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred";
+        setError(errorMessage);
+        return null;
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [jackpotId]
+  );
+
+  const deleteComment = useCallback(async (commentId: string): Promise<boolean> => {
+    try {
+      setSubmitting(true);
+      const response = await fetch(`${API_BASE}/comments`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commentId }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result: ApiResponse<{ deleted: boolean }> = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete comment");
+      }
+
+      setComments((prev) => prev.filter((c) => c._id !== commentId));
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (jackpotId) {
+      fetchComments();
+    }
+  }, [jackpotId, fetchComments]);
+
+  return {
+    comments,
+    loading,
+    error,
+    submitting,
+    createComment,
+    deleteComment,
+    refetch: fetchComments,
+  };
+}
+
+/**
+ * Custom hook for fetching statistics
+ * @param jackpotId - The jackpot ID (MongoDB ObjectId)
+ */
+export function useStatistics(jackpotId?: string): UseStatisticsReturn {
+  const [stats, setStats] = useState<Statistics | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchStats = useCallback(async () => {
+    if (!jackpotId) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${API_BASE}/statistics?jackpotId=${jackpotId}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result: ApiResponse<Statistics> = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to fetch statistics");
+      }
+
+      setStats(result.data);
+      setError(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [jackpotId]);
+
+  useEffect(() => {
+    if (jackpotId) {
+      fetchStats();
+    }
+  }, [jackpotId, fetchStats]);
+
+  return { stats, loading, error, refetch: fetchStats };
+}
+EOF
+
+echo "✅ Created hooks/useJackpotApi.ts"
+
+echo ""
+echo "🎉 All files created successfully in features/jackpots/"
+echo ""
+echo "📂 Created files:"
+echo "  - types/index.ts"
+echo "  - utils/helpers.ts"
+echo "  - utils/constants.ts"
+echo "  - hooks/useJackpotApi.ts"
+echo ""
+echo "Next steps:"
+echo "1. Copy the component files (coming in next script)"
+echo "2. Update your app/(app)/jackpots files"
+echo ""
 ```
 
 File: tsconfig.json

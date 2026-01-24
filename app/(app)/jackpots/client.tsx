@@ -29,15 +29,15 @@ const DUMMY_JACKPOT: Jackpot = {
   currencySign: "KSH",
   jackpotStatus: "Open",
   isLatest: true,
-  finished: new Date().toISOString(),
-  bettingClosesAt: new Date(Date.now() + 86400000).toISOString(),
+  finished: new Date("2026-01-25T10:00:00Z").toISOString(),
+  bettingClosesAt: new Date("2026-01-26T10:00:00Z").toISOString(),
   events: [
     {
       eventNumber: 1,
       competitorHome: "Arsenal",
       competitorAway: "Chelsea",
       odds: { home: 2.1, draw: 3.2, away: 3.8 },
-      kickoffTime: new Date(Date.now() + 3600000).toISOString(),
+      kickoffTime: new Date("2026-01-25T15:00:00Z").toISOString(),
       competition: "Premier League",
     },
     {
@@ -45,7 +45,7 @@ const DUMMY_JACKPOT: Jackpot = {
       competitorHome: "Manchester United",
       competitorAway: "Liverpool",
       odds: { home: 2.5, draw: 3.1, away: 2.9 },
-      kickoffTime: new Date(Date.now() + 7200000).toISOString(),
+      kickoffTime: new Date("2026-01-25T17:00:00Z").toISOString(),
       competition: "Premier League",
     },
     {
@@ -53,7 +53,7 @@ const DUMMY_JACKPOT: Jackpot = {
       competitorHome: "Barcelona",
       competitorAway: "Real Madrid",
       odds: { home: 2.3, draw: 3.0, away: 3.2 },
-      kickoffTime: new Date(Date.now() + 10800000).toISOString(),
+      kickoffTime: new Date("2026-01-25T19:00:00Z").toISOString(),
       competition: "La Liga",
     },
     {
@@ -61,7 +61,7 @@ const DUMMY_JACKPOT: Jackpot = {
       competitorHome: "Bayern Munich",
       competitorAway: "Borussia Dortmund",
       odds: { home: 1.9, draw: 3.5, away: 4.2 },
-      kickoffTime: new Date(Date.now() + 14400000).toISOString(),
+      kickoffTime: new Date("2026-01-25T21:00:00Z").toISOString(),
       competition: "Bundesliga",
     },
     {
@@ -69,7 +69,7 @@ const DUMMY_JACKPOT: Jackpot = {
       competitorHome: "Juventus",
       competitorAway: "AC Milan",
       odds: { home: 2.2, draw: 3.0, away: 3.5 },
-      kickoffTime: new Date(Date.now() + 18000000).toISOString(),
+      kickoffTime: new Date("2026-01-26T15:00:00Z").toISOString(),
       competition: "Serie A",
     },
   ],
@@ -95,8 +95,8 @@ const DUMMY_PREDICTIONS: Prediction[] = [
       { gameNumber: 5, pick: "X" },
     ],
     score: 3,
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+    createdAt: new Date("2026-01-24T10:00:00Z").toISOString(),
+    updatedAt: new Date("2026-01-24T10:00:00Z").toISOString(),
   },
   {
     _id: "pred2",
@@ -111,8 +111,8 @@ const DUMMY_PREDICTIONS: Prediction[] = [
       { gameNumber: 5, pick: "2" },
     ],
     score: 2,
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-    updatedAt: new Date(Date.now() - 7200000).toISOString(),
+    createdAt: new Date("2026-01-24T08:00:00Z").toISOString(),
+    updatedAt: new Date("2026-01-24T08:00:00Z").toISOString(),
   },
   {
     _id: "pred3",
@@ -127,8 +127,8 @@ const DUMMY_PREDICTIONS: Prediction[] = [
       { gameNumber: 5, pick: "1" },
     ],
     score: 4,
-    createdAt: new Date(Date.now() - 10800000).toISOString(),
-    updatedAt: new Date(Date.now() - 10800000).toISOString(),
+    createdAt: new Date("2026-01-24T06:00:00Z").toISOString(),
+    updatedAt: new Date("2026-01-24T06:00:00Z").toISOString(),
   },
 ];
 
@@ -139,8 +139,8 @@ const DUMMY_COMMENTS: Comment[] = [
     userId: "user1",
     username: "JohnDoe",
     text: "Arsenal are looking strong this season! Going with them.",
-    createdAt: new Date(Date.now() - 1800000).toISOString(),
-    updatedAt: new Date(Date.now() - 1800000).toISOString(),
+    createdAt: new Date("2026-01-24T12:00:00Z").toISOString(),
+    updatedAt: new Date("2026-01-24T12:00:00Z").toISOString(),
   },
   {
     _id: "com2",
@@ -148,8 +148,8 @@ const DUMMY_COMMENTS: Comment[] = [
     userId: "user3",
     username: "MikeJones",
     text: "The El Clasico will be a draw, I can feel it!",
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+    createdAt: new Date("2026-01-24T11:00:00Z").toISOString(),
+    updatedAt: new Date("2026-01-24T11:00:00Z").toISOString(),
   },
   {
     _id: "com3",
@@ -157,8 +157,8 @@ const DUMMY_COMMENTS: Comment[] = [
     userId: "user2",
     username: "JaneSmith",
     text: "Bayern are unstoppable at home. Easy win for them.",
-    createdAt: new Date(Date.now() - 5400000).toISOString(),
-    updatedAt: new Date(Date.now() - 5400000).toISOString(),
+    createdAt: new Date("2026-01-24T09:30:00Z").toISOString(),
+    updatedAt: new Date("2026-01-24T09:30:00Z").toISOString(),
   },
 ];
 
@@ -274,7 +274,7 @@ export default function JackpotTracker({ jackpotId = "latest" }: JackpotTrackerP
   // Add comment (dummy implementation)
   const handleAddComment = (text: string) => {
     const newComment: Comment = {
-      _id: "12345678",
+      _id: `com_${Date.now()}`,
       jackpotId: jackpot._id,
       userId: "currentUser",
       username: "You",
