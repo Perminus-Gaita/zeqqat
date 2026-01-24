@@ -1,168 +1,450 @@
 File Structure:
 
-app/
+./
 ```
-├── (app)
-│   ├── jackpots
-│   │   └── client.jsx
-│   │   ├── components
-│   │   │   └── JackpotDetails.jsx
-│   │   │   ├── Tabs
-│   │   │   │   ├── Comments
-│   │   │   │   │   └── CommentItem.jsx
-│   │   │   │   │   └── index.jsx
-│   │   │   │   ├── Matches
-│   │   │   │   │   └── MatchCard.jsx
-│   │   │   │   │   └── index.jsx
-│   │   │   │   ├── Predictions
-│   │   │   │   │   └── PredictionItem.jsx
-│   │   │   │   │   └── index.jsx
-│   │   │   │   ├── Stats
-│   │   │   │   │   └── BellCurve.jsx
-│   │   │   │   │   └── index.jsx
-│   │   │   └── TabsHeader.jsx
-│   │   ├── hooks
-│   │   │   └── useJackpotApi.js
-│   │   └── page.jsx
-│   │   ├── utils
-│   │   │   └── constants.js
-│   │   │   └── helpers.js
+└── .gitignore
+└── README.md
+├── app
+│   ├── (app)
+│   │   ├── jackpots
+│   │   │   └── client.jsx
+│   │   │   ├── components
+│   │   │   │   └── JackpotDetails.jsx
+│   │   │   │   ├── Tabs
+│   │   │   │   │   ├── Comments
+│   │   │   │   │   │   └── CommentItem.jsx
+│   │   │   │   │   │   └── index.jsx
+│   │   │   │   │   ├── Matches
+│   │   │   │   │   │   └── MatchCard.jsx
+│   │   │   │   │   │   └── index.jsx
+│   │   │   │   │   ├── Predictions
+│   │   │   │   │   │   └── PredictionItem.jsx
+│   │   │   │   │   │   └── index.jsx
+│   │   │   │   │   ├── Stats
+│   │   │   │   │   │   └── BellCurve.jsx
+│   │   │   │   │   │   └── index.jsx
+│   │   │   │   └── TabsHeader.jsx
+│   │   │   ├── hooks
+│   │   │   │   └── useJackpotApi.js
+│   │   │   └── page.jsx
+│   │   │   ├── utils
+│   │   │   │   └── constants.js
+│   │   │   │   └── helpers.js
+│   │   └── layout.tsx
+│   │   ├── lobby
+│   │   │   └── page.tsx
+│   │   ├── profile
+│   │   │   └── page.tsx
+│   │   ├── settings
+│   │   │   └── page.tsx
+│   │   ├── support
+│   │   │   └── page.tsx
+│   ├── (landing)
+│   │   └── layout.tsx
+│   │   └── page.tsx
+│   └── globals.css
 │   └── layout.tsx
-│   ├── lobby
-│   │   └── page.tsx
-│   ├── profile
-│   │   └── page.tsx
-│   ├── settings
-│   │   └── page.tsx
-│   ├── support
-│   │   └── page.tsx
-├── (landing)
-│   └── layout.tsx
-│   └── page.tsx
-└── globals.css
-└── layout.tsx
+├── components
+│   ├── layouts
+│   │   └── AppLayout.tsx
+│   ├── navigation
+│   │   └── BottomNavigation.tsx
+│   │   └── LeftSideBar.tsx
+│   │   └── MainNavbar.tsx
+│   ├── ui
+│   │   └── avatar.tsx
+│   │   └── badge.tsx
+│   │   └── button.tsx
+│   │   └── scroll-area.tsx
+│   │   └── sheet.tsx
+│   │   └── tooltip.tsx
+└── components.json
+├── features
+├── hooks
+│   └── useMediaQuery.ts
+├── lib
+│   └── utils.ts
+└── package.json
+└── tsconfig.json
 
 ```
 
 File Contents:
 
-File: (app)/jackpots/client.jsx
+File: .gitignore
+```
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+```
+
+File: app/(app)/jackpots/client.jsx
 ```jsx
 "use client";import React,{useState,useCallback,useMemo}from "react";import{Loader2,AlertCircle,RefreshCw}from "lucide-react";import JackpotDetails from "./components/JackpotDetails";import TabsHeader from "./components/TabsHeader";import MatchesTab from "./components/Tabs/Matches";import PredictionsTab from "./components/Tabs/Predictions";import StatsTab from "./components/Tabs/Stats";import CommentsTab from "./components/Tabs/Comments";import{usePredictions,useComments,useStatistics,useJackpotDetails,}from "./hooks/useJackpotApi";const JackpotSkeleton=()=> ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen">{}<div className="p-4 border-b border-border"> <div className="animate-pulse space-y-3"> <div className="h-6 bg-muted rounded w-1/3" /> <div className="h-8 bg-muted rounded w-2/3" /> <div className="flex gap-4 mt-4"> <div className="h-16 bg-muted rounded flex-1" /> <div className="h-16 bg-muted rounded flex-1" /> </div> </div> </div>{}<div className="flex border-b border-border">{[1,2,3,4].map((i)=> ( <div key={i}className="flex-1 py-4 flex justify-center"> <div className="h-4 bg-muted rounded w-16 animate-pulse" /> </div> ))}</div>{}<div className="p-4 space-y-3">{[1,2,3].map((i)=> ( <div key={i}className="h-32 bg-muted rounded-xl animate-pulse" /> ))}</div> </div> </div> );const JackpotError=({error,onRetry})=> ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen flex items-center justify-center p-8"> <div className="text-center"> <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" /> <h2 className="text-lg font-semibold text-foreground mb-2"> Failed to load jackpot </h2> <p className="text-sm text-muted-foreground mb-4">{error || "Something went wrong. Please try again."}</p> <button onClick={onRetry}className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors" > <RefreshCw className="w-4 h-4" /> Try Again </button> </div> </div> </div> );export default function JackpotTracker({jackpotId:propJackpotId}){const [activeTab,setActiveTab]=useState("matches");const [localPicks,setLocalPicks]=useState({});const jackpotId=propJackpotId || "latest";const{data:jackpot,loading:jackpotLoading,error:jackpotError,refetch:refetchJackpot,}=useJackpotDetails(jackpotId);const{predictions,userPrediction,loading:predictionsLoading,submitting:predictionsSubmitting,createPrediction,updatePrediction,deletePrediction,}=usePredictions(jackpot?._id);const{comments,loading:commentsLoading,submitting:commentsSubmitting,createComment,deleteComment,}=useComments(jackpot?._id);const{stats,loading:statsLoading}=useStatistics(jackpot?._id);const userPicks=useMemo(()=>{if (!userPrediction?.picks) return localPicks;const picksMap={};userPrediction.picks.forEach((pick)=>{const pickLabel=pick.pick==="1" ? "Home":pick.pick==="X" ? "Draw":"Away";picksMap[pick.gameNumber]=pickLabel;});return{...picksMap,...localPicks};},[userPrediction,localPicks]);const handlePickSelect=useCallback((eventNumber,pick)=>{setLocalPicks((prev)=> ({...prev,[eventNumber]:pick,}));},[]);const handleSavePrediction=useCallback(async ()=>{const allPicks={...userPicks,...localPicks};const picksArray=Object.entries(allPicks).map(([gameNumber,pick])=> ({gameNumber:parseInt(gameNumber),pick:pick==="Home" ? "1":pick==="Draw" ? "X":"2",}));if (picksArray.length===0) return;if (userPrediction){await updatePrediction(userPrediction._id,picksArray);}else{await createPrediction(picksArray);}setLocalPicks({});},[userPicks,localPicks,userPrediction,createPrediction,updatePrediction]);const handleAddComment=useCallback( async (text)=>{if (!text.trim()) return;await createComment(text);},[createComment] );const handleDeleteComment=useCallback( async (commentId)=>{await deleteComment(commentId);},[deleteComment] );const hasUnsavedPicks=Object.keys(localPicks).length > 0;if (jackpotLoading){return <JackpotSkeleton />;}if (jackpotError || !jackpot){return <JackpotError error={jackpotError}onRetry={refetchJackpot}/>;}return ( <div className="min-h-screen bg-background"> <div className="max-w-2xl mx-auto border-x border-border min-h-screen">{}<JackpotDetails jackpot={jackpot}/>{}<TabsHeader activeTab={activeTab}setActiveTab={setActiveTab}/>{}<div className="animate-in fade-in duration-200">{activeTab==="matches" && ( <MatchesTab events={jackpot.events}predictions={userPicks}onSelect={handlePickSelect}hasUnsavedPicks={hasUnsavedPicks}onSavePrediction={handleSavePrediction}isSaving={predictionsSubmitting}jackpotStatus={jackpot.jackpotStatus}/> )}{activeTab==="predictions" && ( <PredictionsTab predictions={predictions}jackpot={jackpot}loading={predictionsLoading}/> )}{activeTab==="stats" && ( <StatsTab jackpot={jackpot}communityPredictions={predictions}stats={stats}loading={statsLoading}/> )}{activeTab==="comments" && ( <CommentsTab comments={comments}loading={commentsLoading}submitting={commentsSubmitting}onAddComment={handleAddComment}onDeleteComment={handleDeleteComment}/> )}</div> </div> </div> );}
 ```
 
-File: (app)/jackpots/components/JackpotDetails.jsx
+File: app/(app)/jackpots/components/JackpotDetails.jsx
 ```jsx
 "use client";import React from 'react';import{formatDate}from '../utils/helpers';const JackpotDetails=({jackpot})=>{const isOpen=jackpot.jackpotStatus==='Open';const formatFullAmount=(amount)=>{return new Intl.NumberFormat('en-KE').format(Math.round(amount));};return ( <div className="p-4 border-b border-border">{}<div className="text-xs text-muted-foreground mb-3 text-center"> Jackpot #{jackpot.jackpotHumanId}•{formatDate(jackpot.finished)}</div>{}<div className="bg-gradient-to-br from-green-500/15 to-green-600/5 border border-green-500/30 rounded-xl p-6 text-center">{}<div className="text-sm text-green-500/80 font-medium mb-2">{jackpot.site}MEGA Jackpot Pro{jackpot.events.length}</div>{}<div className="text-2xl md:text-3xl font-bold text-green-500">{jackpot.currencySign}{formatFullAmount(jackpot.totalPrizePool)}</div> </div>{}<div className="flex items-center justify-center gap-2 flex-wrap mt-3"> <span className={`px-3 py-1 rounded text-xs font-semibold ${isOpen ? 'bg-green-500/20 text-green-500':'bg-muted text-muted-foreground'}`}>{jackpot.jackpotStatus.toUpperCase()}</span>{jackpot.isLatest && ( <span className="bg-primary/20 text-primary px-3 py-1 rounded text-xs font-semibold"> LATEST </span> )}</div> </div> );};export default JackpotDetails;
 ```
 
-File: (app)/jackpots/components/Tabs/Comments/CommentItem.jsx
+File: app/(app)/jackpots/components/Tabs/Comments/CommentItem.jsx
 ```jsx
 "use client";import React,{useState}from "react";import{MessageSquare,Share2,Trash2,MoreHorizontal}from "lucide-react";import{formatTimeAgo,generateAvatar}from "../../../utils/helpers";const CommentItem=({comment,onDelete})=>{const [showMenu,setShowMenu]=useState(false);const user=comment.userId ||{};const userName=user.name || "Anonymous";const userInitial=userName.charAt(0).toUpperCase();const profilePicture=user.profilePicture;const timestamp=comment.createdAt || comment.timestamp;const handleDelete=async ()=>{if (window.confirm("Are you sure you want to delete this comment?")){await onDelete(comment._id);}setShowMenu(false);};return ( <div className="flex gap-3 py-3 relative">{}{profilePicture ? ( <img src={profilePicture}alt={userName}className="w-8 h-8 rounded-full object-cover flex-shrink-0" /> ):( <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" style={{background:generateAvatar(userName)}}>{userInitial}</div> )}{}<div className="flex-1 min-w-0">{}<div className="flex items-center gap-2 mb-1"> <span className="text-sm font-semibold text-foreground hover:underline cursor-pointer">{userName}</span> <span className="text-xs text-muted-foreground">•</span> <span className="text-xs text-muted-foreground">{formatTimeAgo(timestamp)}</span>{}<div className="ml-auto relative"> <button onClick={()=> setShowMenu(!showMenu)}className="p-1 rounded-full hover:bg-muted transition-colors" > <MoreHorizontal className="w-4 h-4 text-muted-foreground" /> </button>{}{showMenu && ( <> <div className="fixed inset-0 z-10" onClick={()=> setShowMenu(false)}/> <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg py-1 z-20 min-w-[120px]"> <button onClick={handleDelete}className="w-full px-3 py-2 text-left text-sm text-red-500 hover:bg-muted flex items-center gap-2" > <Trash2 className="w-4 h-4" /> Delete </button> </div> </> )}</div> </div>{}<p className="text-sm text-foreground leading-relaxed mb-2">{comment.text}</p>{}<div className="flex items-center gap-4"> <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"> <MessageSquare className="w-4 h-4" /> Reply </button> <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"> <Share2 className="w-4 h-4" /> Share </button> </div> </div> </div> );};export default CommentItem;
 ```
 
-File: (app)/jackpots/components/Tabs/Comments/index.jsx
+File: app/(app)/jackpots/components/Tabs/Comments/index.jsx
 ```jsx
 "use client";import React,{useState}from "react";import{MessageSquare,Loader2}from "lucide-react";import CommentItem from "./CommentItem";import{generateAvatar}from "../../../utils/helpers";const CommentsTab=({comments,loading,submitting,onAddComment,onDeleteComment,})=>{const [isExpanded,setIsExpanded]=useState(false);const [newComment,setNewComment]=useState("");const handleSubmit=async (e)=>{e.preventDefault();if (!newComment.trim() || submitting) return;await onAddComment(newComment);setNewComment("");setIsExpanded(false);};if (loading){return ( <div className="p-8 flex flex-col items-center justify-center"> <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" /> <p className="text-muted-foreground text-sm">Loading comments...</p> </div> );}return ( <div className="p-4">{}<div className="mb-6"> <div className={`border border-border rounded-lg bg-card transition-all ${isExpanded ? "ring-2 ring-primary":"hover:border-muted-foreground"}`}>{!isExpanded ? ( <div className="flex items-center gap-3 p-3 cursor-text" onClick={()=> setIsExpanded(true)}> <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0" style={{background:generateAvatar("User")}}> U </div> <span className="text-muted-foreground text-sm"> Add a comment... </span> </div> ):( <form onSubmit={handleSubmit}className="p-3"> <textarea placeholder="What are your thoughts?" value={newComment}onChange={(e)=> setNewComment(e.target.value)}className="w-full bg-transparent text-foreground text-sm py-2 outline-none resize-none min-h-[80px] placeholder:text-muted-foreground" rows={3}autoFocus disabled={submitting}/> <div className="flex justify-end gap-2 pt-2 border-t border-border mt-2"> <button type="button" onClick={()=>{setIsExpanded(false);setNewComment("");}}className="px-4 py-1.5 rounded-full text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors" disabled={submitting}> Cancel </button> <button type="submit" disabled={!newComment.trim() || submitting}className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 ${newComment.trim() && !submitting ? "bg-primary text-primary-foreground hover:bg-primary/90":"bg-muted text-muted-foreground cursor-not-allowed"}`}>{submitting && ( <Loader2 className="w-3 h-3 animate-spin" /> )}Comment </button> </div> </form> )}</div> </div>{}{comments.length===0 ? ( <div className="py-12 text-center"> <MessageSquare className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" /> <p className="text-muted-foreground text-sm">No comments yet</p> <p className="text-muted-foreground/60 text-xs mt-1"> Be the first to share your thoughts! </p> </div> ):( <div className="divide-y divide-border">{comments.map((comment)=> ( <CommentItem key={comment._id}comment={comment}onDelete={onDeleteComment}/> ))}</div> )}</div> );};export default CommentsTab;
 ```
 
-File: (app)/jackpots/components/Tabs/Matches/index.jsx
+File: app/(app)/jackpots/components/Tabs/Matches/index.jsx
 ```jsx
 "use client";import React from "react";import{Save,Loader2}from "lucide-react";import MatchCard from "./MatchCard";const MatchesTab=({events,predictions,onSelect,hasUnsavedPicks,onSavePrediction,isSaving,jackpotStatus,})=>{const isOpen=jackpotStatus==="Open";const picksCount=Object.keys(predictions).length;const totalGames=events.length;const isComplete=picksCount===totalGames;return ( <div className="relative">{}<div className="p-4 space-y-3 pb-24">{events.map((event)=> ( <MatchCard key={event.eventNumber}event={event}prediction={predictions[event.eventNumber]}onSelect={onSelect}/> ))}</div>{}{isOpen && ( <div className="sticky bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent"> <div className="bg-card border border-border rounded-xl p-4 shadow-lg">{}<div className="flex items-center justify-between mb-3"> <span className="text-sm text-muted-foreground">{picksCount}of{totalGames}picks made </span> <span className={`text-sm font-medium ${isComplete ? "text-green-500":"text-primary"}`}>{Math.round((picksCount / totalGames) * 100)}% </span> </div>{}<div className="h-2 bg-muted rounded-full mb-4 overflow-hidden"> <div className={`h-full rounded-full transition-all duration-300 ${isComplete ? "bg-green-500":"bg-primary"}`}style={{width:`${(picksCount / totalGames) * 100}%`}}/> </div>{}<button onClick={onSavePrediction}disabled={!hasUnsavedPicks || isSaving || picksCount===0}className={`w-full py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 ${hasUnsavedPicks && !isSaving && picksCount > 0 ? "bg-primary text-primary-foreground hover:bg-primary/90":"bg-muted text-muted-foreground cursor-not-allowed"}`}>{isSaving ? ( <> <Loader2 className="w-4 h-4 animate-spin" /> Saving... </> ):( <> <Save className="w-4 h-4" />{hasUnsavedPicks ? "Save Prediction":picksCount===0 ? "Make your picks to save":"All picks saved"}</> )}</button>{hasUnsavedPicks && ( <p className="text-xs text-center text-muted-foreground mt-2"> You have unsaved changes </p> )}</div> </div> )}{}{!isOpen && ( <div className="sticky bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent"> <div className="bg-muted/50 border border-border rounded-xl p-4 text-center"> <p className="text-sm text-muted-foreground"> This jackpot is closed. You can no longer make predictions. </p> </div> </div> )}</div> );};export default MatchesTab;
 ```
 
-File: (app)/jackpots/components/Tabs/Matches/MatchCard.jsx
+File: app/(app)/jackpots/components/Tabs/Matches/MatchCard.jsx
 ```jsx
 "use client";import React from "react";import{countryFlags,teamCountry}from "../../../utils/constants";import{formatMatchDate}from "../../../utils/helpers";const MatchCard=({event,prediction,onSelect})=>{const isFinished=event.resultPick !==null;const country=teamCountry[event.competitorHome] || "England";const flag=countryFlags[country] || "🏳️";const [homeScore,awayScore]=event.score ? event.score.split(":"):[null,null];const getButtonStyle=(pick)=>{const isSelected=prediction===pick;const isResult=event.resultPick===pick;let baseClasses="p-3 rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all border";if (isFinished && isResult){return `${baseClasses}bg-green-500/15 border-green-500 text-green-500`;}else if (isFinished && isSelected && !isResult){return `${baseClasses}bg-red-500/15 border-red-500 text-red-500`;}else if (isSelected && !isFinished){return `${baseClasses}bg-primary/15 border-primary text-primary`;}return `${baseClasses}bg-muted/50 border-border text-muted-foreground hover:bg-muted`;};return ( <div className="bg-card border border-border rounded-xl overflow-hidden">{}<div className="px-4 py-3 border-b border-border flex items-center gap-3 text-sm text-muted-foreground"> <span className="bg-primary/15 text-primary px-3 py-1 rounded-md font-semibold text-xs">{event.eventNumber}</span> <span className="text-xs">{formatMatchDate(event.kickoffTime)}</span> <span className="ml-auto text-xs">{flag}{country}</span> </div>{}<div className="p-4 flex items-center justify-center gap-3"> <span className="flex-1 text-right text-sm font-medium text-foreground truncate">{event.competitorHome}</span> <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg text-muted-foreground text-sm font-semibold">{isFinished ? ( <> <span>{homeScore}</span> <span>-</span> <span>{awayScore}</span> </> ):( <span>vs</span> )}</div> <span className="flex-1 text-left text-sm font-medium text-foreground truncate">{event.competitorAway}</span> </div>{}<div className="grid grid-cols-3 gap-2 px-4 pb-4">{["Home","Draw","Away"].map((pick)=>{const odds=event.odds?.[pick.toLowerCase()] || "-";return ( <button key={pick}onClick={()=> !isFinished && onSelect?.(event.eventNumber,pick)}disabled={isFinished}className={getButtonStyle(pick)}> <span className="text-xs font-medium uppercase opacity-70">{pick==="Home" ? "1":pick==="Draw" ? "X":"2"}</span> <span className="text-base font-bold">{odds}</span> </button> );})}</div> </div> );};export default MatchCard;
 ```
 
-File: (app)/jackpots/components/Tabs/Predictions/index.jsx
+File: app/(app)/jackpots/components/Tabs/Predictions/index.jsx
 ```jsx
 "use client";import React from "react";import{Loader2,Users}from "lucide-react";import PredictionItem from "./PredictionItem";const PredictionsTab=({predictions,jackpot,loading})=>{if (loading){return ( <div className="p-8 flex flex-col items-center justify-center"> <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" /> <p className="text-muted-foreground text-sm">Loading predictions...</p> </div> );}if (!predictions || predictions.length===0){return ( <div className="p-8 text-center"> <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" /> <p className="text-muted-foreground text-sm font-medium"> No predictions yet </p> <p className="text-muted-foreground/60 text-xs mt-1"> Be the first to make your picks! </p> </div> );}return ( <div>{}<div className="px-4 py-3 border-b border-border bg-muted/30"> <p className="text-sm text-muted-foreground"> <span className="font-semibold text-foreground">{predictions.length}</span>{" "}prediction{predictions.length !==1 ? "s":""}shared </p> </div>{}<div>{predictions.map((pred)=> ( <PredictionItem key={pred._id}prediction={pred}jackpot={jackpot}/> ))}</div> </div> );};export default PredictionsTab;
 ```
 
-File: (app)/jackpots/components/Tabs/Predictions/PredictionItem.jsx
+File: app/(app)/jackpots/components/Tabs/Predictions/PredictionItem.jsx
 ```jsx
 "use client";import React from 'react';import{formatTimeAgo,generateAvatar}from '../../../utils/helpers';const PredictionItem=({prediction,jackpot})=>{const isFinished=jackpot.jackpotStatus==='Finished';const calculateScore=()=>{if (!isFinished) return null;let correct=0;jackpot.events.forEach(event=>{if (prediction.picks[event.eventNumber]===event.resultPick) correct++;});return correct;};const score=calculateScore();const getScoreBadgeStyle=()=>{if (score >=13) return 'bg-green-500 text-white';if (score >=10) return 'bg-yellow-500 text-black';return 'bg-muted text-foreground';};return ( <div className="p-4 border-b border-border flex gap-3">{}<div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0" style={{background:generateAvatar(prediction.username)}}>{prediction.username.charAt(0).toUpperCase()}</div>{}<div className="flex-1 min-w-0">{}<div className="flex items-center gap-1 mb-2 flex-wrap"> <span className="font-semibold text-sm text-foreground">{prediction.username}</span> <span className="text-muted-foreground text-sm"> @{prediction.username.toLowerCase().replace(/\s/g,'_')}</span> <span className="text-muted-foreground text-sm">·</span> <span className="text-muted-foreground text-sm">{formatTimeAgo(prediction.timestamp)}</span>{score !==null && ( <span className={`ml-auto px-3 py-1 rounded-full text-xs font-bold ${getScoreBadgeStyle()}`}>{score}/17 </span> )}</div>{}<div className="flex flex-wrap gap-2">{Object.entries(prediction.picks) .sort((a,b)=> Number(a[0]) - Number(b[0])) .map(([num,pick])=>{const event=jackpot.events[num - 1];const isCorrect=isFinished && event?.resultPick===pick;const pickLabel=pick==='Home' ? '1':pick==='Draw' ? 'X':'2';return ( <div key={num}className={`relative px-3 py-2 rounded-lg text-base font-bold border min-w-[44px] text-center ${!isFinished ? 'bg-primary/10 text-primary border-primary/30':isCorrect ? 'bg-green-500/15 text-green-500 border-green-500/40':'bg-red-500/15 text-red-500 border-red-500/40'}`}>{}<span className="absolute top-0.5 left-1 text-[9px] opacity-60">{num}</span>{}{pickLabel}</div> );})}</div> </div> </div> );};export default PredictionItem;
 ```
 
-File: (app)/jackpots/components/Tabs/Stats/BellCurve.jsx
+File: app/(app)/jackpots/components/Tabs/Stats/BellCurve.jsx
 ```jsx
 "use client";import React,{useState,useRef,useCallback,useEffect}from 'react';const BellCurve=({totalGames:initialGames=17})=>{const [hoveredPoint,setHoveredPoint]=useState(null);const [lockedPoint,setLockedPoint]=useState(null);const [cursorPosition,setCursorPosition]=useState(null);const [totalGames,setTotalGames]=useState(initialGames);const svgRef=useRef(null);const width=1200;const height=500;const padding=60;const calculateOddsData=useCallback((n)=>{const data=[];const choose=(n,k)=>{if (k > n) return 0;if (k===0 || k===n) return 1;let result=1;for (let i=1;i <=k;i++){result *=(n - i + 1) / i;}return result;};for (let k=0;k <=n;k++){const combinations=choose(n,k) * Math.pow(2,n - k);const totalCombinations=Math.pow(3,n);const percentage=(combinations / totalCombinations) * 100;const odds=Math.round(totalCombinations / combinations);let status='NO PRIZE';if (k===n){status='MEGA JACKPOT';}else if (k >=Math.max(n - 5,Math.ceil(n * 0.7))){status='BONUS';}data.push({score:k,percentage:percentage,odds:odds,combinations:combinations,status:status});}return data;},[]);const oddsData=calculateOddsData(totalGames);const maxPercentage=Math.max(...oddsData.map(d=> d.percentage));useEffect(()=>{if (!lockedPoint && !hoveredPoint){const peakPoint=oddsData.reduce((max,d)=> d.percentage > max.percentage ? d:max);const peakIndex=oddsData.findIndex(d=> d.score===peakPoint.score);const x=padding + (peakIndex / (oddsData.length - 1)) * (width - 2 * padding);const y=height - padding - (peakPoint.percentage / maxPercentage) * (height - 2 * padding);setHoveredPoint({x,y,data:peakPoint});}},[totalGames,oddsData,lockedPoint,hoveredPoint,maxPercentage]);const createCurvePath=()=>{const points=oddsData.map((d,i)=>{const x=padding + (i / (oddsData.length - 1)) * (width - 2 * padding);const y=height - padding - (d.percentage / maxPercentage) * (height - 2 * padding);return{x,y,data:d};});let path=`M ${points[0].x}${points[0].y}`;for (let i=0;i < points.length - 1;i++){const current=points[i];const next=points[i + 1];const controlX=(current.x + next.x) / 2;const controlY=(current.y + next.y) / 2;path +=` Q ${controlX}${current.y},${controlX}${controlY}`;path +=` Q ${controlX}${next.y},${next.x}${next.y}`;}return{path,points};};const{path:curvePath,points}=createCurvePath();const createAreaPath=()=>{const baseY=height - padding;return `${curvePath}L ${width - padding}${baseY}L ${padding}${baseY}Z`;};const handleMouseMove=(e)=>{if (lockedPoint) return;if (!svgRef.current) return;const svgRect=svgRef.current.getBoundingClientRect();const scaleX=width / svgRect.width;const scaleY=height / svgRect.height;const mouseX=(e.clientX - svgRect.left) * scaleX;const mouseY=(e.clientY - svgRect.top) * scaleY;if (mouseX < padding || mouseX > width - padding || mouseY < 0 || mouseY > height){setCursorPosition(null);return;}setCursorPosition({x:mouseX,y:mouseY});let closestPoint=null;let minDistance=Infinity;points.forEach(point=>{const distance=Math.abs(point.x - mouseX);if (distance < minDistance){minDistance=distance;closestPoint=point;}});if (closestPoint && minDistance < 50){setHoveredPoint(closestPoint);}};const handleClick=(e)=>{if (!svgRef.current) return;const svgRect=svgRef.current.getBoundingClientRect();const scaleX=width / svgRect.width;const mouseX=(e.clientX - svgRect.left) * scaleX;let closestPoint=null;let minDistance=Infinity;points.forEach(point=>{const distance=Math.abs(point.x - mouseX);if (distance < minDistance){minDistance=distance;closestPoint=point;}});if (closestPoint && minDistance < 50){if (lockedPoint?.data.score===closestPoint.data.score){setLockedPoint(null);}else{setLockedPoint(closestPoint);setHoveredPoint(closestPoint);}}else{setLockedPoint(null);}};const handleMouseLeave=()=>{if (!lockedPoint){setCursorPosition(null);const peakPoint=oddsData.reduce((max,d)=> d.percentage > max.percentage ? d:max);const peakIndex=oddsData.findIndex(d=> d.score===peakPoint.score);const x=padding + (peakIndex / (oddsData.length - 1)) * (width - 2 * padding);const y=height - padding - (peakPoint.percentage / maxPercentage) * (height - 2 * padding);setHoveredPoint({x,y,data:peakPoint});}};const getColorForScore=(score)=>{if (score===totalGames) return '#fbbf24';if (score >=Math.max(totalGames - 5,Math.ceil(totalGames * 0.7))) return '#a855f7';if (score >=Math.ceil(totalGames * 0.5)) return '#3b82f6';return '#10b981';};const activePoint=lockedPoint || hoveredPoint;const formatPercentage=(percentage)=>{if (percentage===0) return "0.00";if (percentage >=1){return percentage.toFixed(2);}let str=percentage.toFixed(20);let dotIndex=str.indexOf('.');let nonZeroCount=0;let lastNonZeroIndex=dotIndex;for (let i=dotIndex + 1;i < str.length;i++){if (str[i] !=='0'){nonZeroCount++;lastNonZeroIndex=i;if (nonZeroCount >=2) break;}}let decimalPlaces=lastNonZeroIndex - dotIndex;return percentage.toFixed(decimalPlaces);};return ( <div className="bg-card border border-border rounded-xl overflow-hidden">{}<div className="px-4 py-3 border-b border-border"> <h3 className="font-semibold text-foreground text-center">Probability Distribution</h3> <p className="text-xs text-muted-foreground text-center mt-1"> Tap any point to see odds for that score </p> </div>{}{activePoint && ( <div className="px-4 py-3 border-b-2" style={{borderColor:getColorForScore(activePoint.data.score)}}> <div className="flex justify-center items-center gap-6 flex-wrap">{}<div className="text-center"> <div className="text-xs text-muted-foreground">Score</div> <div className="text-sm font-bold" style={{color:getColorForScore(activePoint.data.score)}}>{activePoint.data.score}/{totalGames}</div> </div>{}<div className="text-center"> <div className="text-xs text-muted-foreground">Odds</div> <div className="text-sm font-bold text-purple-400"> 1 in{activePoint.data.odds.toLocaleString()}</div> </div>{}<div className="text-center"> <div className="text-xs text-muted-foreground">Probability</div> <div className="text-sm font-bold text-foreground">{formatPercentage(activePoint.data.percentage)}% </div> </div>{}<div className="text-center"> <div className="text-xs text-muted-foreground">Prize</div> <div className={`px-3 py-1 rounded-lg text-xs font-bold ${activePoint.data.status==='MEGA JACKPOT' ? 'bg-yellow-500 text-black':activePoint.data.status==='BONUS' ? 'bg-purple-500 text-white':'bg-muted text-foreground'}`}>{activePoint.data.status}{lockedPoint && ' 🔒'}</div> </div> </div> </div> )}{}<div className="p-2"> <svg ref={svgRef}width="100%" height={height}viewBox={`0 0 ${width}${height}`}onMouseMove={handleMouseMove}onMouseLeave={handleMouseLeave}onClick={handleClick}className="cursor-pointer" preserveAspectRatio="xMidYMid meet" > <defs> <linearGradient id="curveGradient" x1="0%" y1="0%" x2="0%" y2="100%"> <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" /> <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" /> </linearGradient> <filter id="glow"> <feGaussianBlur stdDeviation="4" result="coloredBlur"/> <feMerge> <feMergeNode in="coloredBlur"/> <feMergeNode in="SourceGraphic"/> </feMerge> </filter> </defs>{}{[0,25,50,75,100].map((percent)=>{const y=height - padding - (percent / 100) * (height - 2 * padding);return ( <g key={percent}> <line x1={padding}y1={y}x2={width - padding}y2={y}stroke="hsl(var(--border))" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" /> <text x={padding - 15}y={y + 5}fill="hsl(var(--muted-foreground))" fontSize="14" textAnchor="end" >{percent}% </text> </g> );})}{}{oddsData.map((d,i)=>{const x=padding + (i / (oddsData.length - 1)) * (width - 2 * padding);const isActive=activePoint?.data.score===d.score;const showLabel=totalGames <=13 || i % 2===0;return ( <g key={i}> <line x1={x}y1={height - padding}x2={x}y2={height - padding + 6}stroke={isActive ? getColorForScore(d.score):"hsl(var(--muted-foreground))"}strokeWidth={isActive ? "2":"1"}/>{showLabel && ( <text x={x}y={height - padding + 22}fill={isActive ? getColorForScore(d.score):"hsl(var(--muted-foreground))"}fontSize="14" fontWeight={isActive ? "bold":"normal"}textAnchor="middle" >{d.score}</text> )}</g> );})}<path d={createAreaPath()}fill="url(#curveGradient)" /> <path d={curvePath}fill="none" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />{cursorPosition && !lockedPoint && ( <line x1={cursorPosition.x}y1={0}x2={cursorPosition.x}y2={height - padding}stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.3" pointerEvents="none" /> )}{activePoint && ( <g> <line x1={activePoint.x}y1={activePoint.y}x2={activePoint.x}y2={height - padding}stroke={getColorForScore(activePoint.data.score)}strokeWidth="6" opacity="0.3" filter="url(#glow)" /> <line x1={activePoint.x}y1={activePoint.y}x2={activePoint.x}y2={height - padding}stroke={getColorForScore(activePoint.data.score)}strokeWidth="2.5" strokeDasharray="6 3" opacity="0.9" >{!lockedPoint && ( <animate attributeName="stroke-dashoffset" from="0" to="18" dur="1s" repeatCount="indefinite" /> )}</line> <line x1={padding}y1={activePoint.y}x2={activePoint.x}y2={activePoint.y}stroke={getColorForScore(activePoint.data.score)}strokeWidth="1.5" strokeDasharray="3 3" opacity="0.5" /> </g> )}{points.map((point,i)=>{const isActive=activePoint?.data.score===point.data.score;const isLocked=lockedPoint?.data.score===point.data.score;const color=getColorForScore(point.data.score);return ( <g key={i}>{isActive && ( <circle cx={point.x}cy={point.y}r={18}fill="none" stroke={color}strokeWidth="1.5" opacity="0.3" > <animate attributeName="r" from="18" to="24" dur="1.5s" repeatCount="indefinite" /> <animate attributeName="opacity" from="0.3" to="0" dur="1.5s" repeatCount="indefinite" /> </circle> )}<circle cx={point.x}cy={point.y}r={isActive ? 9:5}fill={color}stroke="hsl(var(--background))" strokeWidth={isActive ? "2.5":"1.5"}style={{filter:isActive ? 'drop-shadow(0 0 8px rgba(255,255,255,0.8))':'none',cursor:'pointer',transition:'all 0.2s ease-out'}}/>{isLocked && ( <text x={point.x}y={point.y - 14}fontSize="12" textAnchor="middle">🔒</text> )}{(point.data.status==='MEGA JACKPOT' || point.data.status==='BONUS') && ( <circle cx={point.x}cy={point.y}r={isActive ? 14:10}fill="none" stroke={color}strokeWidth="1.5" opacity="0.4" style={{transition:'all 0.2s ease-out'}}/> )}</g> );})}{}<text x={width / 2}y={height - 5}fill="hsl(var(--muted-foreground))" fontSize="14" textAnchor="middle" fontWeight="600"> Number of Correct Predictions </text> <text x={20}y={height / 2}fill="hsl(var(--muted-foreground))" fontSize="14" textAnchor="middle" fontWeight="600" transform={`rotate(-90,20,${height / 2})`}> Probability (%) </text> </svg> </div>{}<div className="px-4 pb-4" style={{marginTop:'-10px'}}> <input type="range" min="5" max="20" value={totalGames}onChange={(e)=>{setTotalGames(parseInt(e.target.value));setLockedPoint(null);}}className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-500" style={{background:`linear-gradient(to right,#3b82f6 0%,#3b82f6 ${((totalGames - 5) / 15) * 100}%,hsl(var(--muted)) ${((totalGames - 5) / 15) * 100}%,hsl(var(--muted)) 100%)`}}/> <div className="flex justify-between text-xs text-muted-foreground mt-1"> <span>5</span> <span className="text-foreground font-semibold">{totalGames}</span> <span>20</span> </div> </div> </div> );};export default BellCurve;
 ```
 
-File: (app)/jackpots/components/Tabs/Stats/index.jsx
+File: app/(app)/jackpots/components/Tabs/Stats/index.jsx
 ```jsx
 "use client";import React from 'react';import{TrendingUp,BarChart3,Target,Users,Trophy}from 'lucide-react';import{formatCurrency}from '../../../utils/helpers';import BellCurve from './BellCurve';const StatsTab=({jackpot,communityPredictions})=>{const isFinished=jackpot.jackpotStatus==='Finished';const homeWins=jackpot.events.filter(e=> e.resultPick==='Home').length;const draws=jackpot.events.filter(e=> e.resultPick==='Draw').length;const awayWins=jackpot.events.filter(e=> e.resultPick==='Away').length;const communityStats={home:0,draw:0,away:0};communityPredictions.forEach(pred=>{Object.values(pred.picks).forEach(pick=>{if (pick==='Home') communityStats.home++;else if (pick==='Draw') communityStats.draw++;else communityStats.away++;});});const totalCommunityPicks=communityStats.home + communityStats.draw + communityStats.away;const avgOdds={home:(jackpot.events.reduce((sum,e)=> sum + (e.odds?.home || 0),0) / jackpot.events.length).toFixed(2),draw:(jackpot.events.reduce((sum,e)=> sum + (e.odds?.draw || 0),0) / jackpot.events.length).toFixed(2),away:(jackpot.events.reduce((sum,e)=> sum + (e.odds?.away || 0),0) / jackpot.events.length).toFixed(2)};const highestOddsMatches=[...jackpot.events] .sort((a,b)=>{const maxA=Math.max(a.odds?.home || 0,a.odds?.draw || 0,a.odds?.away || 0);const maxB=Math.max(b.odds?.home || 0,b.odds?.draw || 0,b.odds?.away || 0);return maxB - maxA;}) .slice(0,3);return ( <div className="p-4 space-y-4">{}{!isFinished && ( <BellCurve totalGames={jackpot.events.length}/> )}{}{isFinished && ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <BarChart3 className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Result Distribution</h3> </div> <div className="flex h-10 rounded-lg overflow-hidden mb-3"> <div className="bg-green-500 flex items-center justify-center text-sm font-bold text-green-950" style={{width:`${(homeWins / jackpot.events.length) * 100}%`}}>{homeWins}H </div> <div className="bg-yellow-500 flex items-center justify-center text-sm font-bold text-yellow-950" style={{width:`${(draws / jackpot.events.length) * 100}%`}}>{draws}D </div> <div className="bg-blue-500 flex items-center justify-center text-sm font-bold text-blue-950" style={{width:`${(awayWins / jackpot.events.length) * 100}%`}}>{awayWins}A </div> </div> <div className="grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground"> <div>Home Wins:{homeWins}</div> <div>Draws:{draws}</div> <div>Away Wins:{awayWins}</div> </div> </div> )}{}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Trophy className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Prize Breakdown</h3> </div> <div className="space-y-3">{jackpot.prizes.map((prize)=>{const isGrand=prize.jackpotType==='17/17';return ( <div key={prize.jackpotType}className={`rounded-lg p-3 ${isGrand ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30':'bg-muted/50'}`}> <div className="flex justify-between items-center"> <div> <div className={`text-xs font-medium mb-0.5 ${isGrand ? 'text-yellow-500':'text-muted-foreground'}`}>{isGrand ? '🏆 GRAND JACKPOT':`${prize.jackpotType}Correct`}</div> <div className={`text-base font-bold ${isGrand ? 'text-yellow-500':'text-foreground'}`}> KSH{formatCurrency(prize.prize)}</div> </div> <div className={`px-3 py-1.5 rounded-lg text-center ${isGrand ? 'bg-yellow-500/20':'bg-background'}`}> <div className={`text-base font-bold ${isGrand ? 'text-yellow-500':'text-foreground'}`}>{prize.winners}</div> <div className={`text-[10px] ${isGrand ? 'text-yellow-500/70':'text-muted-foreground'}`}> winners </div> </div> </div> </div> );})}</div> </div>{}{totalCommunityPicks > 0 && ( <div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Users className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Community Picks</h3> </div> <div className="grid grid-cols-3 gap-3"> <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20"> <div className="text-2xl font-bold text-green-500">{Math.round((communityStats.home / totalCommunityPicks) * 100)}% </div> <div className="text-xs text-muted-foreground mt-1">Home</div> </div> <div className="text-center p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20"> <div className="text-2xl font-bold text-yellow-500">{Math.round((communityStats.draw / totalCommunityPicks) * 100)}% </div> <div className="text-xs text-muted-foreground mt-1">Draw</div> </div> <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20"> <div className="text-2xl font-bold text-primary">{Math.round((communityStats.away / totalCommunityPicks) * 100)}% </div> <div className="text-xs text-muted-foreground mt-1">Away</div> </div> </div> </div> )}{}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <TrendingUp className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Average Odds</h3> </div> <div className="grid grid-cols-3 gap-3"> <div className="text-center p-3 bg-muted rounded-lg"> <div className="text-xl font-bold text-foreground">{avgOdds.home}</div> <div className="text-xs text-muted-foreground mt-1">Home</div> </div> <div className="text-center p-3 bg-muted rounded-lg"> <div className="text-xl font-bold text-foreground">{avgOdds.draw}</div> <div className="text-xs text-muted-foreground mt-1">Draw</div> </div> <div className="text-center p-3 bg-muted rounded-lg"> <div className="text-xl font-bold text-foreground">{avgOdds.away}</div> <div className="text-xs text-muted-foreground mt-1">Away</div> </div> </div> </div>{}<div className="bg-card border border-border rounded-xl p-4"> <div className="flex items-center gap-2 mb-4"> <Target className="w-5 h-5 text-primary" /> <h3 className="font-semibold text-foreground">Highest Odds Matches</h3> </div> <div className="space-y-3">{highestOddsMatches.map(match=>{const maxOdds=Math.max(match.odds?.home || 0,match.odds?.draw || 0,match.odds?.away || 0);const maxOddsType=match.odds?.home===maxOdds ? 'Home':match.odds?.draw===maxOdds ? 'Draw':'Away';return ( <div key={match.eventNumber}className="flex items-center justify-between p-3 bg-muted/50 rounded-lg" > <div className="flex items-center gap-3"> <span className="bg-primary/15 text-primary px-2 py-1 rounded text-xs font-semibold"> #{match.eventNumber}</span> <span className="text-sm text-foreground truncate">{match.competitorHome}vs{match.competitorAway}</span> </div> <div className="text-right"> <div className="text-sm font-bold text-foreground">{maxOdds.toFixed(2)}</div> <div className="text-xs text-muted-foreground">{maxOddsType}</div> </div> </div> );})}</div> </div>{}<div className="grid grid-cols-2 gap-3"> <div className="bg-card border border-border rounded-xl p-4 text-center"> <div className="text-2xl font-bold text-foreground">{jackpot.events.length}</div> <div className="text-xs text-muted-foreground mt-1">Total Matches</div> </div> <div className="bg-card border border-border rounded-xl p-4 text-center"> <div className="text-2xl font-bold text-foreground">{communityPredictions.length}</div> <div className="text-xs text-muted-foreground mt-1">Predictions</div> </div> </div> </div> );};export default StatsTab;
 ```
 
-File: (app)/jackpots/components/TabsHeader.jsx
+File: app/(app)/jackpots/components/TabsHeader.jsx
 ```jsx
 "use client";import React from 'react';const TabsHeader=({activeTab,setActiveTab})=>{const tabs=[{id:'matches',label:'Matches'},{id:'predictions',label:'Predictions'},{id:'stats',label:'Stats'},{id:'comments',label:'Comments'}];return ( <div className="flex border-b border-border bg-card sticky top-0 z-10">{tabs.map(tab=> ( <button key={tab.id}onClick={()=> setActiveTab(tab.id)}className={`flex-1 py-4 text-sm font-medium transition-colors relative ${activeTab===tab.id ? 'text-foreground':'text-muted-foreground hover:text-foreground'}`}>{tab.label}{activeTab===tab.id && ( <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-14 h-1 bg-primary rounded-t-full" /> )}</button> ))}</div> );};export default TabsHeader;
 ```
 
-File: (app)/jackpots/hooks/useJackpotApi.js
+File: app/(app)/jackpots/hooks/useJackpotApi.js
 ```js
 "use client";import{useState,useEffect,useCallback}from "react";const API_BASE="/api/jackpot";export function useJackpotDetails(jackpotId){const [data,setData]=useState(null);const [loading,setLoading]=useState(true);const [error,setError]=useState(null);const fetchDetails=useCallback(async ()=>{if (!jackpotId){setLoading(false);return;}try{setLoading(true);setError(null);let url=`${API_BASE}/details`;if (jackpotId !=="latest"){url +=`?jackpotId=${jackpotId}`;}else{url +=`?limit=1`;}const response=await fetch(url);const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch jackpot details");}const jackpotData=Array.isArray(result.data) ? result.data[0]:result.data;if (!jackpotData){throw new Error("No jackpot found");}setData(jackpotData);}catch (err){setError(err.message);setData(null);}finally{setLoading(false);}},[jackpotId]);useEffect(()=>{fetchDetails();},[fetchDetails]);return{data,loading,error,refetch:fetchDetails};}export function usePredictions(jackpotId){const [predictions,setPredictions]=useState([]);const [userPrediction,setUserPrediction]=useState(null);const [loading,setLoading]=useState(false);const [error,setError]=useState(null);const [submitting,setSubmitting]=useState(false);const fetchPredictions=useCallback(async ()=>{if (!jackpotId) return;try{setLoading(true);const response=await fetch( `${API_BASE}/predictions?jackpotId=${jackpotId}` );const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch predictions");}setPredictions(result.data || []);setError(null);}catch (err){setError(err.message);}finally{setLoading(false);}},[jackpotId]);const fetchUserPrediction=useCallback(async ()=>{if (!jackpotId) return;try{const response=await fetch( `${API_BASE}/predictions?jackpotId=${jackpotId}` );const result=await response.json();if (response.ok && result.data?.length > 0){setUserPrediction(result.data[0]);}}catch (err){console.error("Error fetching user prediction:",err);}},[jackpotId]);const createPrediction=useCallback( async (picks)=>{if (!jackpotId) return null;try{setSubmitting(true);const response=await fetch(`${API_BASE}/predictions`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jackpotId,picks}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to create prediction");}setUserPrediction(result.data);await fetchPredictions();return result.data;}catch (err){setError(err.message);return null;}finally{setSubmitting(false);}},[jackpotId,fetchPredictions] );const updatePrediction=useCallback( async (predictionId,picks)=>{try{setSubmitting(true);const response=await fetch(`${API_BASE}/predictions`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({predictionId,picks}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to update prediction");}setUserPrediction(result.data);await fetchPredictions();return result.data;}catch (err){setError(err.message);return null;}finally{setSubmitting(false);}},[fetchPredictions] );const deletePrediction=useCallback( async (predictionId)=>{try{setSubmitting(true);const response=await fetch(`${API_BASE}/predictions`,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({predictionId}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to delete prediction");}setUserPrediction(null);await fetchPredictions();return true;}catch (err){setError(err.message);return false;}finally{setSubmitting(false);}},[fetchPredictions] );useEffect(()=>{if (jackpotId){fetchPredictions();fetchUserPrediction();}},[jackpotId,fetchPredictions,fetchUserPrediction]);return{predictions,userPrediction,loading,error,submitting,createPrediction,updatePrediction,deletePrediction,refetch:fetchPredictions,};}export function useComments(jackpotId){const [comments,setComments]=useState([]);const [loading,setLoading]=useState(false);const [error,setError]=useState(null);const [submitting,setSubmitting]=useState(false);const fetchComments=useCallback(async ()=>{if (!jackpotId) return;try{setLoading(true);const response=await fetch( `${API_BASE}/comments?jackpotId=${jackpotId}` );const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch comments");}setComments(result.data || []);setError(null);}catch (err){setError(err.message);}finally{setLoading(false);}},[jackpotId]);const createComment=useCallback( async (text)=>{if (!jackpotId || !text.trim()) return null;try{setSubmitting(true);const response=await fetch(`${API_BASE}/comments`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jackpotId,text}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to create comment");}setComments((prev)=> [result.data,...prev]);return result.data;}catch (err){setError(err.message);return null;}finally{setSubmitting(false);}},[jackpotId] );const deleteComment=useCallback(async (commentId)=>{try{setSubmitting(true);const response=await fetch(`${API_BASE}/comments`,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({commentId}),});const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to delete comment");}setComments((prev)=> prev.filter((c)=> c._id !==commentId));return true;}catch (err){setError(err.message);return false;}finally{setSubmitting(false);}},[]);useEffect(()=>{if (jackpotId){fetchComments();}},[jackpotId,fetchComments]);return{comments,loading,error,submitting,createComment,deleteComment,refetch:fetchComments,};}export function useStatistics(jackpotId){const [stats,setStats]=useState(null);const [loading,setLoading]=useState(false);const [error,setError]=useState(null);const fetchStats=useCallback(async ()=>{if (!jackpotId) return;try{setLoading(true);const response=await fetch( `${API_BASE}/statistics?jackpotId=${jackpotId}` );const result=await response.json();if (!response.ok){throw new Error(result.message || "Failed to fetch statistics");}setStats(result.data);setError(null);}catch (err){setError(err.message);}finally{setLoading(false);}},[jackpotId]);useEffect(()=>{if (jackpotId){fetchStats();}},[jackpotId,fetchStats]);return{stats,loading,error,refetch:fetchStats};}
 ```
 
-File: (app)/jackpots/page.jsx
+File: app/(app)/jackpots/page.jsx
 ```jsx
-import JackpotTracker from "./client";export const metadata={title:"Wufwuf Jackpot Tracker",description:"Track SportPesa Mega Jackpot results,view match outcomes,share predictions with the community,and analyze winning patterns. Free jackpot tracker for Kenya!",keywords:[ "sportpesa jackpot","mega jackpot results","jackpot predictions","sportpesa results","kenya jackpot","jackpot tracker","betting tips kenya","sportpesa mega jackpot","jackpot analysis","football predictions kenya","midweek jackpot","jackpot winners",],openGraph:{title:"SportPesa Jackpot Tracker:Results,Predictions & Analysis | Wufwuf",description:"Never miss a jackpot result! Track SportPesa Mega Jackpot matches,share your predictions,see community picks,and analyze winning patterns on Wufwuf.",type:"website",url:"https:image:"https:siteName:"Wufwuf",},twitter:{card:"summary_large_image",title:"SportPesa Jackpot Tracker:Live Results & Predictions",description:"Track Mega Jackpot results,share predictions & compete with the community! 🎯 #SportPesa #Jackpot #Kenya #BettingTips #Wufwuf",creator:"@Wufwuf",images:["https:},alternates:{canonical:"https:},robots:{index:true,follow:true,nocache:true,googleBot:{index:true,follow:true,"max-video-preview":-1,"max-image-preview":"large","max-snippet":-1,},},};export default function JackpotsPage(){return <JackpotTracker />;}
+import Client from "./client";export const metadata={title:"Wufwuf Jackpot Tracker",description:"Track SportPesa Mega Jackpot results,view match outcomes,share predictions with the community,and analyze winning patterns. Free jackpot tracker for Kenya!",keywords:[ "sportpesa jackpot","mega jackpot results","jackpot predictions","sportpesa results","kenya jackpot","jackpot tracker","betting tips kenya","sportpesa mega jackpot","jackpot analysis","football predictions kenya","midweek jackpot","jackpot winners",],openGraph:{title:"SportPesa Jackpot Tracker:Results,Predictions & Analysis | Wufwuf",description:"Never miss a jackpot result! Track SportPesa Mega Jackpot matches,share your predictions,see community picks,and analyze winning patterns on Wufwuf.",type:"website",url:"https:image:"https:siteName:"Wufwuf",},twitter:{card:"summary_large_image",title:"SportPesa Jackpot Tracker:Live Results & Predictions",description:"Track Mega Jackpot results,share predictions & compete with the community! 🎯 #SportPesa #Jackpot #Kenya #BettingTips #Wufwuf",creator:"@Wufwuf",images:["https:},alternates:{canonical:"https:},robots:{index:true,follow:true,nocache:true,googleBot:{index:true,follow:true,"max-video-preview":-1,"max-image-preview":"large","max-snippet":-1,},},};export default function JackpotsPage(){return <Client />;}
 ```
 
-File: (app)/jackpots/utils/constants.js
+File: app/(app)/jackpots/utils/constants.js
 ```js
 export const countryFlags={'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Spain':'🇪🇸','Germany':'🇩🇪','Italy':'🇮🇹','France':'🇫🇷','Portugal':'🇵🇹','Netherlands':'🇳🇱','Belgium':'🇧🇪','Turkey':'🇹🇷','Cyprus':'🇨🇾','Israel':'🇮🇱','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿'};export const teamCountry={'Sunderland AFC':'England','Crystal Palace':'England','Swansea City':'England','Birmingham City':'England','Manchester United':'England','Liverpool FC':'England','Arsenal FC':'England','Chelsea FC':'England','Fulham FC':'England','Brighton & Hove Albion':'England','Hertha BSC':'Germany','Schalke 04':'Germany','VfL Bochum':'Germany','SV Darmstadt 98':'Germany','Holstein Kiel':'Germany','SC Paderborn 07':'Germany','FC Augsburg':'Germany','SC Freiburg':'Germany','Real Betis Seville':'Spain','Villarreal CF':'Spain','CD Mirandes':'Spain','FC Andorra':'Spain','Getafe CF':'Spain','Valencia CF':'Spain','Racing Santander':'Spain','UD Las Palmas':'Spain','Kocaelispor':'Turkey','Trabzonspor':'Turkey','Genclerbirligi SK':'Turkey','Samsunspor':'Turkey','FCV Dender EH':'Belgium','Royal Antwerp FC':'Belgium','Santa Clara Azores':'Portugal','FC Famalicao':'Portugal','FC Nantes':'France','Paris FC':'France','Apollon Limassol':'Cyprus','APOEL Nikosia':'Cyprus','Maccabi Haifa FC':'Israel','Maccabi Tel Aviv FC':'Israel',};export const jackpotData={jackpotId:"5d86d823-dad8-4ab9-aa6e-c2af3d406b7e",jackpotHumanId:164,jackpotStatus:"Finished",site:"SportPesa",finished:"2026-01-18T20:56:03.396Z",currencySign:"KSH",isLatest:true,totalPrizePool:366899365.93,events:[{eventNumber:1,kickoffTime:"2026-01-17T15:00:00Z",competitorHome:"Sunderland AFC",competitorAway:"Crystal Palace",resultPick:"Home",score:"2:1",odds:{home:2.10,draw:3.40,away:3.25}},{eventNumber:2,kickoffTime:"2026-01-17T17:30:00Z",competitorHome:"Swansea City",competitorAway:"Birmingham City",resultPick:"Draw",score:"1:1",odds:{home:2.45,draw:3.20,away:2.90}},{eventNumber:3,kickoffTime:"2026-01-17T19:30:00Z",competitorHome:"Hertha BSC",competitorAway:"Schalke 04",resultPick:"Draw",score:"0:0",odds:{home:2.30,draw:3.30,away:3.00}},{eventNumber:4,kickoffTime:"2026-01-17T20:00:00Z",competitorHome:"Real Betis Seville",competitorAway:"Villarreal CF",resultPick:"Home",score:"2:0",odds:{home:2.55,draw:3.10,away:2.85}},{eventNumber:5,kickoffTime:"2026-01-18T12:30:00Z",competitorHome:"VfL Bochum",competitorAway:"SV Darmstadt 98",resultPick:"Draw",score:"3:3",odds:{home:2.20,draw:3.45,away:3.10}},{eventNumber:6,kickoffTime:"2026-01-18T12:30:00Z",competitorHome:"Holstein Kiel",competitorAway:"SC Paderborn 07",resultPick:"Home",score:"2:0",odds:{home:2.15,draw:3.35,away:3.20}},{eventNumber:7,kickoffTime:"2026-01-18T13:00:00Z",competitorHome:"CD Mirandes",competitorAway:"FC Andorra",resultPick:"Away",score:"1:2",odds:{home:2.40,draw:3.25,away:2.95}},{eventNumber:8,kickoffTime:"2026-01-18T13:00:00Z",competitorHome:"Getafe CF",competitorAway:"Valencia CF",resultPick:"Away",score:"0:1",odds:{home:2.60,draw:3.05,away:2.80}},{eventNumber:9,kickoffTime:"2026-01-18T14:00:00Z",competitorHome:"Kocaelispor",competitorAway:"Trabzonspor",resultPick:"Away",score:"1:2",odds:{home:3.20,draw:3.30,away:2.15}},{eventNumber:10,kickoffTime:"2026-01-18T14:00:00Z",competitorHome:"Genclerbirligi SK",competitorAway:"Samsunspor",resultPick:"Draw",score:"1:1",odds:{home:2.75,draw:3.15,away:2.65}},{eventNumber:11,kickoffTime:"2026-01-18T15:00:00Z",competitorHome:"FCV Dender EH",competitorAway:"Royal Antwerp FC",resultPick:"Home",score:"1:0",odds:{home:3.40,draw:3.25,away:2.10}},{eventNumber:12,kickoffTime:"2026-01-18T15:15:00Z",competitorHome:"Racing Santander",competitorAway:"UD Las Palmas",resultPick:"Home",score:"4:1",odds:{home:2.85,draw:3.20,away:2.50}},{eventNumber:13,kickoffTime:"2026-01-18T15:30:00Z",competitorHome:"Santa Clara Azores",competitorAway:"FC Famalicao",resultPick:"Away",score:"0:1",odds:{home:2.50,draw:3.30,away:2.80}},{eventNumber:14,kickoffTime:"2026-01-18T16:15:00Z",competitorHome:"FC Nantes",competitorAway:"Paris FC",resultPick:"Away",score:"1:2",odds:{home:2.25,draw:3.40,away:3.05}},{eventNumber:15,kickoffTime:"2026-01-18T16:30:00Z",competitorHome:"FC Augsburg",competitorAway:"SC Freiburg",resultPick:"Draw",score:"2:2",odds:{home:2.90,draw:3.25,away:2.45}},{eventNumber:16,kickoffTime:"2026-01-18T17:00:00Z",competitorHome:"Apollon Limassol",competitorAway:"APOEL Nikosia",resultPick:"Home",score:"2:1",odds:{home:2.35,draw:3.30,away:2.95}},{eventNumber:17,kickoffTime:"2026-01-18T18:30:00Z",competitorHome:"Maccabi Haifa FC",competitorAway:"Maccabi Tel Aviv FC",resultPick:"Home",score:"4:1",odds:{home:2.70,draw:3.20,away:2.60}}],prizes:[{jackpotType:"17/17",prize:113971243.68,winners:0},{jackpotType:"16/17",prize:123398540.87,winners:2},{jackpotType:"15/17",prize:92219280.05,winners:18},{jackpotType:"14/17",prize:25489124.86,winners:156},{jackpotType:"13/17",prize:11821176.47,winners:1243}]};
 ```
 
-File: (app)/jackpots/utils/helpers.js
+File: app/(app)/jackpots/utils/helpers.js
 ```js
 export const formatCurrency=(amount)=>{if (amount >=1000000) return `${(amount / 1000000).toFixed(1)}M`;if (amount >=1000) return `${(amount / 1000).toFixed(0)}K`;return new Intl.NumberFormat('en-KE').format(amount);};export const formatDate=(dateStr)=>{const date=new Date(dateStr);return date.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});};export const formatMatchDate=(dateStr)=>{const date=new Date(dateStr);return `${date.toLocaleDateString('en-GB',{weekday:'long'})}${date.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'})}- ${date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;};export const formatTimeAgo=(dateStr)=>{const now=new Date();const date=new Date(dateStr);const diff=Math.floor((now - date) / 1000);if (diff < 60) return 'now';if (diff < 3600) return `${Math.floor(diff / 60)}m`;if (diff < 86400) return `${Math.floor(diff / 3600)}h`;return `${Math.floor(diff / 86400)}d`;};export const generateAvatar=(name)=>{const colors=[ ['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140'],['#a18cd1','#fbc2eb'] ];const color=colors[name.charCodeAt(0) % colors.length];return `linear-gradient(135deg,${color[0]},${color[1]})`;};
 ```
 
-File: (app)/layout.tsx
+File: app/(app)/layout.tsx
 ```tsx
 import{ReactNode}from "react";import AppLayout from "@/components/layouts/AppLayout";interface AppLayoutWrapperProps{children:ReactNode;}export default function AppLayoutWrapper({children}:AppLayoutWrapperProps){return <AppLayout>{children}</AppLayout>;}
 ```
 
-File: (app)/lobby/page.tsx
+File: app/(app)/lobby/page.tsx
 ```tsx
 export default function LobbyPage(){return ( <div> <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4"> Lobby </h1> <p className="text-gray-600 dark:text-gray-400"> Welcome to the lobby! This is where your main content goes. </p> </div> );}
 ```
 
-File: (app)/profile/page.tsx
+File: app/(app)/profile/page.tsx
 ```tsx
 export default function ProfilePage(){return ( <div> <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4"> Profile </h1> <p className="text-gray-600 dark:text-gray-400"> Manage your profile settings and information here. </p> </div> );}
 ```
 
-File: (app)/settings/page.tsx
+File: app/(app)/settings/page.tsx
 ```tsx
 export default function SettingsPage(){return ( <div> <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4"> Settings </h1> <p className="text-gray-600 dark:text-gray-400"> Configure your application settings here. </p> </div> );}
 ```
 
-File: (app)/support/page.tsx
+File: app/(app)/support/page.tsx
 ```tsx
 export default function SupportPage(){return ( <div> <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4"> Support </h1> <p className="text-gray-600 dark:text-gray-400"> Get help and support for using the application. </p> </div> );}
 ```
 
-File: (landing)/layout.tsx
+File: app/(landing)/layout.tsx
 ```tsx
 import{ReactNode}from "react";import AppLayout from "@/components/layouts/AppLayout";interface AppLayoutWrapperProps{children:ReactNode;}export default function AppLayoutWrapper({children}:AppLayoutWrapperProps){return <AppLayout>{children}</AppLayout>;}
 ```
 
-File: (landing)/page.tsx
+File: app/(landing)/page.tsx
 ```tsx
 import Link from "next/link";export default function LandingPage(){return ( <div className="flex items-center justify-center min-h-screen"> <div className="text-center"> <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4"> Welcome to My App </h1> <p className="text-gray-600 dark:text-gray-400 mb-8"> Your app is ready to build! </p> <Link href="/lobby" className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" > Get Started </Link> </div> </div> );}
 ```
 
-File: globals.css
+File: app/globals.css
 ```css
 @import "tailwindcss";@import "tw-animate-css";@custom-variant dark (&:is(.dark *));@theme inline{--color-background:var(--background);--color-foreground:var(--foreground);--font-sans:var(--font-geist-sans);--font-mono:var(--font-geist-mono);--color-sidebar-ring:var(--sidebar-ring);--color-sidebar-border:var(--sidebar-border);--color-sidebar-accent-foreground:var(--sidebar-accent-foreground);--color-sidebar-accent:var(--sidebar-accent);--color-sidebar-primary-foreground:var(--sidebar-primary-foreground);--color-sidebar-primary:var(--sidebar-primary);--color-sidebar-foreground:var(--sidebar-foreground);--color-sidebar:var(--sidebar);--color-chart-5:var(--chart-5);--color-chart-4:var(--chart-4);--color-chart-3:var(--chart-3);--color-chart-2:var(--chart-2);--color-chart-1:var(--chart-1);--color-ring:var(--ring);--color-input:var(--input);--color-border:var(--border);--color-destructive:var(--destructive);--color-accent-foreground:var(--accent-foreground);--color-accent:var(--accent);--color-muted-foreground:var(--muted-foreground);--color-muted:var(--muted);--color-secondary-foreground:var(--secondary-foreground);--color-secondary:var(--secondary);--color-primary-foreground:var(--primary-foreground);--color-primary:var(--primary);--color-popover-foreground:var(--popover-foreground);--color-popover:var(--popover);--color-card-foreground:var(--card-foreground);--color-card:var(--card);--radius-sm:calc(var(--radius) - 4px);--radius-md:calc(var(--radius) - 2px);--radius-lg:var(--radius);--radius-xl:calc(var(--radius) + 4px);--radius-2xl:calc(var(--radius) + 8px);--radius-3xl:calc(var(--radius) + 12px);--radius-4xl:calc(var(--radius) + 16px);}:root{--radius:0.625rem;--background:oklch(1 0 0);--foreground:oklch(0.129 0.042 264.695);--card:oklch(1 0 0);--card-foreground:oklch(0.129 0.042 264.695);--popover:oklch(1 0 0);--popover-foreground:oklch(0.129 0.042 264.695);--primary:oklch(0.208 0.042 265.755);--primary-foreground:oklch(0.984 0.003 247.858);--secondary:oklch(0.968 0.007 247.896);--secondary-foreground:oklch(0.208 0.042 265.755);--muted:oklch(0.968 0.007 247.896);--muted-foreground:oklch(0.554 0.046 257.417);--accent:oklch(0.968 0.007 247.896);--accent-foreground:oklch(0.208 0.042 265.755);--destructive:oklch(0.577 0.245 27.325);--border:oklch(0.929 0.013 255.508);--input:oklch(0.929 0.013 255.508);--ring:oklch(0.704 0.04 256.788);--chart-1:oklch(0.646 0.222 41.116);--chart-2:oklch(0.6 0.118 184.704);--chart-3:oklch(0.398 0.07 227.392);--chart-4:oklch(0.828 0.189 84.429);--chart-5:oklch(0.769 0.188 70.08);--sidebar:oklch(0.984 0.003 247.858);--sidebar-foreground:oklch(0.129 0.042 264.695);--sidebar-primary:oklch(0.208 0.042 265.755);--sidebar-primary-foreground:oklch(0.984 0.003 247.858);--sidebar-accent:oklch(0.968 0.007 247.896);--sidebar-accent-foreground:oklch(0.208 0.042 265.755);--sidebar-border:oklch(0.929 0.013 255.508);--sidebar-ring:oklch(0.704 0.04 256.788);}.dark{--background:oklch(0.129 0.042 264.695);--foreground:oklch(0.984 0.003 247.858);--card:oklch(0.208 0.042 265.755);--card-foreground:oklch(0.984 0.003 247.858);--popover:oklch(0.208 0.042 265.755);--popover-foreground:oklch(0.984 0.003 247.858);--primary:oklch(0.929 0.013 255.508);--primary-foreground:oklch(0.208 0.042 265.755);--secondary:oklch(0.279 0.041 260.031);--secondary-foreground:oklch(0.984 0.003 247.858);--muted:oklch(0.279 0.041 260.031);--muted-foreground:oklch(0.704 0.04 256.788);--accent:oklch(0.279 0.041 260.031);--accent-foreground:oklch(0.984 0.003 247.858);--destructive:oklch(0.704 0.191 22.216);--border:oklch(1 0 0 / 10%);--input:oklch(1 0 0 / 15%);--ring:oklch(0.551 0.027 264.364);--chart-1:oklch(0.488 0.243 264.376);--chart-2:oklch(0.696 0.17 162.48);--chart-3:oklch(0.769 0.188 70.08);--chart-4:oklch(0.627 0.265 303.9);--chart-5:oklch(0.645 0.246 16.439);--sidebar:oklch(0.208 0.042 265.755);--sidebar-foreground:oklch(0.984 0.003 247.858);--sidebar-primary:oklch(0.488 0.243 264.376);--sidebar-primary-foreground:oklch(0.984 0.003 247.858);--sidebar-accent:oklch(0.279 0.041 260.031);--sidebar-accent-foreground:oklch(0.984 0.003 247.858);--sidebar-border:oklch(1 0 0 / 10%);--sidebar-ring:oklch(0.551 0.027 264.364);}@layer base{*{@apply border-border outline-ring/50;}body{@apply bg-background text-foreground;}}
 ```
 
-File: layout.tsx
+File: app/layout.tsx
 ```tsx
 import{ReactNode}from "react";import type{Metadata,Viewport}from "next";import "./globals.css";export const metadata:Metadata={title:"My App",description:"Welcome to my application",};export const viewport:Viewport={width:"device-width",initialScale:1,};interface RootLayoutProps{children:ReactNode;}export default function RootLayout({children}:RootLayoutProps){return ( <html lang="en"> <body className="bg-white dark:bg-gray-900"> <main className="min-h-screen">{children}</main> </body> </html> );}
+```
+
+File: components.json
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/globals.css",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {}
+}
+
+```
+
+File: components/layouts/AppLayout.tsx
+```tsx
+"use client";import{useRef,useState,useEffect,ReactNode}from "react";import{useMediaQuery}from "@/hooks/useMediaQuery";import LeftSideBar from "@/components/navigation/LeftSideBar";import MainNavbar from "@/components/navigation/MainNavbar";import BottomNavigation from "@/components/navigation/BottomNavigation";interface SidebarStyles{sidebar:string;content:string;}interface DeviceWidths{open:SidebarStyles;closed:SidebarStyles;}interface SidebarWidths{desktop:DeviceWidths;tablet:DeviceWidths;mobile:DeviceWidths;}const SIDEBAR_WIDTHS:SidebarWidths={desktop:{open:{sidebar:"w-60",content:"ml-60"},closed:{sidebar:"w-16",content:"ml-16"},},tablet:{open:{sidebar:"w-72",content:"ml-0"},closed:{sidebar:"w-0",content:"ml-0"},},mobile:{open:{sidebar:"w-[65%]",content:"ml-0"},closed:{sidebar:"w-0",content:"ml-0"},},};interface AppLayoutProps{children:ReactNode;}export default function AppLayout({children}:AppLayoutProps){const isMobile=useMediaQuery('(max-width:639px)');const isTablet=useMediaQuery('(min-width:640px) and (max-width:1023px)');const [openLeftSidebar,setOpenLeftSidebar]=useState<boolean>(true);const sidebarRef=useRef<HTMLElement>(null);useEffect(()=>{const isDarkMode=localStorage.getItem("theme")==="dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.classList.toggle("dark",isDarkMode);},[]);useEffect(()=>{if (!isMobile && !isTablet) return;const handleClickOutside=(event:MouseEvent)=>{if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)){setOpenLeftSidebar(false);}};document.addEventListener("mousedown",handleClickOutside);return ()=> document.removeEventListener("mousedown",handleClickOutside);},[isMobile,isTablet]);const getSidebarStyles=():SidebarStyles=>{const deviceType:keyof SidebarWidths=isMobile ? "mobile":isTablet ? "tablet":"desktop";const state:keyof DeviceWidths=openLeftSidebar ? "open":"closed";return SIDEBAR_WIDTHS[deviceType][state];};return ( <div className="min-h-screen bg-white dark:bg-gray-900"> <MainNavbar openLeftSidebar={openLeftSidebar}onToggleSidebar={()=> setOpenLeftSidebar(!openLeftSidebar)}/> <div className="flex relative">{}{openLeftSidebar && (isMobile || isTablet) && ( <div className="fixed inset-0 bg-black/50 z-20" onClick={()=> setOpenLeftSidebar(false)}/> )}{}<aside ref={sidebarRef}className={` fixed top-12 left-0 h-[calc(100vh-3rem)] z-30 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-all duration-300 ease-in-out ${!openLeftSidebar && (isMobile || isTablet) ? "-translate-x-full":"translate-x-0"}${getSidebarStyles().sidebar}${isMobile || isTablet ? "shadow-xl":""}`}> <LeftSideBar openLeftSidebar={openLeftSidebar}onClose={()=> setOpenLeftSidebar(false)}/> </aside>{}<main className={` flex-1 pt-20 px-4 pb-20 md:pb-4 min-h-screen transition-all duration-300 ${getSidebarStyles().content}`}>{children}</main> </div> <BottomNavigation openLeftSidebar={openLeftSidebar}onToggleSidebar={()=> setOpenLeftSidebar(!openLeftSidebar)}/> </div> );}
+```
+
+File: components/navigation/BottomNavigation.tsx
+```tsx
+"use client";import Link from "next/link";import{usePathname}from "next/navigation";import{Home,User,Menu}from "lucide-react";interface BottomNavigationProps{openLeftSidebar:boolean;onToggleSidebar:()=> void;}export default function BottomNavigation({openLeftSidebar,onToggleSidebar}:BottomNavigationProps){const pathname=usePathname();return ( <div className="fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex items-center justify-around md:hidden z-10"> <Link href="/lobby" className={`flex flex-col items-center justify-center w-1/3 ${pathname==="/lobby" ? "text-blue-600":"text-gray-600 dark:text-gray-400"}`}> <Home className="h-5 w-5" /> <span className="text-xs mt-1">Lobby</span> </Link> <Link href="/profile" className={`flex flex-col items-center justify-center w-1/3 ${pathname==="/profile" ? "text-blue-600":"text-gray-600 dark:text-gray-400"}`}> <User className="h-5 w-5" /> <span className="text-xs mt-1">Profile</span> </Link> <button onClick={onToggleSidebar}className={`flex flex-col items-center justify-center w-1/3 ${openLeftSidebar ? "text-blue-600":"text-gray-600 dark:text-gray-400"}`}> <Menu className="h-5 w-5" /> <span className="text-xs mt-1">More</span> </button> </div> );}
+```
+
+File: components/navigation/LeftSideBar.tsx
+```tsx
+"use client";import Link from "next/link";import{usePathname}from "next/navigation";import{useMediaQuery}from "@/hooks/useMediaQuery";import{cn}from "@/lib/utils";import{Home,User,Settings,Headset,LucideIcon}from "lucide-react";interface NavItemType{href:string;icon:LucideIcon;label:string;}interface NavItemProps{item:NavItemType;isActive:boolean;openLeftSidebar:boolean;onClose:()=> void;}const NavItem=({item,isActive,openLeftSidebar,onClose}:NavItemProps)=>{const isMobile=useMediaQuery('(max-width:639px)');const isTablet=useMediaQuery('(min-width:640px) and (max-width:1023px)');const Icon=item.icon;const handleClick=()=>{if ((isMobile || isTablet) && onClose){onClose();}};return ( <Link href={item.href}onClick={handleClick}className={cn( "flex items-center px-3 h-12 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800",isActive ? "bg-gray-100 dark:bg-gray-800 text-blue-600":"text-gray-700 dark:text-gray-300",openLeftSidebar ? "justify-start":"justify-center" )}> <Icon className="h-5 w-5" />{openLeftSidebar && <span className="ml-3">{item.label}</span>}</Link> );};interface LeftSideBarProps{openLeftSidebar:boolean;onClose:()=> void;}export default function LeftSideBar({openLeftSidebar,onClose}:LeftSideBarProps){const pathname=usePathname();const topNavItems:NavItemType[]=[{href:"/lobby",icon:Home,label:"Lobby"},{href:"/profile",icon:User,label:"Profile"},];const bottomNavItems:NavItemType[]=[{href:"/support",icon:Headset,label:"Support"},{href:"/settings",icon:Settings,label:"Settings"},];return ( <aside className="h-full overflow-y-auto"> <div className="flex flex-col h-full">{}<div className="flex-1 py-4">{topNavItems.map((item,index)=> ( <NavItem key={index}item={item}isActive={pathname===item.href}openLeftSidebar={openLeftSidebar}onClose={onClose}/> ))}</div>{}<div className="py-4 border-t border-gray-200 dark:border-gray-800">{bottomNavItems.map((item,index)=> ( <NavItem key={index}item={item}isActive={pathname===item.href}openLeftSidebar={openLeftSidebar}onClose={onClose}/> ))}</div> </div> </aside> );}
+```
+
+File: components/navigation/MainNavbar.tsx
+```tsx
+"use client";import Link from "next/link";import Image from "next/image";import{useMediaQuery}from "@/hooks/useMediaQuery";import{Menu,X,Sun,Moon}from "lucide-react";import{Button}from "@/components/ui/button";import{useState,useEffect}from "react";interface MainNavbarProps{openLeftSidebar:boolean;onToggleSidebar:()=> void;}type Theme="light" | "dark";export default function MainNavbar({openLeftSidebar,onToggleSidebar}:MainNavbarProps){const isMobile=useMediaQuery('(max-width:639px)');const [theme,setTheme]=useState<Theme>("light");useEffect(()=>{const savedTheme=(localStorage.getItem("theme") as Theme) || "light";setTheme(savedTheme);},[]);const toggleTheme=()=>{const newTheme:Theme=theme==="light" ? "dark":"light";setTheme(newTheme);localStorage.setItem("theme",newTheme);document.documentElement.classList.toggle("dark",newTheme==="dark");};return ( <header className="fixed top-0 w-full h-12 flex items-center justify-between px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50"> <div className="flex items-center gap-4"> <Button variant="ghost" size="icon" onClick={onToggleSidebar}className="h-8 w-8" >{openLeftSidebar ? <X className="h-5 w-5" />:<Menu className="h-5 w-5" />}</Button>{!isMobile && ( <Link href="/"> <Image src="/logo.png" alt="Logo" width={32}height={32}/> </Link> )}</div> <h1 className="text-sm font-semibold">My App</h1> <Button variant="ghost" size="icon" onClick={toggleTheme}className="h-8 w-8">{theme==="light" ? <Moon className="h-4 w-4" />:<Sun className="h-4 w-4" />}</Button> </header> );}
+```
+
+File: components/ui/avatar.tsx
+```tsx
+"use client" import * as React from "react" import * as AvatarPrimitive from "@radix-ui/react-avatar" import{cn}from "@/lib/utils" function Avatar({className,...props}:React.ComponentProps<typeof AvatarPrimitive.Root>){return ( <AvatarPrimitive.Root data-slot="avatar" className={cn( "relative flex size-8 shrink-0 overflow-hidden rounded-full",className )}{...props}/> )}function AvatarImage({className,...props}:React.ComponentProps<typeof AvatarPrimitive.Image>){return ( <AvatarPrimitive.Image data-slot="avatar-image" className={cn("aspect-square size-full",className)}{...props}/> )}function AvatarFallback({className,...props}:React.ComponentProps<typeof AvatarPrimitive.Fallback>){return ( <AvatarPrimitive.Fallback data-slot="avatar-fallback" className={cn( "bg-muted flex size-full items-center justify-center rounded-full",className )}{...props}/> )}export{Avatar,AvatarImage,AvatarFallback}
+```
+
+File: components/ui/badge.tsx
+```tsx
+import * as React from "react" import{Slot}from "@radix-ui/react-slot" import{cva,type VariantProps}from "class-variance-authority" import{cn}from "@/lib/utils" const badgeVariants=cva( "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",{variants:{variant:{default:"border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",secondary:"border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",destructive:"border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",outline:"text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",},},defaultVariants:{variant:"default",},}) function Badge({className,variant,asChild=false,...props}:React.ComponentProps<"span"> & VariantProps<typeof badgeVariants> &{asChild?:boolean}){const Comp=asChild ? Slot:"span" return ( <Comp data-slot="badge" className={cn(badgeVariants({variant}),className)}{...props}/> )}export{Badge,badgeVariants}
+```
+
+File: components/ui/button.tsx
+```tsx
+import * as React from "react" import{Slot}from "@radix-ui/react-slot" import{cva,type VariantProps}from "class-variance-authority" import{cn}from "@/lib/utils" const buttonVariants=cva( "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",{variants:{variant:{default:"bg-primary text-primary-foreground hover:bg-primary/90",destructive:"bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",outline:"border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",secondary:"bg-secondary text-secondary-foreground hover:bg-secondary/80",ghost:"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",link:"text-primary underline-offset-4 hover:underline",},size:{default:"h-9 px-4 py-2 has-[>svg]:px-3",sm:"h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",lg:"h-10 rounded-md px-6 has-[>svg]:px-4",icon:"size-9","icon-sm":"size-8","icon-lg":"size-10",},},defaultVariants:{variant:"default",size:"default",},}) function Button({className,variant="default",size="default",asChild=false,...props}:React.ComponentProps<"button"> & VariantProps<typeof buttonVariants> &{asChild?:boolean}){const Comp=asChild ? Slot:"button" return ( <Comp data-slot="button" data-variant={variant}data-size={size}className={cn(buttonVariants({variant,size,className}))}{...props}/> )}export{Button,buttonVariants}
+```
+
+File: components/ui/scroll-area.tsx
+```tsx
+"use client" import * as React from "react" import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area" import{cn}from "@/lib/utils" function ScrollArea({className,children,...props}:React.ComponentProps<typeof ScrollAreaPrimitive.Root>){return ( <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn("relative",className)}{...props}> <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1" >{children}</ScrollAreaPrimitive.Viewport> <ScrollBar /> <ScrollAreaPrimitive.Corner /> </ScrollAreaPrimitive.Root> )}function ScrollBar({className,orientation="vertical",...props}:React.ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>){return ( <ScrollAreaPrimitive.ScrollAreaScrollbar data-slot="scroll-area-scrollbar" orientation={orientation}className={cn( "flex touch-none p-px transition-colors select-none",orientation==="vertical" && "h-full w-2.5 border-l border-l-transparent",orientation==="horizontal" && "h-2.5 flex-col border-t border-t-transparent",className )}{...props}> <ScrollAreaPrimitive.ScrollAreaThumb data-slot="scroll-area-thumb" className="bg-border relative flex-1 rounded-full" /> </ScrollAreaPrimitive.ScrollAreaScrollbar> )}export{ScrollArea,ScrollBar}
+```
+
+File: components/ui/sheet.tsx
+```tsx
+"use client" import * as React from "react" import * as SheetPrimitive from "@radix-ui/react-dialog" import{XIcon}from "lucide-react" import{cn}from "@/lib/utils" function Sheet({...props}:React.ComponentProps<typeof SheetPrimitive.Root>){return <SheetPrimitive.Root data-slot="sheet"{...props}/>}function SheetTrigger({...props}:React.ComponentProps<typeof SheetPrimitive.Trigger>){return <SheetPrimitive.Trigger data-slot="sheet-trigger"{...props}/>}function SheetClose({...props}:React.ComponentProps<typeof SheetPrimitive.Close>){return <SheetPrimitive.Close data-slot="sheet-close"{...props}/>}function SheetPortal({...props}:React.ComponentProps<typeof SheetPrimitive.Portal>){return <SheetPrimitive.Portal data-slot="sheet-portal"{...props}/>}function SheetOverlay({className,...props}:React.ComponentProps<typeof SheetPrimitive.Overlay>){return ( <SheetPrimitive.Overlay data-slot="sheet-overlay" className={cn( "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",className )}{...props}/> )}function SheetContent({className,children,side="right",...props}:React.ComponentProps<typeof SheetPrimitive.Content> &{side?:"top" | "right" | "bottom" | "left"}){return ( <SheetPortal> <SheetOverlay /> <SheetPrimitive.Content data-slot="sheet-content" className={cn( "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",side==="right" && "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",side==="left" && "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",side==="top" && "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",side==="bottom" && "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",className )}{...props}>{children}<SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"> <XIcon className="size-4" /> <span className="sr-only">Close</span> </SheetPrimitive.Close> </SheetPrimitive.Content> </SheetPortal> )}function SheetHeader({className,...props}:React.ComponentProps<"div">){return ( <div data-slot="sheet-header" className={cn("flex flex-col gap-1.5 p-4",className)}{...props}/> )}function SheetFooter({className,...props}:React.ComponentProps<"div">){return ( <div data-slot="sheet-footer" className={cn("mt-auto flex flex-col gap-2 p-4",className)}{...props}/> )}function SheetTitle({className,...props}:React.ComponentProps<typeof SheetPrimitive.Title>){return ( <SheetPrimitive.Title data-slot="sheet-title" className={cn("text-foreground font-semibold",className)}{...props}/> )}function SheetDescription({className,...props}:React.ComponentProps<typeof SheetPrimitive.Description>){return ( <SheetPrimitive.Description data-slot="sheet-description" className={cn("text-muted-foreground text-sm",className)}{...props}/> )}export{Sheet,SheetTrigger,SheetClose,SheetContent,SheetHeader,SheetFooter,SheetTitle,SheetDescription,}
+```
+
+File: components/ui/tooltip.tsx
+```tsx
+"use client" import * as React from "react" import * as TooltipPrimitive from "@radix-ui/react-tooltip" import{cn}from "@/lib/utils" function TooltipProvider({delayDuration=0,...props}:React.ComponentProps<typeof TooltipPrimitive.Provider>){return ( <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration}{...props}/> )}function Tooltip({...props}:React.ComponentProps<typeof TooltipPrimitive.Root>){return ( <TooltipProvider> <TooltipPrimitive.Root data-slot="tooltip"{...props}/> </TooltipProvider> )}function TooltipTrigger({...props}:React.ComponentProps<typeof TooltipPrimitive.Trigger>){return <TooltipPrimitive.Trigger data-slot="tooltip-trigger"{...props}/>}function TooltipContent({className,sideOffset=0,children,...props}:React.ComponentProps<typeof TooltipPrimitive.Content>){return ( <TooltipPrimitive.Portal> <TooltipPrimitive.Content data-slot="tooltip-content" sideOffset={sideOffset}className={cn( "bg-foreground text-background animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",className )}{...props}>{children}<TooltipPrimitive.Arrow className="bg-foreground fill-foreground z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" /> </TooltipPrimitive.Content> </TooltipPrimitive.Portal> )}export{Tooltip,TooltipTrigger,TooltipContent,TooltipProvider}
+```
+
+File: hooks/useMediaQuery.ts
+```ts
+import{useState,useEffect}from 'react';export function useMediaQuery(query:string):boolean{const [matches,setMatches]=useState<boolean>(false);useEffect(()=>{const media=window.matchMedia(query);setMatches(media.matches);const listener=()=> setMatches(media.matches);media.addEventListener('change',listener);return ()=> media.removeEventListener('change',listener);},[query]);return matches;}
+```
+
+File: lib/utils.ts
+```ts
+import{clsx,type ClassValue}from "clsx" import{twMerge}from "tailwind-merge" export function cn(...inputs:ClassValue[]){return twMerge(clsx(inputs))}
+```
+
+File: package.json
+```json
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.563.0",
+    "next": "16.1.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.4.0",
+    "zustand": "^5.0.10"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.4",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5"
+  }
+}
+
+```
+
+File: README.md
+```md
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```
+
+File: tsconfig.json
+```json
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
 ```
 

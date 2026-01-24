@@ -1,6 +1,7 @@
-import Client from "./client";
+import { Metadata } from 'next';
+import Client from './client';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Wufwuf Jackpot Tracker",
   description: "Track SportPesa Mega Jackpot results, view match outcomes, share predictions with the community, and analyze winning patterns. Free jackpot tracker for Kenya!",
   keywords: [
@@ -22,7 +23,9 @@ export const metadata = {
     description: "Never miss a jackpot result! Track SportPesa Mega Jackpot matches, share your predictions, see community picks, and analyze winning patterns on Wufwuf.",
     type: "website",
     url: "https://wufwuf.io/jackpots",
-    image: "https://wufwuf.io/og-jackpot.png",
+    images: [{
+      url: "https://wufwuf.io/og-jackpot.png",
+    }],
     siteName: "Wufwuf",
   },
   twitter: {
@@ -43,8 +46,8 @@ export const metadata = {
       index: true,
       follow: true,
       "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      'max-image-preview': "large",
+      'max-snippet': -1,
     },
   },
 };
