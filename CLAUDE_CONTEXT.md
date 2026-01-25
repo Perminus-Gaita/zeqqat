@@ -68,6 +68,12 @@ File Structure:
 │   └── prisma.ts
 │   └── utils.ts
 └── package.json
+├── prisma
+│   ├── migrations
+│   │   ├── 20260124111340_init
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
 ├── scripts
 │   └── claude.sh
 └── tsconfig.json
