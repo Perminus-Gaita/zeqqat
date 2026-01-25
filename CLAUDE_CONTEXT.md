@@ -6,6 +6,9 @@ File Structure:
 └── README.md
 ├── app
 │   ├── (app)
+│   │   ├── auth
+│   │   │   ├── [path]
+│   │   │   │   └── page.tsx
 │   │   ├── jackpots
 │   │   │   └── client.tsx
 │   │   │   └── page.tsx
@@ -21,6 +24,10 @@ File Structure:
 │   ├── (landing)
 │   │   └── layout.tsx
 │   │   └── page.tsx
+│   ├── api
+│   │   ├── auth
+│   │   │   ├── [...path]
+│   │   │   │   ├── route.ts
 │   └── globals.css
 │   └── layout.tsx
 ├── components
@@ -65,6 +72,8 @@ File Structure:
 ├── hooks
 │   └── useMediaQuery.ts
 ├── lib
+│   ├── auth
+│   │   └── client.ts
 │   └── prisma.ts
 │   └── utils.ts
 └── package.json
