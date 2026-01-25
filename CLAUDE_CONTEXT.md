@@ -9,6 +9,8 @@ File Structure:
 │   │   ├── auth
 │   │   │   ├── [path]
 │   │   │   │   └── page.tsx
+│   │   │   ├── sign-in
+│   │   │   │   └── page.tsx
 │   │   ├── jackpots
 │   │   │   └── client.tsx
 │   │   │   └── page.tsx
@@ -27,10 +29,12 @@ File Structure:
 │   ├── api
 │   │   ├── auth
 │   │   │   ├── [...path]
-│   │   │   │   ├── route.ts
+│   │   │   │   └── route.ts
 │   └── globals.css
 │   └── layout.tsx
 ├── components
+│   ├── auth
+│   │   └── AuthModal.tsx
 │   ├── layouts
 │   │   └── AppLayout.tsx
 │   ├── navigation
@@ -75,6 +79,8 @@ File Structure:
 │   ├── auth
 │   │   └── client.ts
 │   └── prisma.ts
+│   ├── stores
+│   │   └── auth-modal-store.ts
 │   └── utils.ts
 └── package.json
 ├── prisma
