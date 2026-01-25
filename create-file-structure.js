@@ -9,6 +9,7 @@ const INCLUDED_FOLDERS = new Set([
     'hooks',
     'lib',
     'models',
+    'prisma',
     'scripts',
     'services',
     'styles',
