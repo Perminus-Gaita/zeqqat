@@ -99,7 +99,7 @@ function shouldIgnoreCustomPath(relativePath, filename = '') {
 // Check if a file should be included
 function shouldIncludeFile(filename, relativePath, isRootLevel = false) {
     // Always ignore the output file
-    if (filename === 'claude-input.md') {
+    if (filename === 'CLAUDE_CONTEXT.md') {
         return false;
     }
     
@@ -376,7 +376,7 @@ async function main() {
             console.log('  - Media files (images, videos, audio, fonts, etc.)');
             console.log('  - Binary files');
             console.log('  - Lock files (yarn.lock, package-lock.json, etc.)');
-            console.log('  - claude-input.md (output file)');
+            console.log('  - CLAUDE_CONTEXT.md (output file)');
             console.log('  - page_components/Cards/Tutorial/');
             console.log('  - *_old files');
             return;
@@ -402,7 +402,7 @@ async function main() {
         
         const output = await processMultipleFiles(fileList);
         
-        const outputFile = 'claude-input.md';
+        const outputFile = 'CLAUDE_CONTEXT.md';
         await fs.writeFile(outputFile, output);
         console.log(`\nSuccessfully created ${outputFile}`);
         console.log(`Output file size: ${(output.length / 1024 / 1024).toFixed(2)} MB`);
@@ -415,8 +415,8 @@ async function main() {
 main();
 
 // command to call this script
-// node prepare-for-claude .
+// node prepare-for-claude.js .
 // or
-// node prepare-for-claude app
+// node prepare-for-claude.js app
 // or
-// node prepare-for-claude --list prepare-for-claude-list.txt
+// node prepare-for-claude.js --list prepare-for-claude-list.txt
