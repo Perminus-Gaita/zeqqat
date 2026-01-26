@@ -30,11 +30,15 @@ File Structure:
 │   │   ├── auth
 │   │   │   ├── [...path]
 │   │   │   │   └── route.ts
+│   │   │   ├── telegram
+│   │   │   │   ├── callback
+│   │   │   │   │   └── route.ts
 │   └── globals.css
 │   └── layout.tsx
 ├── components
 │   ├── auth
 │   │   └── AuthModal.tsx
+│   │   └── TelegramLoginWidget.tsx
 │   ├── layouts
 │   │   └── AppLayout.tsx
 │   ├── navigation
