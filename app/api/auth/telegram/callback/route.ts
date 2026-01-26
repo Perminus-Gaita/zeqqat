@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createAuthServer } from '@neondatabase/auth/next/server';
+import { createAuthClient } from '@neondatabase/neon-js/auth';
+import { neon } from '@neondatabase/serverless';
 
 interface TelegramAuthData {
   id: number;
@@ -15,7 +16,6 @@ interface TelegramAuthData {
 function verifyTelegramAuth(authData: TelegramAuthData): boolean {
   const { hash, ...data } = authData;
   
-  // Create check string
   const checkString = Object.keys(data)
     .sort()
     .filter(key => data[key as keyof typeof data] !== undefined)
@@ -27,24 +27,20 @@ function verifyTelegramAuth(authData: TelegramAuthData): boolean {
     throw new Error('Bot token not configured');
   }
 
-  // Create secret key
   const secretKey = crypto
     .createHash('sha256')
     .update(botToken)
     .digest();
   
-  // Calculate HMAC
   const hmac = crypto
     .createHmac('sha256', secretKey)
     .update(checkString)
     .digest('hex');
   
-  // Verify hash matches
   if (hmac !== hash) {
     return false;
   }
   
-  // Check auth date (should be within 24 hours)
   const currentTime = Math.floor(Date.now() / 1000);
   if (currentTime - data.auth_date > 86400) {
     return false;
@@ -65,78 +61,75 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get Neon Auth server instance
-    const authServer = createAuthServer();
-    
-    // Create a unique email for Telegram users (they don't have real emails)
-    const telegramEmail = `telegram_${telegramData.id}@telegram.local`;
-    
-    // Try to find existing user or create new one
-    let user;
-    try {
-      // Check if user already exists
-      const existingUsers = await authServer.api.listUsers();
-      user = existingUsers.find(u => 
-        u.email === telegramEmail || 
-        u.id === telegramData.id.toString()
-      );
+    // Get origin from request
+    const origin = request.headers.get('origin') || 
+                   request.headers.get('referer')?.split('/').slice(0, 3).join('/') ||
+                   'http://localhost:3000';
 
-      if (!user) {
-        // Create new user
-        user = await authServer.api.createUser({
-          email: telegramEmail,
-          name: `${telegramData.first_name} ${telegramData.last_name || ''}`.trim(),
-          image: telegramData.photo_url || null,
-          emailVerified: true, // Telegram auth is verified
-        });
-      } else {
-        // Update existing user with latest data
-        user = await authServer.api.updateUser({
-          userId: user.id,
-          data: {
-            name: `${telegramData.first_name} ${telegramData.last_name || ''}`.trim(),
-            image: telegramData.photo_url || user.image,
-          }
-        });
+    // Initialize database and auth client
+    const sql = neon(process.env.DATABASE_URL!);
+    const auth = createAuthClient(process.env.NEON_AUTH_BASE_URL!, {
+      fetchOptions: {
+        headers: {
+          'Origin': origin,
+        }
       }
-    } catch (error) {
-      console.error('Error managing user:', error);
+    });
+    
+    // Create unique email and deterministic password
+    const telegramEmail = `telegram_${telegramData.id}@telegram.local`;
+    const password = crypto
+      .createHmac('sha256', process.env.TELEGRAM_BOT_TOKEN!)
+      .update(telegramData.id.toString())
+      .digest('hex');
+
+    // Check if user already exists
+    const existingUser = await sql`
+      SELECT id FROM neon_auth.user 
+      WHERE email = ${telegramEmail}
+      LIMIT 1
+    `;
+
+    let result;
+
+    if (existingUser.length > 0) {
+      // User exists - sign them in
+      console.log('✅ Existing user, signing in...');
+      result = await auth.signIn.email({
+        email: telegramEmail,
+        password: password,
+        callbackURL: `${origin}/lobby`,
+      });
+    } else {
+      // User doesn't exist - sign them up
+      console.log('✅ New user, creating account...');
+      result = await auth.signUp.email({
+        email: telegramEmail,
+        password: password,
+        name: `${telegramData.first_name} ${telegramData.last_name || ''}`.trim(),
+        image: telegramData.photo_url,
+        callbackURL: `${origin}/lobby`,
+      });
+    }
+
+    if (result.error || !result.data) {
+      console.error('Auth error:', result.error);
       return NextResponse.json(
-        { success: false, error: 'Failed to create/update user' },
+        { success: false, error: result.error?.message || 'Authentication failed' },
         { status: 500 }
       );
     }
 
-    // Create session
-    const session = await authServer.api.createSession({
-      userId: user.id,
-      userAgent: request.headers.get('user-agent') || 'telegram-widget',
-    });
-
-    // Set session cookie
-    const cookieHeader = `better-auth.session_token=${session.token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 7}; ${
-      process.env.NODE_ENV === 'production' 
-        ? 'Secure; SameSite=None' 
-        : 'SameSite=Lax'
-    }`;
-
+    console.log('✅ Authentication successful');
     return NextResponse.json(
       { 
         success: true, 
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-        }
+        user: result.data.user,
+        session: result.data.session,
       },
-      {
-        status: 200,
-        headers: {
-          'Set-Cookie': cookieHeader,
-        }
-      }
+      { status: 200 }
     );
+
   } catch (error) {
     console.error('Telegram auth error:', error);
     return NextResponse.json(
