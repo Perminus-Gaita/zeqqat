@@ -11,9 +11,6 @@ File Structure:
 │   │   │   │   └── page.tsx
 │   │   │   ├── sign-in
 │   │   │   │   └── page.tsx
-│   │   │   ├── telegram
-│   │   │   │   ├── callback
-│   │   │   │   │   └── route.js
 │   │   ├── jackpots
 │   │   │   └── client.tsx
 │   │   │   └── page.tsx
