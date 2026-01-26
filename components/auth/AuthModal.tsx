@@ -1,15 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuthModal } from '@/lib/stores/auth-modal-store';
 import { SignInForm, SignUpForm } from '@neondatabase/auth/react';
 import { authClient } from '@/lib/auth/client';
-import { Mail, X, AlertCircle } from 'lucide-react';
-import { useAuthModal } from '@/lib/stores/auth-modal-store';
+import { Mail, X } from 'lucide-react';
+import TelegramLoginWidget from '@/components/auth/TelegramLoginWidget';
 
 export default function AuthModal() {
-  const { isOpen, message, closeAuthModal } = useAuthModal();
-  const [selectedMethod, setSelectedMethod] = useState<'email' | null>(null);
+  const { isOpen, closeAuthModal } = useAuthModal();
+  const [selectedMethod, setSelectedMethod] = useState<'email' | 'telegram' | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedMethod(null);
+      setIsSignUp(false);
+    }
+  }, [isOpen]);
+
+  // Prevent scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   const localization = {
     SIGN_IN: 'Sign In',
@@ -19,42 +43,26 @@ export default function AuthModal() {
     FORGOT_PASSWORD: 'Forgot Password?',
   };
 
-  const resetAndClose = () => {
-    setSelectedMethod(null);
-    setIsSignUp(false);
-    closeAuthModal();
-  };
-
-  if (!isOpen) return null;
-
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-50"
-        onClick={resetAndClose}
+        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        onClick={closeAuthModal}
       />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl relative max-h-[90vh] overflow-y-auto">
-          {/* Close Button */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto relative">
+          {/* Close button */}
           <button
-            onClick={resetAndClose}
-            className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 z-10"
+            onClick={closeAuthModal}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 z-10"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
 
           <div className="p-6">
-            {/* Custom Message Alert */}
-            {message && (
-              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-blue-900 dark:text-blue-100">{message}</p>
-              </div>
-            )}
-
             {selectedMethod === 'email' ? (
               <>
                 <button
@@ -76,6 +84,29 @@ export default function AuthModal() {
                     {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
                   </button>
                 </div>
+              </>
+            ) : selectedMethod === 'telegram' ? (
+              <>
+                <button
+                  onClick={() => setSelectedMethod(null)}
+                  className="mb-4 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                >
+                  ← Back to options
+                </button>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    Sign in with Telegram
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Click the button below to authenticate with your Telegram account
+                  </p>
+                </div>
+                <TelegramLoginWidget
+                  botUsername={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || ''}
+                  buttonSize="large"
+                  redirectTo="/lobby"
+                  onAuth={() => closeAuthModal()}
+                />
               </>
             ) : (
               <>
@@ -110,12 +141,7 @@ export default function AuthModal() {
 
                   {/* Telegram */}
                   <div
-                    onClick={() => {
-                      authClient.signIn.social({ 
-                        provider: 'telegram',
-                        callbackURL: window.location.pathname
-                      });
-                    }}
+                    onClick={() => setSelectedMethod('telegram')}
                     className="bg-blue-500 rounded-lg p-4 cursor-pointer hover:bg-blue-600 transition-all"
                   >
                     <div className="flex items-center gap-3">
