@@ -15,8 +15,15 @@ File Structure:
 │   │   │   └── client.tsx
 │   │   │   └── page.tsx
 │   │   └── layout.tsx
-│   │   ├── lobby
-│   │   │   └── page.tsx
+│   │   ├── nyumbani
+│   │   │   └── client.jsx
+│   │   │   ├── components
+│   │   │   │   └── markets-tab.jsx
+│   │   │   │   └── nfts-tab.jsx
+│   │   │   │   └── pools-tab.jsx
+│   │   │   │   └── ratings-tab.jsx
+│   │   │   │   └── shows-tab.jsx
+│   │   │   └── page.jsx
 │   │   ├── profile
 │   │   │   └── page.tsx
 │   │   ├── settings
