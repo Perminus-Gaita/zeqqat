@@ -112,7 +112,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {/* Main Content */}
         <main className={`
-          flex-1 pt-20 px-4 pb-20 md:pb-4 min-h-screen
+          flex-1 pt-10 px-4 pb-20 md:pb-4 min-h-screen
           transition-all duration-300
           ${getSidebarStyles().content}
         `}>

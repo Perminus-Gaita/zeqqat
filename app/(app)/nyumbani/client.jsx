@@ -21,10 +21,10 @@ const TabNavigation = () => {
   ];
 
   const exampleQueries = [
-    "Create a market for UFC 310",
-    "Show me trending pools",
-    "Explain how betting pools work",
-    "What are the leaderboard rankings?",
+    "Show me the winning patterns",
+    "Strategies to predict draws",
+    "Odds vs actual outcomes",
+    "How to build a prediction strategy",
   ];
 
   useEffect(() => {
@@ -110,7 +110,7 @@ const TabNavigation = () => {
                 </div>
 
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                  💡 Try: Create a market for [event] or describe any future event you want to bet on
+                  💡 Try: Give me previous jackpot analysis or show me draw statistics
                 </p>
               </div>
             </div>
