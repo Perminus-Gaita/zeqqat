@@ -17,7 +17,7 @@ const BellCurve: React.FC<BellCurveProps> = ({ stats }) => {
     <div className="space-y-3">
       <div>
         <div className="flex justify-between text-xs mb-1">
-          <span className="text-green-500 font-medium">Home Wins</span>
+          <span className="text-green-500 font-medium">Home Winss</span>
           <span className="text-foreground font-bold">{stats.homeWins} ({homePercent.toFixed(1)}%)</span>
         </div>
         <div className="h-8 bg-muted rounded-lg overflow-hidden">
