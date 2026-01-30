@@ -38,10 +38,10 @@ const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => 
         isActive
           ? "bg-gray-100 dark:bg-gray-800 text-blue-600"
           : "text-gray-700 dark:text-gray-300",
-        openLeftSidebar ? "px-3" : "pl-[1.375rem]"
+        openLeftSidebar ? "px-3" : "pl-5.5"
       )}
     >
-      <Icon className="h-5 w-5 flex-shrink-0" />
+      <Icon className="h-5 w-5 shrink-0" />
       <span 
         className={cn(
           "whitespace-nowrap transition-all duration-300 ease-in-out",

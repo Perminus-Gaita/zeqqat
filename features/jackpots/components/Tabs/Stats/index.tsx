@@ -52,7 +52,7 @@ const StatsTab: React.FC<StatsTabProps> = ({
                 key={prize.jackpotType}
                 className={`rounded-lg p-3 ${
                   isGrand 
-                    ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30'
+                    ? 'bg-linear-to-r from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30'
                     : 'bg-muted/50'
                 }`}
               >

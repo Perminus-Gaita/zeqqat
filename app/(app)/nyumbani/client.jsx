@@ -227,7 +227,7 @@ const TabNavigation = () => {
                         onClick={() => setExampleQuery(exampleQueries[3])}
                         className="bg-white dark:bg-gray-800 
                                  hover:bg-blue-600 hover:text-white 
-                                 dark:hover:bg-blue-500 dark:hover:bg-blue-600 
+                                 dark:hover:bg-blue-500
                                  text-gray-700 dark:text-gray-200 
                                  border border-gray-300 dark:border-gray-600
                                  px-3 py-1.5 rounded-full text-sm 
