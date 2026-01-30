@@ -1,7 +1,7 @@
-// components/layouts/AppLayout.tsx
 "use client";
-import { useRef, useState, useEffect, ReactNode } from "react";
+import { useRef, useEffect, ReactNode } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSidebar } from "@/lib/stores/sidebar-store";
 import LeftSideBar from "@/components/navigation/LeftSideBar";
 import MainNavbar from "@/components/navigation/main-navbar/index";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
@@ -45,7 +45,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isMobile = useMediaQuery('(max-width: 639px)');
   const isTablet = useMediaQuery('(min-width: 640px) and (max-width: 1023px)');
   
-  const [openLeftSidebar, setOpenLeftSidebar] = useState<boolean>(true);
+  const { openLeftSidebar, setOpenLeftSidebar, toggleSidebar } = useSidebar();
   const sidebarRef = useRef<HTMLElement>(null);
 
   // Dark mode
@@ -67,7 +67,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobile, isTablet]);
+  }, [isMobile, isTablet, setOpenLeftSidebar]);
 
   const getSidebarStyles = (): SidebarStyles => {
     const deviceType: keyof SidebarWidths = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
@@ -79,7 +79,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <MainNavbar
         openLeftSidebar={openLeftSidebar}
-        onToggleSidebar={() => setOpenLeftSidebar(!openLeftSidebar)}
+        onToggleSidebar={toggleSidebar}
       />
 
       <div className="flex relative">
@@ -122,7 +122,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       <BottomNavigation
         openLeftSidebar={openLeftSidebar}
-        onToggleSidebar={() => setOpenLeftSidebar(!openLeftSidebar)}
+        onToggleSidebar={toggleSidebar}
       />
     </div>
   );

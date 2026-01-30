@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Send, Sparkles, Loader2 } from 'lucide-react';
+import { useSidebar } from '@/lib/stores/sidebar-store';
 import WinningPicksDistribution from './components/WinningPicksDistribution';
 
 const TabNavigation = () => {
@@ -11,6 +12,9 @@ const TabNavigation = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
+  
+  // Get sidebar state from context
+  const { openLeftSidebar } = useSidebar();
 
   const greetingPairs = [
     { withName: "Hey, {name}!", withoutName: "Hey there!" },
@@ -72,31 +76,34 @@ const TabNavigation = () => {
     for (let i = 0; i < words.length; i++) {
       currentText += (i > 0 ? ' ' : '') + words[i];
       onUpdate(currentText);
-      await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 40));
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
   };
 
   const handleSendMessage = async () => {
     if (!message.trim() || isGenerating) return;
 
-    const userMessage = message.trim();
+    const userMessage = {
+      id: Date.now(),
+      role: 'user',
+      content: message
+    };
+
+    setMessages(prev => [...prev, userMessage]);
     setMessage('');
-    
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsGenerating(true);
 
-    if (userMessage.toLowerCase().includes('winning pattern') || 
-        userMessage.toLowerCase().includes('show me the winning')) {
-      
-      const assistantMessageId = Date.now();
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        introText: '', 
-        afterComponentText: '',
-        id: assistantMessageId,
-        showComponents: false 
-      }]);
+    const assistantMessageId = Date.now() + 1;
+    setMessages(prev => [...prev, {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      introText: '',
+      showComponents: false,
+      afterComponentText: ''
+    }]);
 
+    if (message.toLowerCase().includes('winning') || message.toLowerCase().includes('pattern')) {
       const introText = "Based on analyzing previous SportPesa jackpots, here is the winning patterns:";
       
       await simulateStreaming(introText, (text) => {
@@ -116,26 +123,18 @@ const TabNavigation = () => {
       ));
 
       await new Promise(resolve => setTimeout(resolve, 500));
+
+      const afterText = "This data shows historical winning patterns from past jackpots. Remember, past results don't guarantee future outcomes, but understanding these patterns can inform your winning strategy.";
       
-      const contextText = "This data shows historical winning patterns from past jackpots. Remember, past results don't guarantee future outcomes, but understanding these patterns can inform your winning strategy.";
-      
-      await simulateStreaming(contextText, (text) => {
+      await simulateStreaming(afterText, (text) => {
         setMessages(prev => prev.map(msg => 
           msg.id === assistantMessageId 
             ? { ...msg, afterComponentText: text }
             : msg
         ));
       });
-
     } else {
-      const assistantMessageId = Date.now();
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: '', 
-        id: assistantMessageId 
-      }]);
-
-      const responseText = "I can help you analyze jackpot patterns and statistics. Try asking me to 'Show me the winning patterns' or 'What are the draw statistics?' to see detailed analysis with visual components.";
+      const responseText = "I can help you analyze SportPesa jackpot patterns and statistics. Try asking about 'winning patterns' to see detailed analysis with visual components.";
       
       await simulateStreaming(responseText, (text) => {
         setMessages(prev => prev.map(msg => 
@@ -155,6 +154,9 @@ const TabNavigation = () => {
       handleSendMessage();
     }
   };
+
+  // Dynamic margin class based on sidebar state
+  const inputMarginClass = openLeftSidebar ? 'lg:ml-60' : 'lg:ml-16';
 
   return (
     <div className="flex-1 flex flex-col w-full">
@@ -225,7 +227,7 @@ const TabNavigation = () => {
                         onClick={() => setExampleQuery(exampleQueries[3])}
                         className="bg-white dark:bg-gray-800 
                                  hover:bg-blue-600 hover:text-white 
-                                 dark:hover:bg-blue-500 dark:hover:text-white
+                                 dark:hover:bg-blue-500 dark:hover:bg-blue-600 
                                  text-gray-700 dark:text-gray-200 
                                  border border-gray-300 dark:border-gray-600
                                  px-3 py-1.5 rounded-full text-sm 
@@ -245,7 +247,7 @@ const TabNavigation = () => {
           </div>
         </div>
       ) : (
-        // Chat Mode - Fixed width, centered
+        // Chat Mode
         <div className="flex-1 flex flex-col">
           <div className="flex-1 px-4 max-w-3xl mx-auto w-full pt-1 pb-32">
             <div className="space-y-6">
@@ -305,10 +307,12 @@ const TabNavigation = () => {
             </div>
           </div>
 
-          {/* Fixed Input - Same width as content, moves with sidebar, no border */}
-          <div className="fixed bottom-0 left-0 lg:left-16 right-0 
+          {/* Fixed Input - Dynamically responds to sidebar state */}
+          <div className={`fixed bottom-0 left-0 right-0 
+                        ${inputMarginClass}
                         bg-white dark:bg-gray-900 
-                        pt-4 pb-4 z-10">
+                        pt-4 pb-4 z-10
+                        transition-all duration-300`}>
             <div className="px-4 max-w-3xl mx-auto w-full">
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">

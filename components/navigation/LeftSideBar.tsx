@@ -34,15 +34,24 @@ const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => 
       href={item.href}
       onClick={handleClick}
       className={cn(
-        "flex items-center px-3 h-12 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800",
+        "flex items-center justify-start h-12 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 overflow-hidden transition-all duration-300 ease-in-out",
         isActive
           ? "bg-gray-100 dark:bg-gray-800 text-blue-600"
           : "text-gray-700 dark:text-gray-300",
-        openLeftSidebar ? "justify-start" : "justify-center"
+        openLeftSidebar ? "px-3" : "pl-[1.375rem]"
       )}
     >
-      <Icon className="h-5 w-5" />
-      {openLeftSidebar && <span className="ml-3">{item.label}</span>}
+      <Icon className="h-5 w-5 flex-shrink-0" />
+      <span 
+        className={cn(
+          "whitespace-nowrap transition-all duration-300 ease-in-out",
+          openLeftSidebar 
+            ? "opacity-100 ml-3 max-w-xs" 
+            : "opacity-0 ml-0 max-w-0"
+        )}
+      >
+        {item.label}
+      </span>
     </Link>
   );
 };
@@ -66,7 +75,7 @@ export default function LeftSideBar({ openLeftSidebar, onClose }: LeftSideBarPro
   ];
 
   return (
-    <aside className="h-full overflow-y-auto">
+    <aside className="h-full overflow-y-auto overflow-x-hidden">
       <div className="flex flex-col h-full">
         {/* Top navigation items */}
         <div className="flex-1 py-4">
