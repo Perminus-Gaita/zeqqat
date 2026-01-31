@@ -37,7 +37,7 @@ const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => 
 
   const content = (
     <>
-      <Icon className="h-5 w-5 flex-shrink-0" />
+      <Icon className="h-5 w-5 shrink-0" />
       <span 
         className={cn(
           "whitespace-nowrap transition-all duration-300 ease-in-out",
