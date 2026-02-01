@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import MainNavbar from '@/components/navigation/MainNavbar';
+import MainNavbar from '@/components/navigation/main-navbar/index';
+import PicksDrawer from "@/components/navigation/PicksDrawer";
 import LeftSideBar from '@/components/navigation/LeftSideBar';
 import BottomNavigation from '@/components/navigation/BottomNavigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -97,6 +98,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         openLeftSidebar={openLeftSidebar}
         onToggleSidebar={toggleSidebar}
       />
+      <PicksDrawer />
     </div>
   );
 }

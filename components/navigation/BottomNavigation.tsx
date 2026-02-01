@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, User, Menu } from "lucide-react";
+import { Trophy } from "lucide-react";
+import { usePicksStore } from "@/lib/stores/picks-store";
 
 interface BottomNavigationProps {
   openLeftSidebar: boolean;

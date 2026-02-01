@@ -59,8 +59,7 @@ File Structure:
 │   ├── navigation
 │   │   └── BottomNavigation.tsx
 │   │   └── LeftSideBar.tsx
-│   │   └── LeftSideBar.tsx.backup
-│   │   └── MainNavbar.tsx
+│   │   └── PicksDrawer.tsx
 │   │   ├── chats
 │   │   │   └── ChatsView.tsx
 │   │   ├── main-navbar
@@ -110,6 +109,7 @@ File Structure:
 │   └── prisma.ts
 │   ├── stores
 │   │   └── auth-modal-store.ts
+│   │   └── picks-store.ts
 │   │   └── sidebar-store.tsx
 │   └── utils.ts
 └── package.json

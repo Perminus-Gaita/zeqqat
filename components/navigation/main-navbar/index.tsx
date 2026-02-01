@@ -2,12 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useAuthModal } from '@/lib/stores/auth-modal-store';
 import { authClient } from '@/lib/auth/client';
 import MainNavbarDropdown from './main-navbar-dropdown';
+import { usePicksStore } from "@/lib/stores/picks-store";
 
 interface MainNavbarProps {
   openLeftSidebar: boolean;
@@ -23,6 +24,10 @@ export default function MainNavbar({ openLeftSidebar, onToggleSidebar }: MainNav
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  
+  // Picks store
+  const { picks, isDrawerOpen, toggleDrawer } = usePicksStore();
+  const picksCount = picks.length;
 
   useEffect(() => {
     const savedTheme = (localStorage.getItem("theme") as Theme) || "light";
@@ -81,6 +86,35 @@ export default function MainNavbar({ openLeftSidebar, onToggleSidebar }: MainNav
       <h1 className="text-sm font-semibold">My App</h1>
 
       <div className="flex items-center gap-2">
+        {/* Picks Button - Only show on desktop */}
+        {!isMobile && (
+          <button
+            onClick={toggleDrawer}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed transition-colors ${
+              isDrawerOpen
+                ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border-gray-300 dark:border-gray-700 cursor-not-allowed"
+                : "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-400 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            <Trophy className="h-4 w-4" />
+            <div className="flex items-center">
+              <span className="text-sm font-bold">PICKS:</span>
+              <span
+                className={`text-sm font-bold ml-1 ${
+                  picksCount > 0 && !isDrawerOpen ? "text-yellow-500" : ""
+                }`}
+                style={
+                  picksCount > 0 && !isDrawerOpen
+                    ? { animation: "customPulse 2s infinite" }
+                    : {}
+                }
+              >
+                {picksCount}
+              </span>
+            </div>
+          </button>
+        )}
+
         <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-8 w-8">
           {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
         </Button>
@@ -92,7 +126,7 @@ export default function MainNavbar({ openLeftSidebar, onToggleSidebar }: MainNav
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               data-dropdown-trigger
-              className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-r from-pink-500 to-orange-500 flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="w-8 h-8 rounded-full overflow-hidden bg-linear-to-r from-pink-500 to-orange-500 flex items-center justify-center hover:opacity-80 transition-opacity"
             >
               {user.image ? (
                 <img 
@@ -126,6 +160,14 @@ export default function MainNavbar({ openLeftSidebar, onToggleSidebar }: MainNav
           </Button>
         )}
       </div>
+
+      {/* Add pulse animation for picks count */}
+      <style jsx global>{`
+        @keyframes customPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
     </header>
   );
 }
