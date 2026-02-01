@@ -18,15 +18,23 @@ File Structure:
 │   │   ├── nyumbani
 │   │   │   └── client.jsx
 │   │   │   ├── components
-│   │   │   │   └── markets-tab.jsx
-│   │   │   │   └── nfts-tab.jsx
-│   │   │   │   └── pools-tab.jsx
-│   │   │   │   └── ratings-tab.jsx
-│   │   │   │   └── shows-tab.jsx
+│   │   │   │   └── BellCurve.jsx
+│   │   │   │   └── WinningPatternsStats.jsx
+│   │   │   │   └── WinningPicksDistribution.jsx
+│   │   │   ├── outcomes
+│   │   │   │   └── page.jsx
 │   │   │   └── page.jsx
+│   │   │   ├── patterns
+│   │   │   │   └── page.jsx
 │   │   ├── profile
 │   │   │   └── page.tsx
 │   │   ├── settings
+│   │   │   └── page.tsx
+│   │   ├── strategies
+│   │   │   └── client.tsx
+│   │   │   ├── components
+│   │   │   │   └── StrategyStudio.jsx
+│   │   │   │   └── YourStrategies.jsx
 │   │   │   └── page.tsx
 │   │   ├── support
 │   │   │   └── page.tsx
@@ -52,6 +60,8 @@ File Structure:
 │   │   └── BottomNavigation.tsx
 │   │   └── LeftSideBar.tsx
 │   │   └── MainNavbar.tsx
+│   │   ├── chats
+│   │   │   └── ChatsView.tsx
 │   │   ├── main-navbar
 │   │   │   └── index.tsx
 │   │   │   ├── main-navbar-dropdown
@@ -63,6 +73,7 @@ File Structure:
 │   │   └── scroll-area.tsx
 │   │   └── sheet.tsx
 │   │   └── switch.tsx
+│   │   └── tabs.tsx
 │   │   └── tooltip.tsx
 └── components.json
 ├── features
@@ -98,6 +109,7 @@ File Structure:
 │   └── prisma.ts
 │   ├── stores
 │   │   └── auth-modal-store.ts
+│   │   └── sidebar-store.tsx
 │   └── utils.ts
 └── package.json
 ├── prisma
