@@ -11,6 +11,9 @@ File Structure:
 │   │   │   │   └── page.tsx
 │   │   │   ├── sign-in
 │   │   │   │   └── page.tsx
+│   │   ├── h2h
+│   │   │   └── client.jsx
+│   │   │   └── page.jsx
 │   │   ├── jackpots
 │   │   │   └── client.tsx
 │   │   │   └── page.tsx
