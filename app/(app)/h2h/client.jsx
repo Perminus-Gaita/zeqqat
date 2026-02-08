@@ -6,6 +6,8 @@ import {
   BarChart4, TrendingUp, AlertTriangle, Target, History,
   ChevronRight, Loader2
 } from 'lucide-react';
+import StrategyWorkflow from './components/StrategyWorkflow';
+import YourStrategiesTab from './components/YourStrategiesTab';
 
 const MATCH = {
   meta: {
@@ -23,7 +25,14 @@ const MATCH = {
       { pos: 3, team: "Arsenal", mp: 8, w: 6, d: 1, l: 1, gf: 20, ga: 8, gd: "+12", pts: 19, last5: ['W','D','W','L','W'], isCurrent: true },
       { pos: 4, team: "Newcastle", mp: 8, w: 5, d: 2, l: 1, gf: 16, ga: 9, gd: "+7", pts: 17, last5: ['W','W','D','W','L'] },
     ],
-    quality: { xG: 1.72, actualGoals: 1.55, xGA: 1.10, actualConceded: 1.05, possession: 55, convRate: 12.4, shotsOnTarget: 5.8 },
+    quality: { 
+      xG: 1.72, actualGoals: 1.55, 
+      xGA: 1.10, actualConceded: 1.05, 
+      possession: 55, convRate: 12.4, shotsOnTarget: 5.8,
+      finishingEfficiency: 62,
+      sustainabilityIndex: 1.24,
+      bigChances: 75
+    },
     form: {
       last5: ['W', 'D', 'W', 'L', 'W'],
       detail: [
@@ -33,12 +42,24 @@ const MATCH = {
         { result: 'L', opponent: 'Newcastle', oppRank: 4, score: '0-1' },
         { result: 'W', opponent: 'Burnley', oppRank: 19, score: '4-0' },
       ],
-      winPct: 60, goalsScored: 10, goalsConceded: 3, unbeaten: 2
+      winPct: 60, goalsScored: 10, goalsConceded: 3, unbeaten: 2,
+      momentumScore: 17
     },
+    homeRecord: { win: 65, draw: 20 },
     absences: [{ name: "Rice", reason: "Suspended", role: "CDM", starts: "22/23", avgRating: 7.8, gc: 5 }],
     schedule: { last: { opp: "Wolves", daysAgo: 4 }, next: { opp: "Man Utd", daysIn: 5 } },
     travelKm: 0,
-    tactical: { setPieceXG: 0.45, discipline: 1.2, totalYC: 28, totalRC: 1, pressureIndex: 72, counterRate: 18, cleanSheetPct: 42 }
+    tactical: { 
+      setPieceXG: 0.45, 
+      discipline: 1.2, 
+      totalYC: 28, 
+      totalRC: 1, 
+      defensiveActivity: 55,
+      cleanSheetPct: 42,
+      tackles: 15.5,
+      interceptions: 7.2,
+      possFinal3rd: 4.4
+    }
   },
   away: {
     name: "Liverpool", short: "LIV",
@@ -49,7 +70,14 @@ const MATCH = {
       { pos: 2, team: "Liverpool", mp: 8, w: 6, d: 1, l: 1, gf: 20, ga: 8, gd: "+12", pts: 19, last5: ['W','W','D','W','D'], isCurrent: true },
       { pos: 3, team: "Man City", mp: 8, w: 7, d: 1, l: 0, gf: 22, ga: 6, gd: "+16", pts: 22, last5: ['W','D','W','W','W'] },
     ],
-    quality: { xG: 1.75, actualGoals: 1.90, xGA: 1.05, actualConceded: 0.95, possession: 52, convRate: 14.1, shotsOnTarget: 6.2 },
+    quality: { 
+      xG: 1.75, actualGoals: 1.90, 
+      xGA: 1.05, actualConceded: 0.95, 
+      possession: 52, convRate: 14.1, shotsOnTarget: 6.2,
+      finishingEfficiency: 68,
+      sustainabilityIndex: 0.74,
+      bigChances: 75
+    },
     form: {
       last5: ['W', 'W', 'D', 'W', 'D'],
       detail: [
@@ -59,49 +87,74 @@ const MATCH = {
         { result: 'W', opponent: 'Everton', oppRank: 16, score: '3-0' },
         { result: 'D', opponent: 'Tottenham', oppRank: 6, score: '1-1' },
       ],
-      winPct: 60, goalsScored: 11, goalsConceded: 4, unbeaten: 8
+      winPct: 60, goalsScored: 11, goalsConceded: 4, unbeaten: 8,
+      momentumScore: 20
     },
+    awayRecord: { win: 40, draw: 35 },
     absences: [],
     schedule: { last: { opp: "Chelsea", daysAgo: 4 }, next: { opp: "Wolves", daysIn: 4 } },
     travelKm: 340,
-    tactical: { setPieceXG: 0.22, discipline: 1.8, totalYC: 42, totalRC: 2, pressureIndex: 68, counterRate: 24, cleanSheetPct: 50 }
+    tactical: { 
+      setPieceXG: 0.22, 
+      discipline: 1.8, 
+      totalYC: 42, 
+      totalRC: 2, 
+      defensiveActivity: 58,
+      cleanSheetPct: 50,
+      tackles: 16.2,
+      interceptions: 8.1,
+      possFinal3rd: 4.7
+    }
   },
   h2h: {
-    totalMeetings: 192, homeWins: 80, draws: 54, awayWins: 58,
+    homeWins: 4, draws: 2, awayWins: 4, // Last 10 only
     avgGoals: 2.7, bttsRate: 62,
-    last5: [
+    last10: [
       { homeGoals: 2, awayGoals: 0, date: 'Oct 8, 2024', venue: 'Emirates' },
       { homeGoals: 1, awayGoals: 1, date: 'Apr 14, 2024', venue: 'Anfield' },
       { homeGoals: 0, awayGoals: 2, date: 'Jan 7, 2024', venue: 'Emirates' },
       { homeGoals: 1, awayGoals: 1, date: 'Sep 23, 2023', venue: 'Anfield' },
       { homeGoals: 3, awayGoals: 1, date: 'Apr 1, 2023', venue: 'Emirates' },
+      { homeGoals: 2, awayGoals: 2, date: 'Dec 18, 2022', venue: 'Anfield' },
+      { homeGoals: 3, awayGoals: 2, date: 'Oct 9, 2022', venue: 'Emirates' },
+      { homeGoals: 0, awayGoals: 2, date: 'Mar 16, 2022', venue: 'Anfield' },
+      { homeGoals: 0, awayGoals: 4, date: 'Nov 20, 2021', venue: 'Anfield' },
+      { homeGoals: 1, awayGoals: 1, date: 'Aug 29, 2021', venue: 'Emirates' },
     ]
   }
 };
 
 // ── Strategy metrics definition ──
-// Each metric: what the strategy evaluates, and what it concludes
 const STRATEGY_METRICS = [
   { id: 'rank', section: 'Quality', label: 'League Rank', homeVal: 3, awayVal: 2, verdict: 'A', reason: 'LIV ranked higher (#2 vs #3)', weight: 5 },
   { id: 'xg', section: 'Quality', label: 'xG per game', homeVal: 1.72, awayVal: 1.75, verdict: 'A', reason: 'LIV edge in expected goals', weight: 8 },
   { id: 'xga', section: 'Quality', label: 'xGA per game', homeVal: 1.10, awayVal: 1.05, verdict: 'A', reason: 'LIV concede fewer expected goals', weight: 7 },
   { id: 'conv', section: 'Quality', label: 'Conversion Rate', homeVal: '12.4%', awayVal: '14.1%', verdict: 'A', reason: 'LIV convert chances better', weight: 6 },
+  { id: 'finishing', section: 'Quality', label: 'Finishing Efficiency Index', homeVal: 62, awayVal: 68, verdict: 'A', reason: 'LIV more clinical with chances', weight: 7 },
+  { id: 'sustainability', section: 'Quality', label: 'Performance Sustainability Index', homeVal: 1.24, awayVal: 0.74, verdict: 'H', reason: 'ARS results more sustainable vs xG', weight: 8 },
   { id: 'poss', section: 'Quality', label: 'Possession', homeVal: '55%', awayVal: '52%', verdict: 'H', reason: 'ARS control the ball more', weight: 4 },
   { id: 'sot', section: 'Quality', label: 'Shots on Target', homeVal: 5.8, awayVal: 6.2, verdict: 'A', reason: 'LIV create more shots on target', weight: 5 },
+  
   { id: 'form', section: 'Form', label: 'Last 5 Results', homeVal: 'WDWLW', awayVal: 'WWDWD', verdict: 'D', reason: 'Both on similar form runs', weight: 7 },
+  { id: 'momentum', section: 'Form', label: 'Form Momentum Score', homeVal: 17, awayVal: 20, verdict: 'A', reason: 'LIV trending stronger recently', weight: 8 },
   { id: 'winpct', section: 'Form', label: 'Win %', homeVal: '60%', awayVal: '60%', verdict: 'D', reason: 'Identical win rates', weight: 5 },
   { id: 'gf', section: 'Form', label: 'Goals Scored (L5)', homeVal: 10, awayVal: 11, verdict: 'A', reason: 'LIV scoring slightly more', weight: 6 },
   { id: 'ga', section: 'Form', label: 'Goals Conceded (L5)', homeVal: 3, awayVal: 4, verdict: 'H', reason: 'ARS tighter defense in recent form', weight: 6 },
   { id: 'unb', section: 'Form', label: 'Unbeaten Run', homeVal: 2, awayVal: 8, verdict: 'A', reason: 'LIV unbeaten in 8, ARS lost recently', weight: 7 },
+  
   { id: 'abs', section: 'Health', label: 'Absences', homeVal: '1 out', awayVal: 'Full', verdict: 'A', reason: 'ARS missing Rice (key CDM)', weight: 8 },
   { id: 'rest', section: 'Health', label: 'Days Rest', homeVal: '4d', awayVal: '4d', verdict: 'D', reason: 'Equal rest between matches', weight: 3 },
   { id: 'travel', section: 'Health', label: 'Travel', homeVal: '0km', awayVal: '340km', verdict: 'H', reason: 'ARS at home, no travel fatigue', weight: 4 },
+  
   { id: 'setpiece', section: 'Tactical', label: 'Set Piece xG', homeVal: 0.45, awayVal: 0.22, verdict: 'H', reason: 'ARS dangerous from set pieces', weight: 7 },
+  { id: 'defensive', section: 'Tactical', label: 'Defensive Activity Score', homeVal: 55, awayVal: 58, verdict: 'A', reason: 'LIV more active defensively', weight: 6 },
   { id: 'clean', section: 'Tactical', label: 'Clean Sheet %', homeVal: '42%', awayVal: '50%', verdict: 'A', reason: 'LIV keep more clean sheets', weight: 5 },
   { id: 'disc', section: 'Tactical', label: 'Discipline', homeVal: '1.2/g', awayVal: '1.8/g', verdict: 'H', reason: 'ARS more disciplined', weight: 4 },
-  { id: 'press', section: 'Tactical', label: 'Press Index', homeVal: 72, awayVal: 68, verdict: 'H', reason: 'ARS press more aggressively', weight: 5 },
-  { id: 'h2h', section: 'H2H', label: 'Head-to-Head', homeVal: '42%', awayVal: '30%', verdict: 'H', reason: 'ARS historically dominant', weight: 6 },
-  { id: 'h2hform', section: 'H2H', label: 'Recent H2H', homeVal: '2W 2D', awayVal: '1W 2D', verdict: 'H', reason: 'ARS won more recently', weight: 5 },
+  { id: 'homewin', section: 'Tactical', label: 'Home Win% / Away Win%', homeVal: '65%', awayVal: '40%', verdict: 'H', reason: 'ARS win more at home', weight: 6 },
+  { id: 'homedraw', section: 'Tactical', label: 'Home Draw% / Away Draw%', homeVal: '20%', awayVal: '35%', verdict: 'A', reason: 'LIV get more draws away', weight: 4 },
+  
+  { id: 'h2h', section: 'H2H', label: 'Head-to-Head', homeVal: '40%', awayVal: '40%', verdict: 'D', reason: 'Even in recent meetings', weight: 6 },
+  { id: 'h2hform', section: 'H2H', label: 'Recent H2H', homeVal: '2W 2D', awayVal: '2W 2D', verdict: 'D', reason: 'Identical recent H2H form', weight: 5 },
 ];
 
 
@@ -141,7 +194,6 @@ const Row = ({ label, homeVal, awayVal, unit = '', better = 'higher', clickable,
   const hB = better === 'higher' ? hN > aN : better === 'lower' ? hN < aN : false;
   const aB = better === 'higher' ? aN > hN : better === 'lower' ? aN < hN : false;
 
-  // Strategy scanning state
   const isScanning = strategyState === 'scanning';
   const isComplete = strategyState === 'done';
 
@@ -219,15 +271,63 @@ const XGBreakdown = () => {
   );
 };
 
+// NEW: Simplified metric explanations
+const FinishingEfficiencyExplain = () => (
+  <div className="my-2 rounded-lg border border-border/30 p-3 text-xs text-muted-foreground space-y-2">
+    <p>For every 100 clear scoring chances Arsenal get, they score {MATCH.home.quality.finishingEfficiency} goals.</p>
+    <p>For every 100 clear scoring chances Liverpool get, they score {MATCH.away.quality.finishingEfficiency} goals.</p>
+  </div>
+);
+
+const SustainabilityExplain = () => (
+  <div className="my-2 rounded-lg border border-border/30 p-3 text-xs text-muted-foreground space-y-2">
+    <p>A score above 1.0 means the team's results match how well they're actually playing.</p>
+    <p>A score below 1.0 means the team is getting better results than they deserve.</p>
+    <div className="pt-2 border-t border-border/20 space-y-1">
+      <p>{MATCH.home.short}: {MATCH.home.quality.sustainabilityIndex}</p>
+      <p>{MATCH.away.short}: {MATCH.away.quality.sustainabilityIndex}</p>
+    </div>
+  </div>
+);
+
+const MomentumExplain = () => (
+  <div className="my-2 rounded-lg border border-border/30 p-3 text-xs text-muted-foreground space-y-2">
+    <p>Recent games count for more points. Winning your last game counts more than winning 3 games ago.</p>
+    <div className="pt-2 border-t border-border/20 space-y-1">
+      <p>{MATCH.home.short}: {MATCH.home.form.momentumScore} points from their last 5 games.</p>
+      <p>{MATCH.away.short}: {MATCH.away.form.momentumScore} points from their last 5 games.</p>
+    </div>
+  </div>
+);
+
+const DefensiveActivityExplain = () => (
+  <div className="my-2 rounded-lg border border-border/30 p-3 text-xs text-muted-foreground space-y-2">
+    <p>How much defensive work the team does - tackles, blocks, winning the ball back. A higher number means the defense works harder.</p>
+    <div className="pt-2 border-t border-border/20 space-y-1">
+      <p>{MATCH.home.short}: {MATCH.home.tactical.defensiveActivity} defensive actions per game.</p>
+      <p>{MATCH.away.short}: {MATCH.away.tactical.defensiveActivity} defensive actions per game.</p>
+    </div>
+  </div>
+);
+
+const HomeWinExplain = () => (
+  <div className="my-2 rounded-lg border border-border/30 p-3 text-xs text-muted-foreground space-y-2">
+    <p>{MATCH.home.short} win {MATCH.home.homeRecord.win} out of every 100 games at home.</p>
+    <p>{MATCH.away.short} win {MATCH.away.awayRecord.win} out of every 100 games away.</p>
+  </div>
+);
+
+const HomeDrawExplain = () => (
+  <div className="my-2 rounded-lg border border-border/30 p-3 text-xs text-muted-foreground space-y-2">
+    <p>{MATCH.home.short} draw {MATCH.home.homeRecord.draw} out of every 100 games at home.</p>
+    <p>{MATCH.away.short} draw {MATCH.away.awayRecord.draw} out of every 100 games away.</p>
+  </div>
+);
+
 
 // ══════════════════════════════════════════════
 // STRATEGY VISUALIZATIONS
 // ══════════════════════════════════════════════
-
-// ── VARIATION A: "Inline Verdict" ──
-// Each metric row gets a slim verdict bar beneath it
-// as the strategy scans through. Shows H/D/A verdict
-// with reason text that types out.
 
 const StrategyVerdictInline = ({ metric, visible, animating }) => {
   const [typed, setTyped] = useState('');
@@ -263,10 +363,6 @@ const StrategyVerdictInline = ({ metric, visible, animating }) => {
 };
 
 
-// ── VARIATION B: "Running Scoreboard" ──
-// A fixed scoreboard at the top that shows H/D/A
-// scores accumulating. Each metric adds weight points.
-
 const RunningScoreboard = ({ processedIdx, metrics }) => {
   let hScore = 0, dScore = 0, aScore = 0;
   for (let i = 0; i <= processedIdx && i < metrics.length; i++) {
@@ -282,7 +378,6 @@ const RunningScoreboard = ({ processedIdx, metrics }) => {
 
   return (
     <div className={`${CARD_BG} rounded-xl border border-border p-3 mb-4 transition-all`}>
-      {/* Score numbers */}
       <div className="flex items-center justify-between mb-2">
         <div className="text-center flex-1">
           <p className="text-2xl font-black text-red-500 tabular-nums">{hScore}</p>
@@ -297,7 +392,6 @@ const RunningScoreboard = ({ processedIdx, metrics }) => {
           <p className="text-[9px] font-bold text-muted-foreground">{MATCH.away.short}</p>
         </div>
       </div>
-      {/* Percentage bar */}
       <div className="flex rounded-full overflow-hidden h-2 bg-muted/30">
         <div className="bg-red-500 transition-all duration-500" style={{ width: `${hPct}%` }} />
         <div className="bg-amber-400 transition-all duration-500" style={{ width: `${dPct}%` }} />
@@ -312,10 +406,6 @@ const RunningScoreboard = ({ processedIdx, metrics }) => {
   );
 };
 
-
-// ── VARIATION C: "Console Log" ──
-// Matrix/terminal-style readout that scrolls
-// as each metric is evaluated.
 
 const ConsoleLog = ({ processedIdx, metrics, currentSection }) => {
   const scrollRef = useRef(null);
@@ -367,6 +457,7 @@ const ConsoleLog = ({ processedIdx, metrics, currentSection }) => {
 const SECTION_TABS = [
   { id: 'stats', label: 'Stats & Data' },
   { id: 'odds', label: 'Odds' },
+  { id: 'strategies', label: 'Your Strategies' },
 ];
 
 const STRATEGY_STYLES = [
@@ -380,7 +471,6 @@ const H2HClient = () => {
   const [activeSection, setActiveSection] = useState('stats');
   const toggle = (k) => setEx(p => ({ ...p, [k]: !p[k] }));
 
-  // Strategy state
   const [strategyRunning, setStrategyRunning] = useState(false);
   const [strategyDone, setStrategyDone] = useState(false);
   const [currentMetricIdx, setCurrentMetricIdx] = useState(-1);
@@ -415,7 +505,6 @@ const H2HClient = () => {
 
   useEffect(() => { return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, []);
 
-  // Map metric IDs to the row labels for inline highlighting
   const getMetricRowState = (metricId) => {
     if (!strategyRunning && !strategyDone) return null;
     const metricIdx = STRATEGY_METRICS.findIndex(m => m.id === metricId);
@@ -425,11 +514,10 @@ const H2HClient = () => {
     return null;
   };
 
-  const homeWinPct = ((MATCH.h2h.homeWins / MATCH.h2h.totalMeetings) * 100).toFixed(0);
-  const drawPct = ((MATCH.h2h.draws / MATCH.h2h.totalMeetings) * 100).toFixed(0);
-  const awayWinPct = ((MATCH.h2h.awayWins / MATCH.h2h.totalMeetings) * 100).toFixed(0);
+  const homeWinPct = ((MATCH.h2h.homeWins / 10) * 100).toFixed(0);
+  const drawPct = ((MATCH.h2h.draws / 10) * 100).toFixed(0);
+  const awayWinPct = ((MATCH.h2h.awayWins / 10) * 100).toFixed(0);
 
-  // Current section being analyzed
   const currentSection = currentMetricIdx >= 0 ? STRATEGY_METRICS[currentMetricIdx]?.section : null;
 
   return (
@@ -458,64 +546,13 @@ const H2HClient = () => {
         </div>
       </div>
 
-      {/* ── RUN STRATEGY BUTTON ── */}
+      {/* ── STRATEGY WORKFLOW ── */}
       <div className="my-3">
-        {!strategyRunning && !strategyDone && (
-          <button
-            onClick={runStrategy}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white font-bold text-sm flex items-center justify-center gap-2 hover:from-blue-500 hover:to-violet-500 active:scale-[0.99] transition-all shadow-lg shadow-blue-500/20"
-          >
-            <Zap className="w-4 h-4" />
-            Run Strategy
-          </button>
-        )}
-        {strategyRunning && (
-          <div className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600/80 to-violet-600/80 text-white font-bold text-sm flex items-center justify-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Analyzing... {currentMetricIdx + 1}/{STRATEGY_METRICS.length}
-          </div>
-        )}
-        {strategyDone && (
-          <div className="flex gap-2">
-            <div className="flex-1 py-3 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 font-bold text-sm flex items-center justify-center gap-2">
-              <Zap className="w-4 h-4" />
-              Strategy Complete
-            </div>
-            <button
-              onClick={resetStrategy}
-              className="px-4 py-3 rounded-xl bg-muted border border-border text-muted-foreground font-bold text-sm flex items-center gap-2 hover:bg-muted/80 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Strategy style switcher (only when running or done) */}
-        {(strategyRunning || strategyDone) && (
-          <div className="flex items-center gap-1 mt-2">
-            <span className="text-[9px] text-muted-foreground/50 mr-1">View:</span>
-            {STRATEGY_STYLES.map(s => (
-              <button
-                key={s.id}
-                onClick={() => setStrategyStyle(s.id)}
-                className={`px-2 py-1 rounded text-[9px] font-bold transition-colors ${
-                  strategyStyle === s.id ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        )}
+        <StrategyWorkflow onRunStateChange={(state) => {
+          if (state === 'running') { runStrategy(); }
+          if (state === 'idle') { resetStrategy(); }
+        }} />
       </div>
-
-      {/* ── STRATEGY VISUALIZATIONS (above tabs, below button) ── */}
-      {(strategyRunning || strategyDone) && strategyStyle === 'scoreboard' && (
-        <RunningScoreboard processedIdx={currentMetricIdx} metrics={STRATEGY_METRICS} />
-      )}
-      {(strategyRunning || strategyDone) && strategyStyle === 'console' && (
-        <ConsoleLog processedIdx={currentMetricIdx} metrics={STRATEGY_METRICS} currentSection={currentSection} />
-      )}
 
       {/* ── SECTION TABS ── */}
       <div className="flex border-b border-border mb-4">
@@ -544,7 +581,6 @@ const H2HClient = () => {
                 <LeagueTableExpand snippet={MATCH.away.leagueSnippet} accentBg={MATCH.away.accentBg} />
               </div>
             )}
-            {/* Inline verdict for rank */}
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[0]} visible={currentMetricIdx >= 0} animating={currentMetricIdx === 0} />}
 
             <Row label="xG" homeVal={MATCH.home.quality.xG} awayVal={MATCH.away.quality.xG} clickable onClick={() => toggle('xg')} strategyState={getMetricRowState('xg')} />
@@ -557,11 +593,19 @@ const H2HClient = () => {
             <Row label="Conv. Rate" homeVal={MATCH.home.quality.convRate} awayVal={MATCH.away.quality.convRate} unit="%" strategyState={getMetricRowState('conv')} />
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[3]} visible={currentMetricIdx >= 3} animating={currentMetricIdx === 3} />}
 
-            <Row label="Possession" homeVal={MATCH.home.quality.possession} awayVal={MATCH.away.quality.possession} unit="%" strategyState={getMetricRowState('poss')} />
+            <Row label="Finishing Efficiency Index" homeVal={MATCH.home.quality.finishingEfficiency} awayVal={MATCH.away.quality.finishingEfficiency} clickable onClick={() => toggle('finishing')} strategyState={getMetricRowState('finishing')} />
+            {ex.finishing && <FinishingEfficiencyExplain />}
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[4]} visible={currentMetricIdx >= 4} animating={currentMetricIdx === 4} />}
 
-            <Row label="Shots on Target" homeVal={MATCH.home.quality.shotsOnTarget} awayVal={MATCH.away.quality.shotsOnTarget} strategyState={getMetricRowState('sot')} />
+            <Row label="Performance Sustainability Index" homeVal={MATCH.home.quality.sustainabilityIndex} awayVal={MATCH.away.quality.sustainabilityIndex} clickable onClick={() => toggle('sustainability')} strategyState={getMetricRowState('sustainability')} />
+            {ex.sustainability && <SustainabilityExplain />}
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[5]} visible={currentMetricIdx >= 5} animating={currentMetricIdx === 5} />}
+
+            <Row label="Possession" homeVal={MATCH.home.quality.possession} awayVal={MATCH.away.quality.possession} unit="%" strategyState={getMetricRowState('poss')} />
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[6]} visible={currentMetricIdx >= 6} animating={currentMetricIdx === 6} />}
+
+            <Row label="Shots on Target" homeVal={MATCH.home.quality.shotsOnTarget} awayVal={MATCH.away.quality.shotsOnTarget} strategyState={getMetricRowState('sot')} />
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[7]} visible={currentMetricIdx >= 7} animating={currentMetricIdx === 7} />}
           </Card>
 
           {/* MOMENTUM & FORM */}
@@ -584,19 +628,23 @@ const H2HClient = () => {
             {ex.form && (
               <div><FormDetailExpand team={MATCH.home} /><FormDetailExpand team={MATCH.away} /></div>
             )}
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[6]} visible={currentMetricIdx >= 6} animating={currentMetricIdx === 6} />}
-
-            <Row label="Win %" homeVal={MATCH.home.form.winPct} awayVal={MATCH.away.form.winPct} unit="%" strategyState={getMetricRowState('winpct')} />
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[7]} visible={currentMetricIdx >= 7} animating={currentMetricIdx === 7} />}
-
-            <Row label="Goals Scored" homeVal={MATCH.home.form.goalsScored} awayVal={MATCH.away.form.goalsScored} strategyState={getMetricRowState('gf')} />
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[8]} visible={currentMetricIdx >= 8} animating={currentMetricIdx === 8} />}
 
-            <Row label="Goals Conceded" homeVal={MATCH.home.form.goalsConceded} awayVal={MATCH.away.form.goalsConceded} better="lower" strategyState={getMetricRowState('ga')} />
+            <Row label="Form Momentum Score" homeVal={MATCH.home.form.momentumScore} awayVal={MATCH.away.form.momentumScore} clickable onClick={() => toggle('momentum')} strategyState={getMetricRowState('momentum')} />
+            {ex.momentum && <MomentumExplain />}
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[9]} visible={currentMetricIdx >= 9} animating={currentMetricIdx === 9} />}
 
-            <Row label="Unbeaten Run" homeVal={MATCH.home.form.unbeaten} awayVal={MATCH.away.form.unbeaten} strategyState={getMetricRowState('unb')} />
+            <Row label="Win %" homeVal={MATCH.home.form.winPct} awayVal={MATCH.away.form.winPct} unit="%" strategyState={getMetricRowState('winpct')} />
             {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[10]} visible={currentMetricIdx >= 10} animating={currentMetricIdx === 10} />}
+
+            <Row label="Goals Scored" homeVal={MATCH.home.form.goalsScored} awayVal={MATCH.away.form.goalsScored} strategyState={getMetricRowState('gf')} />
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[11]} visible={currentMetricIdx >= 11} animating={currentMetricIdx === 11} />}
+
+            <Row label="Goals Conceded" homeVal={MATCH.home.form.goalsConceded} awayVal={MATCH.away.form.goalsConceded} better="lower" strategyState={getMetricRowState('ga')} />
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[12]} visible={currentMetricIdx >= 12} animating={currentMetricIdx === 12} />}
+
+            <Row label="Unbeaten Run" homeVal={MATCH.home.form.unbeaten} awayVal={MATCH.away.form.unbeaten} strategyState={getMetricRowState('unb')} />
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[13]} visible={currentMetricIdx >= 13} animating={currentMetricIdx === 13} />}
           </Card>
 
           {/* SQUAD HEALTH */}
@@ -628,22 +676,26 @@ const H2HClient = () => {
                 {MATCH.away.absences.length === 0 && <p className="text-xs text-emerald-500">{MATCH.away.short}: Full squad</p>}
               </div>
             )}
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[11]} visible={currentMetricIdx >= 11} animating={currentMetricIdx === 11} />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[14]} visible={currentMetricIdx >= 14} animating={currentMetricIdx === 14} />}
 
             <Row label="Days Rest" homeVal={MATCH.home.schedule.last.daysAgo} awayVal={MATCH.away.schedule.last.daysAgo} unit="d" strategyState={getMetricRowState('rest')} />
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[12]} visible={currentMetricIdx >= 12} animating={currentMetricIdx === 12} />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[15]} visible={currentMetricIdx >= 15} animating={currentMetricIdx === 15} />}
 
             <Row label="Travel" homeVal={MATCH.home.travelKm} awayVal={MATCH.away.travelKm} unit="km" better="lower" strategyState={getMetricRowState('travel')} />
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[13]} visible={currentMetricIdx >= 13} animating={currentMetricIdx === 13} />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[16]} visible={currentMetricIdx >= 16} animating={currentMetricIdx === 16} />}
           </Card>
 
           {/* TACTICAL */}
           <Card icon={Target} title="Tactical">
             <Row label="Set Piece xG" homeVal={MATCH.home.tactical.setPieceXG} awayVal={MATCH.away.tactical.setPieceXG} strategyState={getMetricRowState('setpiece')} />
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[14]} visible={currentMetricIdx >= 14} animating={currentMetricIdx === 14} />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[17]} visible={currentMetricIdx >= 17} animating={currentMetricIdx === 17} />}
+
+            <Row label="Defensive Activity Score" homeVal={MATCH.home.tactical.defensiveActivity} awayVal={MATCH.away.tactical.defensiveActivity} clickable onClick={() => toggle('defensive')} strategyState={getMetricRowState('defensive')} />
+            {ex.defensive && <DefensiveActivityExplain />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[18]} visible={currentMetricIdx >= 18} animating={currentMetricIdx === 18} />}
 
             <Row label="Clean Sheet %" homeVal={MATCH.home.tactical.cleanSheetPct} awayVal={MATCH.away.tactical.cleanSheetPct} unit="%" strategyState={getMetricRowState('clean')} />
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[15]} visible={currentMetricIdx >= 15} animating={currentMetricIdx === 15} />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[19]} visible={currentMetricIdx >= 19} animating={currentMetricIdx === 19} />}
 
             <Row label="YC / game" homeVal={MATCH.home.tactical.discipline} awayVal={MATCH.away.tactical.discipline} better="lower" clickable onClick={() => toggle('disc')} strategyState={getMetricRowState('disc')} />
             {ex.disc && (
@@ -653,19 +705,22 @@ const H2HClient = () => {
                 <p className="text-[10px] pt-1 border-t border-border/20">Ref: {MATCH.meta.referee} — avg {MATCH.meta.refAvgCards} cards/game</p>
               </div>
             )}
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[16]} visible={currentMetricIdx >= 16} animating={currentMetricIdx === 16} />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[20]} visible={currentMetricIdx >= 20} animating={currentMetricIdx === 20} />}
 
-            <Row label="Press Index" homeVal={MATCH.home.tactical.pressureIndex} awayVal={MATCH.away.tactical.pressureIndex} strategyState={getMetricRowState('press')} />
-            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[17]} visible={currentMetricIdx >= 17} animating={currentMetricIdx === 17} />}
+            <Row label="Home Win% / Away Win%" homeVal={MATCH.home.homeRecord.win} awayVal={MATCH.away.awayRecord.win} unit="%" clickable onClick={() => toggle('homewin')} strategyState={getMetricRowState('homewin')} />
+            {ex.homewin && <HomeWinExplain />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[21]} visible={currentMetricIdx >= 21} animating={currentMetricIdx === 21} />}
 
-            <Row label="Counter Rate" homeVal={MATCH.home.tactical.counterRate} awayVal={MATCH.away.tactical.counterRate} unit="%" />
+            <Row label="Home Draw% / Away Draw%" homeVal={MATCH.home.homeRecord.draw} awayVal={MATCH.away.awayRecord.draw} unit="%" clickable onClick={() => toggle('homedraw')} strategyState={getMetricRowState('homedraw')} />
+            {ex.homedraw && <HomeDrawExplain />}
+            {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[22]} visible={currentMetricIdx >= 22} animating={currentMetricIdx === 22} />}
           </Card>
 
           {/* H2H */}
-          <Card icon={History} title={`H2H (${MATCH.h2h.totalMeetings} meetings)`} noPadBody>
+          <Card icon={History} title="H2H (Last 10)" noPadBody>
             <div className="p-4">
               <div className="flex justify-center gap-4 mb-4">
-                {MATCH.h2h.last5.map((m, i) => {
+                {MATCH.h2h.last10.slice(0, 5).map((m, i) => {
                   const r = m.homeGoals > m.awayGoals ? 'H' : m.awayGoals > m.homeGoals ? 'A' : 'D';
                   return <H2HDot key={i} result={r} />;
                 })}
@@ -676,11 +731,10 @@ const H2HClient = () => {
                 <div className={`${MATCH.away.color} flex items-center justify-center text-white text-[11px] font-bold`} style={{ width: `${awayWinPct}%` }}>{MATCH.away.short} {awayWinPct}%</div>
               </div>
 
-              {/* Inline strategy verdict for H2H */}
-              {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[18]} visible={currentMetricIdx >= 18} animating={currentMetricIdx === 18} />}
-              {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[19]} visible={currentMetricIdx >= 19} animating={currentMetricIdx === 19} />}
+              {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[23]} visible={currentMetricIdx >= 23} animating={currentMetricIdx === 23} />}
+              {strategyStyle === 'inline' && <StrategyVerdictInline metric={STRATEGY_METRICS[24]} visible={currentMetricIdx >= 24} animating={currentMetricIdx === 24} />}
 
-              {MATCH.h2h.last5.map((m, i) => {
+              {MATCH.h2h.last10.map((m, i) => {
                 const homeWon = m.homeGoals > m.awayGoals;
                 const awayWon = m.awayGoals > m.homeGoals;
                 return (
@@ -699,12 +753,11 @@ const H2HClient = () => {
               <div className="flex justify-between mt-3 pt-3 border-t border-border/30 text-[10px] text-muted-foreground">
                 <span>Avg {MATCH.h2h.avgGoals} goals/match</span>
                 <span>BTTS {MATCH.h2h.bttsRate}%</span>
-                <span>{MATCH.h2h.totalMeetings} meetings</span>
               </div>
             </div>
           </Card>
 
-          {/* Final verdict (shows after strategy completes) */}
+          {/* Final verdict */}
           {strategyDone && (
             <div className={`${CARD_BG} rounded-xl border border-emerald-500/30 p-5 text-center`}>
               <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">Strategy Verdict</p>
@@ -749,6 +802,10 @@ const H2HClient = () => {
           <p className="text-sm text-muted-foreground">Odds comparison coming soon</p>
           <p className="text-[10px] text-muted-foreground/50 mt-1">1X2, Over/Under, BTTS, Asian Handicap</p>
         </div>
+      )}
+
+      {activeSection === 'strategies' && (
+        <YourStrategiesTab />
       )}
     </div>
   );

@@ -13,6 +13,9 @@ File Structure:
 │   │   │   │   └── page.tsx
 │   │   ├── h2h
 │   │   │   └── client.jsx
+│   │   │   ├── components
+│   │   │   │   └── StrategyWorkflow.jsx
+│   │   │   │   └── YourStrategiesTab.jsx
 │   │   │   └── page.jsx
 │   │   ├── jackpots
 │   │   │   └── client.tsx
