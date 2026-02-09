@@ -201,7 +201,7 @@ const Row = ({ label, homeVal, awayVal, unit = '', better = 'higher', clickable,
     <div
       className={`flex items-center py-2.5 border-b border-border/30 last:border-0 transition-all duration-300
         ${clickable ? 'cursor-pointer hover:bg-white/[0.03] active:bg-white/[0.05]' : ''}
-        ${isScanning ? 'bg-blue-500/[0.06] border-blue-500/20' : ''}
+        ${isScanning ? 'bg-blue-500/6 border-blue-500/20' : ''}
         ${isComplete ? 'bg-transparent' : ''}`}
       onClick={clickable ? onClick : undefined}
     >
