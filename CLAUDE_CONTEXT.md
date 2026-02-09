@@ -79,6 +79,7 @@ File Structure:
 │   │   └── avatar.tsx
 │   │   └── badge.tsx
 │   │   └── button.tsx
+│   │   └── card.tsx
 │   │   └── scroll-area.tsx
 │   │   └── sheet.tsx
 │   │   └── switch.tsx
