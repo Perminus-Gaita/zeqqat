@@ -47,6 +47,19 @@ File Structure:
 │   │   │   └── page.tsx
 │   │   ├── support
 │   │   │   └── page.tsx
+│   ├── (info)
+│   │   ├── i
+│   │   │   ├── [slug]
+│   │   │   │   └── page.tsx
+│   │   │   ├── category
+│   │   │   │   ├── [category]
+│   │   │   │   │   └── page.tsx
+│   │   │   └── layout.tsx
+│   │   │   └── page.tsx
+│   │   │   ├── tag
+│   │   │   │   ├── [tag]
+│   │   │   │   │   └── page.tsx
+│   │   └── layout.tsx
 │   ├── (landing)
 │   │   └── layout.tsx
 │   │   └── page.tsx
@@ -59,10 +72,23 @@ File Structure:
 │   │   │   │   │   └── route.ts
 │   └── globals.css
 │   └── layout.tsx
+│   └── robots.ts
+│   └── sitemap.ts
 ├── components
 │   ├── auth
 │   │   └── AuthModal.tsx
 │   │   └── TelegramLoginWidget.tsx
+│   ├── blog
+│   │   └── BlogLayout.tsx
+│   │   └── BlogLeftSideBar.tsx
+│   │   └── BlogNavbar.tsx
+│   ├── interactive
+│   │   ├── common
+│   │   │   └── InteractiveWrapper.tsx
+│   │   ├── odds
+│   │   │   └── ImpliedProbability.tsx
+│   │   ├── stats
+│   │   ├── strategy
 │   ├── layouts
 │   │   └── AppLayout.tsx
 │   ├── navigation
@@ -118,6 +144,8 @@ File Structure:
 │   ├── auth
 │   │   └── client.ts
 │   │   └── nonce-store.ts
+│   ├── mdx
+│   │   └── index.ts
 │   └── prisma.ts
 │   ├── stores
 │   │   └── auth-modal-store.ts
