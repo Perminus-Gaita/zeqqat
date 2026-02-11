@@ -85,10 +85,20 @@ File Structure:
 │   ├── interactive
 │   │   ├── common
 │   │   │   └── InteractiveWrapper.tsx
+│   │   │   └── SiteComparison.tsx
 │   │   ├── odds
 │   │   │   └── ImpliedProbability.tsx
+│   │   │   └── JackpotWinProbability.tsx
+│   │   │   └── OutcomePredictor.tsx
 │   │   ├── stats
+│   │   │   └── DrawCounter.tsx
+│   │   │   └── DrawProbabilityCalculator.tsx
+│   │   │   └── WinnersShowcase.tsx
 │   │   ├── strategy
+│   │   ├── tools
+│   │   │   └── FakeWinnerCard.tsx
+│   │   │   └── JackpotBonusCalculator.tsx
+│   │   │   └── MoneyPlanner.tsx
 │   ├── layouts
 │   │   └── AppLayout.tsx
 │   ├── navigation

@@ -10,11 +10,6 @@ interface InteractiveWrapperProps {
   caption?: string;
 }
 
-/**
- * Wraps interactive components with a static image fallback.
- * - Google/crawlers see the <noscript> image + alt text
- * - Users get the full interactive component
- */
 export default function InteractiveWrapper({
   children,
   fallbackImage,
@@ -22,13 +17,11 @@ export default function InteractiveWrapper({
   caption,
 }: InteractiveWrapperProps) {
   return (
-    <figure className="my-8 not-prose">
-      {/* Interactive version for users */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+    <figure className="not-prose">
+      <div className="rounded-xl overflow-hidden bg-[#EDE9FE] shadow-lg shadow-violet-200/50 dark:bg-[#1E293B] dark:shadow-lg dark:shadow-black/30">
         {children}
       </div>
 
-      {/* Static fallback for crawlers / no-JS */}
       {fallbackImage && (
         <noscript>
           <Image
@@ -36,13 +29,13 @@ export default function InteractiveWrapper({
             alt={fallbackAlt}
             width={800}
             height={450}
-            className="rounded-lg w-full"
+            className="rounded-xl w-full"
           />
         </noscript>
       )}
 
       {caption && (
-        <figcaption className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
+        <figcaption className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2">
           {caption}
         </figcaption>
       )}
