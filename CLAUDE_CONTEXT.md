@@ -137,6 +137,7 @@ File Structure:
 │   │   │   │   ├── Predictions
 │   │   │   │   │   └── PredictionItem.tsx
 │   │   │   │   │   └── index.tsx
+│   │   │   │   │   └── index.tsx.backup
 │   │   │   │   ├── Stats
 │   │   │   │   │   └── BellCurve.tsx
 │   │   │   │   │   └── index.tsx
@@ -157,6 +158,7 @@ File Structure:
 │   │   └── nonce-store.ts
 │   ├── mdx
 │   │   └── index.ts
+│   │   └── index.ts.backup
 │   └── prisma.ts
 │   ├── stores
 │   │   └── auth-modal-store.ts

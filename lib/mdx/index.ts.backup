@@ -106,11 +106,7 @@ export function getArticlesByTag(tag: string): ArticleMeta[] {
  */
 export function getAllCategories(): string[] {
   const articles = getAllArticles();
-  const categories = new Set(
-    articles
-      .map((a) => a.category)
-      .filter((category): category is string => typeof category === "string" && category.length > 0)
-  );
+  const categories = new Set(articles.map((a) => a.category));
   return Array.from(categories);
 }
 
@@ -119,10 +115,6 @@ export function getAllCategories(): string[] {
  */
 export function getAllTags(): string[] {
   const articles = getAllArticles();
-  const tags = new Set(
-    articles
-      .flatMap((a) => a.tags || [])
-      .filter((tag): tag is string => typeof tag === "string" && tag.length > 0)
-  );
+  const tags = new Set(articles.flatMap((a) => a.tags));
   return Array.from(tags);
 }
