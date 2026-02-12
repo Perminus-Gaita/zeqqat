@@ -466,7 +466,7 @@ const STRATEGY_STYLES = [
   { id: 'console', label: 'Console' },
 ];
 
-const H2HClient = ({ jackpotId, matchNumber }) => {
+const H2HClient = () => {
   const [ex, setEx] = useState({});
   const [activeSection, setActiveSection] = useState('stats');
   const toggle = (k) => setEx(p => ({ ...p, [k]: !p[k] }));

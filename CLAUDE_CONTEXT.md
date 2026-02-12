@@ -16,6 +16,7 @@ File Structure:
 │   │   │   │   ├── [matchNumber]
 │   │   │   │   │   └── page.tsx
 │   │   │   └── client.jsx
+│   │   │   └── client.jsx.backup
 │   │   │   ├── components
 │   │   │   │   └── StrategyWorkflow.jsx
 │   │   │   │   └── YourStrategiesTab.jsx
