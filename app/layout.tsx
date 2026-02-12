@@ -4,6 +4,7 @@ import "./globals.css";
 import { authClient } from '@/lib/auth/client';
 import { NeonAuthUIProvider, UserButton } from '@neondatabase/auth/react';
 import AuthModal from '@/components/auth/AuthModal';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: "My App",
@@ -37,7 +38,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           </main>
           <AuthModal />
         </NeonAuthUIProvider>
-      </body>
+      <Analytics />
+        </body>
     </html>
   );
 }
