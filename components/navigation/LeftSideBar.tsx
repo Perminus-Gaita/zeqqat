@@ -1,77 +1,8 @@
 "use client";
-import { useState } from "react";
+
 import Link from "next/link";
+import { BookOpen, Home, HelpCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { cn } from "@/lib/utils";
-import { Home, User, Settings, Headset, LucideIcon, MessagesSquare, Target, Trophy } from "lucide-react";
-import ChatsView from "./chats/ChatsView";
-
-interface NavItemType {
-  href?: string;
-  icon: LucideIcon;
-  label: string;
-  onClick?: () => void;
-}
-
-interface NavItemProps {
-  item: NavItemType;
-  isActive: boolean;
-  openLeftSidebar: boolean;
-  onClose: () => void;
-}
-
-const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => {
-  const isMobile = useMediaQuery('(max-width:639px)');
-  const isTablet = useMediaQuery('(min-width:640px) and (max-width:1023px)');
-  const Icon = item.icon;
-
-  const handleClick = () => {
-    if (item.onClick) {
-      item.onClick();
-    } else if ((isMobile || isTablet) && onClose) {
-      onClose();
-    }
-  };
-
-  const content = (
-    <>
-      <Icon className="h-5 w-5 shrink-0" />
-      <span 
-        className={cn(
-          "whitespace-nowrap transition-all duration-300 ease-in-out",
-          openLeftSidebar 
-            ? "opacity-100 ml-3 max-w-xs" 
-            : "opacity-0 ml-0 max-w-0"
-        )}
-      >
-        {item.label}
-      </span>
-    </>
-  );
-
-  const className = cn(
-    "flex items-center justify-start h-12 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 overflow-hidden transition-all duration-300 ease-in-out",
-    isActive
-      ? "bg-gray-100 dark:bg-gray-800 text-blue-600"
-      : "text-gray-700 dark:text-gray-300",
-    openLeftSidebar ? "px-3" : "pl-[1.375rem]"
-  );
-
-  if (item.href) {
-    return (
-      <Link href={item.href} onClick={handleClick} className={className}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
-    <button onClick={handleClick} className={cn(className, "w-full")}>
-      {content}
-    </button>
-  );
-};
 
 interface LeftSideBarProps {
   openLeftSidebar: boolean;
@@ -80,63 +11,54 @@ interface LeftSideBarProps {
 
 export default function LeftSideBar({ openLeftSidebar, onClose }: LeftSideBarProps) {
   const pathname = usePathname();
-  const [showChats, setShowChats] = useState(false);
 
-  const topNavItems: NavItemType[] = [
-    { href: "/nyumbani", icon: Home, label: "Nyumbani" },
-    { 
-      icon: MessagesSquare, 
-      label: "Chats",
-      onClick: () => setShowChats(true)
-    },
-    { href: "/profile", icon: User, label: "Profile" },
-    { href: "/strategies", icon: Target, label: "Strategies" },
-    { href: "/jackpots", icon: Trophy, label: "Jackpots" },
+  const navItems = [
+    { href: "/", icon: Home, label: "About" },
+    { href: "/i", icon: BookOpen, label: "Blogs" },
+    { href: "/support", icon: HelpCircle, label: "Support" },
   ];
-
-  const bottomNavItems: NavItemType[] = [
-    { href: "/support", icon: Headset, label: "Support" },
-    { href: "/settings", icon: Settings, label: "Settings" },
-  ];
-
-  if (showChats) {
-    return (
-      <ChatsView 
-        openLeftSidebar={openLeftSidebar} 
-        onClose={() => setShowChats(false)} 
-      />
-    );
-  }
 
   return (
-    <aside className="h-full overflow-y-auto overflow-x-hidden">
-      <div className="flex flex-col h-full">
-        {/* Top navigation items */}
-        <div className="flex-1 py-4">
-          {topNavItems.map((item, index) => (
-            <NavItem
-              key={index}
-              item={item}
-              isActive={item.href ? pathname === item.href : false}
-              openLeftSidebar={openLeftSidebar}
-              onClose={onClose}
-            />
-          ))}
-        </div>
-
-        {/* Bottom navigation items */}
-        <div className="py-4 border-t border-gray-200 dark:border-gray-800">
-          {bottomNavItems.map((item, index) => (
-            <NavItem
-              key={index}
-              item={item}
-              isActive={pathname === item.href}
-              openLeftSidebar={openLeftSidebar}
-              onClose={onClose}
-            />
-          ))}
-        </div>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+        <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
+          App Nyumbani
+        </Link>
       </div>
-    </aside>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+            
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          © {new Date().getFullYear()} App Nyumbani
+        </p>
+      </div>
+    </div>
   );
 }

@@ -11,41 +11,7 @@ File Structure:
 │   │   │   │   └── page.tsx
 │   │   │   ├── sign-in
 │   │   │   │   └── page.tsx
-│   │   ├── h2h
-│   │   │   ├── [jackpotId]
-│   │   │   │   ├── [matchNumber]
-│   │   │   │   │   └── page.tsx
-│   │   │   └── client.jsx
-│   │   │   └── client.jsx.backup
-│   │   │   ├── components
-│   │   │   │   └── StrategyWorkflow.jsx
-│   │   │   │   └── YourStrategiesTab.jsx
-│   │   │   └── page.jsx
-│   │   ├── jackpots
-│   │   │   └── client.tsx
-│   │   │   └── page.tsx
 │   │   └── layout.tsx
-│   │   ├── nyumbani
-│   │   │   └── client.jsx
-│   │   │   ├── components
-│   │   │   │   └── BellCurve.jsx
-│   │   │   │   └── WinningPatternsStats.jsx
-│   │   │   │   └── WinningPicksDistribution.jsx
-│   │   │   ├── outcomes
-│   │   │   │   └── page.jsx
-│   │   │   └── page.jsx
-│   │   │   ├── patterns
-│   │   │   │   └── page.jsx
-│   │   ├── profile
-│   │   │   └── page.tsx
-│   │   ├── settings
-│   │   │   └── page.tsx
-│   │   ├── strategies
-│   │   │   └── client.tsx
-│   │   │   ├── components
-│   │   │   │   └── StrategyStudio.jsx
-│   │   │   │   └── YourStrategies.jsx
-│   │   │   └── page.tsx
 │   │   ├── support
 │   │   │   └── page.tsx
 │   ├── (info)
@@ -105,7 +71,6 @@ File Structure:
 │   ├── navigation
 │   │   └── BottomNavigation.tsx
 │   │   └── LeftSideBar.tsx
-│   │   └── PicksDrawer.tsx
 │   │   ├── chats
 │   │   │   └── ChatsView.tsx
 │   │   ├── main-navbar
@@ -123,33 +88,6 @@ File Structure:
 │   │   └── tabs.tsx
 │   │   └── tooltip.tsx
 └── components.json
-├── features
-│   ├── jackpots
-│   │   ├── components
-│   │   │   └── JackpotDetails.tsx
-│   │   │   ├── Tabs
-│   │   │   │   ├── Comments
-│   │   │   │   │   └── CommentItem.tsx
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── Matches
-│   │   │   │   │   └── MatchCard.tsx
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── Predictions
-│   │   │   │   │   └── PredictionItem.tsx
-│   │   │   │   │   └── index.tsx
-│   │   │   │   │   └── index.tsx.backup
-│   │   │   │   ├── Stats
-│   │   │   │   │   └── BellCurve.tsx
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── Strategies
-│   │   │   │   │   └── index.tsx
-│   │   │   └── TabsHeader.tsx
-│   │   ├── types
-│   │   │   └── index.ts
-│   │   ├── utils
-│   │   │   └── constants.ts
-│   │   │   └── helpers.ts
-│   └── placeholder
 ├── hooks
 │   └── useMediaQuery.ts
 ├── lib

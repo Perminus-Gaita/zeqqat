@@ -1,79 +1,54 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import MainNavbar from '@/components/navigation/main-navbar/index';
-import PicksDrawer from "@/components/navigation/PicksDrawer";
-import LeftSideBar from '@/components/navigation/LeftSideBar';
-import BottomNavigation from '@/components/navigation/BottomNavigation';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useState, useEffect } from "react";
+import LeftSideBar from "@/components/navigation/LeftSideBar";
+import BottomNavigation from "@/components/navigation/BottomNavigation";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
-interface DeviceWidths {
-  mobile: { open: string; closed: string };
-  tablet: { open: string; closed: string };
-  desktop: { open: string; closed: string };
+interface AppLayoutProps {
+  children: React.ReactNode;
 }
 
-const SIDEBAR_WIDTHS: DeviceWidths = {
-  mobile: { open: 'w-64', closed: 'w-0' },
-  tablet: { open: 'w-64', closed: 'w-0' },
-  desktop: { open: 'w-64', closed: 'w-16' },
-};
-
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function AppLayout({ children }: AppLayoutProps) {
   const [openLeftSidebar, setOpenLeftSidebar] = useState(false);
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isTablet = useMediaQuery("(min-width: 769px) and (max-width: 1024px)");
 
-  const isMobile = useMediaQuery('(max-width:639px)');
-  const isTablet = useMediaQuery('(min-width:640px) and (max-width:1023px)');
+  const toggleSidebar = () => setOpenLeftSidebar(!openLeftSidebar);
 
   useEffect(() => {
     if (!isMobile && !isTablet) {
-      setOpenLeftSidebar(true);
+      setOpenLeftSidebar(false);
     }
   }, [isMobile, isTablet]);
 
-  const toggleSidebar = () => {
-    setOpenLeftSidebar(!openLeftSidebar);
-  };
-
   const getSidebarStyles = () => {
-    const deviceType = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
-    const state: keyof DeviceWidths[typeof deviceType] = openLeftSidebar ? "open" : "closed";
-    
-    const sidebarWidth = SIDEBAR_WIDTHS[deviceType][state];
-    const marginLeft = deviceType === "desktop" ? (openLeftSidebar ? "ml-64" : "ml-16") : "ml-0";
-    
+    if (isMobile || isTablet) {
+      return {
+        sidebar: "w-64 fixed left-0 top-0 bottom-0 bg-white dark:bg-gray-900 z-50",
+        content: "ml-0",
+      };
+    }
     return {
-      sidebar: sidebarWidth,
-      content: marginLeft
+      sidebar: "w-64 fixed left-0 top-0 bottom-0 bg-white dark:bg-gray-900",
+      content: "ml-64",
     };
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <MainNavbar
-        openLeftSidebar={openLeftSidebar}
-        onToggleSidebar={toggleSidebar}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      {(isMobile || isTablet) && openLeftSidebar && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setOpenLeftSidebar(false)}
+        />
+      )}
 
-      <div className="flex relative">
-        {/* Overlay */}
-        {openLeftSidebar && (isMobile || isTablet) && (
-          <div
-            className="fixed inset-0 bg-black/50 z-20"
-            onClick={() => setOpenLeftSidebar(false)}
-          />
-        )}
-
-        {/* Sidebar */}
+      <div className="flex">
         <aside
-          ref={sidebarRef}
           className={`
-            fixed top-12 left-0 h-[calc(100vh-3rem)] z-30 
-            border-r border-gray-200 dark:border-gray-800
-            bg-white dark:bg-gray-900
-            transition-all duration-300 ease-in-out
-            ${!openLeftSidebar && (isMobile || isTablet) ? "-translate-x-full" : "translate-x-0"}
+            transition-transform duration-300 ease-in-out
+            ${openLeftSidebar ? "translate-x-0" : "-translate-x-full"}
             ${getSidebarStyles().sidebar}
             ${isMobile || isTablet ? "shadow-xl" : ""}
           `}
@@ -84,7 +59,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           />
         </aside>
 
-        {/* Main Content - REMOVED pt-10, pages handle their own padding */}
         <main className={`
           flex-1 px-4 pb-20 md:pb-4 min-h-screen
           transition-all duration-300
@@ -98,7 +72,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         openLeftSidebar={openLeftSidebar}
         onToggleSidebar={toggleSidebar}
       />
-      <PicksDrawer />
     </div>
   );
 }
