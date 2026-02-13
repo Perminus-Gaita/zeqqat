@@ -30,7 +30,7 @@ export default function BlogNavbar({ openLeftSidebar, onToggleSidebar }: BlogNav
 
   return (
     <header className="fixed top-0 w-full h-12 flex items-center justify-between px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
@@ -41,10 +41,16 @@ export default function BlogNavbar({ openLeftSidebar, onToggleSidebar }: BlogNav
         </Button>
 
         <Link
-          href="/i"
-          className="text-sm font-semibold text-gray-900 dark:text-white"
+          href="/"
+          className="flex items-center gap-2"
         >
-          App Nyumbani
+          {/* Z Logo */}
+          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm leading-none">Z</span>
+          </div>
+          <span className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">
+            zeqqat
+          </span>
         </Link>
       </div>
 

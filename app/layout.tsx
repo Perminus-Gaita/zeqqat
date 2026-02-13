@@ -8,8 +8,8 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
-  title: "My App",
-  description: "Welcome to my application",
+  title: "zeqqat",
+  description: "Data-driven betting research tools",
 };
 
 export const viewport: Viewport = {

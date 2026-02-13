@@ -11,6 +11,9 @@ File Structure:
 │   │   │   │   └── page.tsx
 │   │   │   ├── sign-in
 │   │   │   │   └── page.tsx
+│   │   ├── chat
+│   │   │   ├── [chatId]
+│   │   │   │   └── page.tsx
 │   │   └── layout.tsx
 │   │   ├── support
 │   │   │   └── page.tsx
@@ -40,7 +43,9 @@ File Structure:
 │   │   │   ├── telegram
 │   │   │   │   ├── callback
 │   │   │   │   │   └── route.ts
+│   └── apple-icon.tsx
 │   └── globals.css
+│   └── icon.tsx
 │   └── layout.tsx
 │   └── robots.ts
 │   └── sitemap.ts

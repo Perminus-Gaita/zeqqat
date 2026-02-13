@@ -51,7 +51,7 @@ const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => 
     </>
   );
 
-  const className = cn(
+  const itemClassName = cn(
     "flex items-center justify-start h-12 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 overflow-hidden transition-all duration-300 ease-in-out",
     isActive
       ? "bg-gray-100 dark:bg-gray-800 text-blue-600"
@@ -61,14 +61,14 @@ const NavItem = ({ item, isActive, openLeftSidebar, onClose }: NavItemProps) => 
 
   if (item.href) {
     return (
-      <Link href={item.href} onClick={handleClick} className={className}>
+      <Link href={item.href} onClick={handleClick} className={itemClassName}>
         {content}
       </Link>
     );
   }
 
   return (
-    <button onClick={handleClick} className={cn(className, "w-full")}>
+    <button onClick={handleClick} className={cn(itemClassName, "w-full")}>
       {content}
     </button>
   );
@@ -85,12 +85,12 @@ export default function LeftSideBar({ openLeftSidebar, onClose }: LeftSideBarPro
 
   const topNavItems: NavItemType[] = [
     { href: "/", icon: Home, label: "About" },
-    { href: "/i", icon: BookOpen, label: "Blogs" },
     {
       icon: MessagesSquare,
       label: "Chats",
       onClick: () => setShowChats(true)
     },
+    { href: "/i", icon: BookOpen, label: "Blogs" },
   ];
 
   const bottomNavItems: NavItemType[] = [

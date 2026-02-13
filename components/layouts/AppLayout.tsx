@@ -31,15 +31,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const toggleSidebar = () => setOpenLeftSidebar(!openLeftSidebar);
 
-  // Auto-open sidebar on desktop, close on mobile/tablet
-  useEffect(() => {
-    if (!isMobile && !isTablet) {
-      setOpenLeftSidebar(true);
-    } else {
-      setOpenLeftSidebar(false);
-    }
-  }, [isMobile, isTablet]);
-
   // Set dark theme as default
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -64,7 +55,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <BlogNavbar openLeftSidebar={openLeftSidebar} onToggleSidebar={toggleSidebar} />
 
       <div className="flex relative">
-        {/* Overlay for mobile/tablet */}
         {openLeftSidebar && (isMobile || isTablet) && (
           <div
             className="fixed inset-0 bg-black/50 z-20"
@@ -72,7 +62,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
           />
         )}
 
-        {/* Sidebar */}
         <aside
           ref={sidebarRef}
           className={`
@@ -91,7 +80,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
           />
         </aside>
 
-        {/* Main Content */}
         <main className={`
           flex-1 pt-12 px-4 pb-20 md:pb-4 min-h-screen
           transition-all duration-300

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { MessagesSquare, Plus, Search, X, Trash2, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,7 @@ const DUMMY_CHATS: Chat[] = [
 ];
 
 export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [chats, setChats] = useState<Chat[]>(DUMMY_CHATS);
@@ -75,7 +77,8 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
   );
 
   const handleNewChat = () => {
-    console.log("Creating new chat...");
+    // Navigate to a new chat page
+    router.push("/chat/new");
     onClose();
   };
 
@@ -85,7 +88,7 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
   };
 
   const handleChatClick = (chatId: string) => {
-    console.log("Opening chat:", chatId);
+    router.push(`/chat/${chatId}`);
     onClose();
   };
 
@@ -107,11 +110,11 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
       <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-800 overflow-hidden">
         <div className="flex items-center gap-2 min-w-0">
           <MessagesSquare className="h-5 w-5 text-gray-700 dark:text-gray-300 shrink-0" />
-          <span 
+          <span
             className={cn(
               "text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap transition-all duration-300 ease-in-out",
-              openLeftSidebar 
-                ? "opacity-100 max-w-xs" 
+              openLeftSidebar
+                ? "opacity-100 max-w-xs"
                 : "opacity-0 max-w-0"
             )}
           >
@@ -122,8 +125,8 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
           onClick={onClose}
           className={cn(
             "p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded shrink-0 transition-all duration-300 ease-in-out",
-            openLeftSidebar 
-              ? "opacity-100" 
+            openLeftSidebar
+              ? "opacity-100"
               : "opacity-0 pointer-events-none"
           )}
         >
@@ -140,15 +143,15 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
             "text-gray-700 dark:text-gray-300",
             "hover:bg-gray-100 dark:hover:bg-gray-800",
             "transition-all duration-300 ease-in-out",
-            openLeftSidebar ? "px-3" : "pl-5.5"
+            openLeftSidebar ? "px-3" : "pl-[1.375rem]"
           )}
         >
           <Plus className="h-5 w-5 shrink-0" />
-          <span 
+          <span
             className={cn(
               "whitespace-nowrap transition-all duration-300 ease-in-out",
-              openLeftSidebar 
-                ? "opacity-100 ml-3 max-w-xs" 
+              openLeftSidebar
+                ? "opacity-100 ml-3 max-w-xs"
                 : "opacity-0 ml-0 max-w-0"
             )}
           >
@@ -163,15 +166,15 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
             "text-gray-700 dark:text-gray-300",
             "hover:bg-gray-100 dark:hover:bg-gray-800",
             "transition-all duration-300 ease-in-out",
-            openLeftSidebar ? "px-3" : "pl-5.5"
+            openLeftSidebar ? "px-3" : "pl-[1.375rem]"
           )}
         >
           <Search className="h-5 w-5 shrink-0" />
-          <span 
+          <span
             className={cn(
               "whitespace-nowrap transition-all duration-300 ease-in-out",
-              openLeftSidebar 
-                ? "opacity-100 ml-3 max-w-xs" 
+              openLeftSidebar
+                ? "opacity-100 ml-3 max-w-xs"
                 : "opacity-0 ml-0 max-w-0"
             )}
           >
@@ -181,11 +184,11 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
       </div>
 
       {/* Search Input */}
-      <div 
+      <div
         className={cn(
           "border-b border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 ease-in-out",
-          showSearchInput && openLeftSidebar 
-            ? "max-h-20 p-3" 
+          showSearchInput && openLeftSidebar
+            ? "max-h-20 p-3"
             : "max-h-0 p-0"
         )}
       >
@@ -196,7 +199,7 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
             placeholder="Search chats..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg 
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg
                      border border-gray-300 dark:border-gray-600
                      bg-white dark:bg-gray-800
                      text-gray-900 dark:text-gray-100
@@ -206,14 +209,14 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
         </div>
       </div>
 
-      {/* Chats List - Smooth transitions */}
-      <div 
+      {/* Chats List */}
+      <div
         className={cn(
           "flex-1 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out",
           openLeftSidebar ? "opacity-100" : "opacity-0"
         )}
       >
-        <div 
+        <div
           className={cn(
             "py-1 transition-all duration-300 ease-in-out",
             openLeftSidebar ? "max-h-full" : "max-h-0 overflow-hidden"
@@ -230,7 +233,7 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
                 onMouseEnter={() => setHoveredChatId(chat.id)}
                 onMouseLeave={() => setHoveredChatId(null)}
                 onClick={() => handleChatClick(chat.id)}
-                className="relative px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 
+                className="relative px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-800
                          cursor-pointer transition-colors group"
               >
                 <div className="flex items-center justify-between gap-2">
@@ -241,27 +244,26 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
                     <div className="relative shrink-0">
                       <button
                         onClick={(e) => handleMenuToggle(chat.id, e)}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 
-                                 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700
+                                 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300
                                  rounded transition-colors"
                       >
                         <MoreVertical className="h-3.5 w-3.5" />
                       </button>
-                      
-                      {/* Dropdown menu */}
+
                       {menuOpenChatId === chat.id && (
-                        <div className="absolute right-0 top-full mt-1 z-10 
-                                      bg-white dark:bg-gray-800 
-                                      border border-gray-200 dark:border-gray-700 
+                        <div className="absolute right-0 top-full mt-1 z-10
+                                      bg-white dark:bg-gray-800
+                                      border border-gray-200 dark:border-gray-700
                                       rounded-lg shadow-lg py-1 min-w-30">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteChat(chat.id);
                             }}
-                            className="w-full px-3 py-2 text-left text-sm 
-                                     text-red-600 dark:text-red-400 
-                                     hover:bg-red-50 dark:hover:bg-red-900/20 
+                            className="w-full px-3 py-2 text-left text-sm
+                                     text-red-600 dark:text-red-400
+                                     hover:bg-red-50 dark:hover:bg-red-900/20
                                      transition-colors flex items-center gap-2"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -278,12 +280,12 @@ export default function ChatsView({ openLeftSidebar, onClose }: ChatsViewProps) 
         </div>
       </div>
 
-      {/* Footer - Smooth transitions */}
-      <div 
+      {/* Footer */}
+      <div
         className={cn(
           "border-t border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 ease-in-out",
-          openLeftSidebar 
-            ? "max-h-20 opacity-100" 
+          openLeftSidebar
+            ? "max-h-20 opacity-100"
             : "max-h-0 opacity-0"
         )}
       >

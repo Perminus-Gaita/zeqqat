@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getAllArticles, getAllCategories } from "@/lib/mdx";
 
 export const metadata: Metadata = {
-  title: "App Nyumbani — Data-Driven Betting Research",
+  title: "zeqqat — Data-Driven Betting Research",
   description:
     "Research tools and insights for smarter betting. Define your strategy, test it with data.",
 };

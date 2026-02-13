@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | App Nyumbani",
-    default: "App Nyumbani",
+    template: "%s | zeqqat",
+    default: "zeqqat",
   },
   description:
     "Data-driven betting research insights, strategies, and analysis.",
