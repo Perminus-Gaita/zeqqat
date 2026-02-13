@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import BlogNavbar from "@/components/blog/BlogNavbar";
-import BlogLeftSideBar from "@/components/blog/BlogLeftSideBar";
+import LeftSideBar from "@/components/navigation/LeftSideBar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface DeviceWidths {
@@ -73,7 +73,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
             ${isMobile || isTablet ? "shadow-xl" : ""}
           `}
         >
-          <BlogLeftSideBar openLeftSidebar={openLeftSidebar} onClose={() => setOpenLeftSidebar(false)} />
+          <LeftSideBar openLeftSidebar={openLeftSidebar} onClose={() => setOpenLeftSidebar(false)} />
         </aside>
 
         <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${getSidebarStyles().content}`}>
@@ -109,23 +109,29 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Winners</h3>
                   <nav className="flex flex-col gap-2">
-                    <Link href="/i/mega-jackpot-winners-2024" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Mega Winners 2024</Link>
-                    <Link href="/i/midweek-jackpot-winners-2024" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Midweek Winners</Link>
+                    <Link href="/i/mega-jackpot-winners-2024" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">2024 Winners</Link>
+                    <Link href="/i/biggest-sportpesa-winners" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Biggest Winners</Link>
                   </nav>
                 </div>
 
-                {/* Site */}
+                {/* Company */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Site</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Company</h3>
                   <nav className="flex flex-col gap-2">
-                    <Link href="/" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Home</Link>
-                    <Link href="/i" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">All Articles</Link>
+                    <Link href="/" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">About</Link>
                     <Link href="/support" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Support</Link>
                   </nav>
                 </div>
               </div>
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-6 text-center">
-                <p className="text-xs text-gray-400 dark:text-gray-500">© 2026 App</p>
+
+              <div className="pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  &copy; {new Date().getFullYear()} App Nyumbani. All rights reserved.
+                </p>
+                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                  <Link href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</Link>
+                  <Link href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Terms</Link>
+                </div>
               </div>
             </div>
           </footer>

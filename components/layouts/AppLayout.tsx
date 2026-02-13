@@ -6,6 +6,18 @@ import LeftSideBar from "@/components/navigation/LeftSideBar";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
+interface DeviceWidths {
+  mobile: { open: string; closed: string };
+  tablet: { open: string; closed: string };
+  desktop: { open: string; closed: string };
+}
+
+const SIDEBAR_WIDTHS: DeviceWidths = {
+  mobile: { open: "w-64", closed: "w-0" },
+  tablet: { open: "w-64", closed: "w-0" },
+  desktop: { open: "w-64", closed: "w-16" },
+};
+
 interface AppLayoutProps {
   children: React.ReactNode;
 }
@@ -15,13 +27,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isLandingPage = pathname === "/";
 
   const [openLeftSidebar, setOpenLeftSidebar] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const isTablet = useMediaQuery("(min-width: 769px) and (max-width: 1024px)");
+  const isMobile = useMediaQuery("(max-width:639px)");
+  const isTablet = useMediaQuery("(min-width:640px) and (max-width:1023px)");
 
   const toggleSidebar = () => setOpenLeftSidebar(!openLeftSidebar);
 
+  // Auto-open sidebar on desktop, close on mobile/tablet
   useEffect(() => {
     if (!isMobile && !isTablet) {
+      setOpenLeftSidebar(true);
+    } else {
       setOpenLeftSidebar(false);
     }
   }, [isMobile, isTablet]);
@@ -38,19 +53,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, []);
 
   const getSidebarStyles = () => {
-    if (isMobile || isTablet) {
-      return {
-        sidebar: "w-64 fixed left-0 top-0 bottom-0 bg-white dark:bg-gray-900 z-50",
-        content: "ml-0",
-      };
-    }
-    return {
-      sidebar: "w-64 fixed left-0 top-0 bottom-0 bg-white dark:bg-gray-900",
-      content: "ml-64",
-    };
+    const deviceType = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
+    const state: keyof DeviceWidths[typeof deviceType] = openLeftSidebar ? "open" : "closed";
+    const sidebarWidth = SIDEBAR_WIDTHS[deviceType][state];
+    const marginLeft = deviceType === "desktop" ? (openLeftSidebar ? "ml-64" : "ml-16") : "ml-0";
+    return { sidebar: sidebarWidth, content: marginLeft };
   };
 
-  // Landing page: no sidebar, no background
+  // Landing page: no sidebar
   if (isLandingPage) {
     return (
       <div className="min-h-screen">
@@ -67,19 +77,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Other pages: with sidebar
   return (
-    <div className="min-h-screen">
-      {(isMobile || isTablet) && openLeftSidebar && (
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {openLeftSidebar && (isMobile || isTablet) && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/50 z-20"
           onClick={() => setOpenLeftSidebar(false)}
         />
       )}
 
-      <div className="flex">
+      <div className="flex relative">
         <aside
           className={`
-            transition-transform duration-300 ease-in-out
-            ${openLeftSidebar ? "translate-x-0" : "-translate-x-full"}
+            fixed top-0 left-0 h-screen z-30
+            border-r border-gray-200 dark:border-gray-800
+            bg-white dark:bg-gray-900
+            transition-all duration-300 ease-in-out
+            ${!openLeftSidebar && (isMobile || isTablet) ? "-translate-x-full" : "translate-x-0"}
             ${getSidebarStyles().sidebar}
             ${isMobile || isTablet ? "shadow-xl" : ""}
           `}
