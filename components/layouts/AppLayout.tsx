@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 import LeftSideBar from "@/components/navigation/LeftSideBar";
+import BlogNavbar from "@/components/blog/BlogNavbar";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -23,10 +23,9 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const pathname = usePathname();
-  const isLandingPage = pathname === "/";
-
   const [openLeftSidebar, setOpenLeftSidebar] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
   const isMobile = useMediaQuery("(max-width:639px)");
   const isTablet = useMediaQuery("(min-width:640px) and (max-width:1023px)");
 
@@ -60,35 +59,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
     return { sidebar: sidebarWidth, content: marginLeft };
   };
 
-  // Landing page: no sidebar
-  if (isLandingPage) {
-    return (
-      <div className="min-h-screen">
-        <main className="px-4 pb-4 min-h-screen">
-          {children}
-        </main>
-        <BottomNavigation
-          openLeftSidebar={openLeftSidebar}
-          onToggleSidebar={toggleSidebar}
-        />
-      </div>
-    );
-  }
-
-  // Other pages: with sidebar
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      {openLeftSidebar && (isMobile || isTablet) && (
-        <div
-          className="fixed inset-0 bg-black/50 z-20"
-          onClick={() => setOpenLeftSidebar(false)}
-        />
-      )}
+      <BlogNavbar openLeftSidebar={openLeftSidebar} onToggleSidebar={toggleSidebar} />
 
       <div className="flex relative">
+        {/* Overlay for mobile/tablet */}
+        {openLeftSidebar && (isMobile || isTablet) && (
+          <div
+            className="fixed inset-0 bg-black/50 z-20"
+            onClick={() => setOpenLeftSidebar(false)}
+          />
+        )}
+
+        {/* Sidebar */}
         <aside
+          ref={sidebarRef}
           className={`
-            fixed top-0 left-0 h-screen z-30
+            fixed top-12 left-0 h-[calc(100vh-3rem)] z-30
             border-r border-gray-200 dark:border-gray-800
             bg-white dark:bg-gray-900
             transition-all duration-300 ease-in-out
@@ -103,8 +91,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
           />
         </aside>
 
+        {/* Main Content */}
         <main className={`
-          flex-1 px-4 pb-20 md:pb-4 min-h-screen
+          flex-1 pt-12 px-4 pb-20 md:pb-4 min-h-screen
           transition-all duration-300
           ${getSidebarStyles().content}
         `}>
