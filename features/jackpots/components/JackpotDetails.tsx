@@ -1,7 +1,9 @@
 "use client";
 
-import React from 'react';
-import { formatDate } from '../utils/helpers';
+import React, { useState, useCallback } from 'react';
+import { Calendar } from 'lucide-react';
+import { formatShortDate, getJackpotDateRange, formatCurrency } from '../utils/helpers';
+import MiniCalendar from './MiniCalendar';
 import type { Jackpot } from '../types';
 
 interface JackpotDetailsProps {
@@ -9,43 +11,59 @@ interface JackpotDetailsProps {
 }
 
 const JackpotDetails: React.FC<JackpotDetailsProps> = ({ jackpot }) => {
-  const isOpen = jackpot.jackpotStatus === 'Open';
-  
-  const formatFullAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-KE').format(Math.round(amount));
-  };
+  const [showCalendar, setShowCalendar] = useState(false);
+  const { start, end } = getJackpotDateRange(jackpot);
+
+  const handleCloseCalendar = useCallback(() => setShowCalendar(false), []);
 
   return (
-    <div className="p-4 border-y border-border">
-      <div className="text-xs text-muted-foreground mb-3 text-center">
-        Jackpot #{jackpot.jackpotHumanId} • {formatDate(jackpot.finished)}
-      </div>
+    <div className="border-b border-border">
+      {/* Single glassmorphism box — edge to edge, starts from the top */}
+      <div
+        className="p-[1px]"
+        style={{
+          background: 'linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.05), rgba(34,197,94,0.15))',
+        }}
+      >
+        <div className="bg-card p-5 text-center">
+          {/* Date row inside the box */}
+          <div className="relative mb-4">
+            <button
+              onClick={() => setShowCalendar(!showCalendar)}
+              className="inline-flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground hover:text-green-500 transition-colors tracking-wider cursor-pointer border-b border-dashed border-border pb-0.5"
+            >
+              <Calendar className="w-[10px] h-[10px]" />
+              {formatShortDate(jackpot.finished)} – {formatShortDate(jackpot.events[0]?.kickoffTime || jackpot.finished)} · #{jackpot.jackpotHumanId}
+            </button>
 
-      <div className="bg-gradient-to-br from-green-500/15 to-green-600/5 border border-green-500/30 rounded-xl p-6 text-center">
-        <div className="text-sm text-green-500/80 font-medium mb-2">
-          {jackpot.site} MEGA Jackpot Pro {jackpot.events.length}
+            {showCalendar && (
+              <MiniCalendar
+                start={start}
+                end={end}
+                onClose={handleCloseCalendar}
+                status={jackpot.jackpotStatus}
+                isLatest={jackpot.isLatest}
+              />
+            )}
+          </div>
+
+          {/* Jackpot info */}
+          <div className="text-sm text-green-500/80 font-medium mb-2">
+            {jackpot.site} MEGA Jackpot Pro {jackpot.events.length}
+          </div>
+
+          <div
+            className="text-3xl md:text-4xl font-black tracking-tight"
+            style={{
+              backgroundImage: 'linear-gradient(to right, #22c55e, #4ade80, #22c55e)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            {jackpot.currencySign} {formatCurrency(jackpot.totalPrizePool)}
+          </div>
         </div>
-
-        <div className="text-2xl md:text-3xl font-bold text-green-500">
-          {jackpot.currencySign} {formatFullAmount(jackpot.totalPrizePool)}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-center gap-2 flex-wrap mt-3">
-        <span
-          className={`px-3 py-1 rounded text-xs font-semibold ${
-            isOpen
-              ? 'bg-green-500/20 text-green-500'
-              : 'bg-muted text-muted-foreground'
-          }`}
-        >
-          {jackpot.jackpotStatus.toUpperCase()}
-        </span>
-        {jackpot.isLatest && (
-          <span className="bg-primary/20 text-primary px-3 py-1 rounded text-xs font-semibold">
-            LATEST
-          </span>
-        )}
       </div>
     </div>
   );

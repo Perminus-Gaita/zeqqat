@@ -20,14 +20,15 @@ const MatchesTab: React.FC<MatchesTabProps> = ({
   const isFinished = jackpotStatus === 'Finished' || jackpotStatus === 'Closed';
 
   return (
-    <div className="p-4 space-y-4">
-      {events.map((event) => (
+    <div>
+      {events.map((event, index) => (
         <MatchCard
           key={event.eventNumber}
           event={event}
           jackpotId={jackpotId}
           onSelect={onSelect}
           isFinished={isFinished}
+          isLast={index === events.length - 1}
         />
       ))}
     </div>

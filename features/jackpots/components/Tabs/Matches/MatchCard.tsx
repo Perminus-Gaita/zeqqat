@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { usePicksStore } from "@/lib/stores/picks-store";
 import type { JackpotEvent, LocalPick } from "@/features/jackpots/types";
 
@@ -9,6 +10,7 @@ interface MatchCardProps {
   jackpotId: string;
   onSelect?: (eventNumber: number, pick: LocalPick) => void;
   isFinished?: boolean;
+  isLast?: boolean;
 }
 
 const MatchCard: React.FC<MatchCardProps> = ({
@@ -16,7 +18,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
   jackpotId,
   onSelect,
   isFinished = false,
+  isLast = false,
 }) => {
+  const router = useRouter();
   const { picks, addPick, removePickByEvent } = usePicksStore();
 
   const existingPick = picks.find((p) => p.eventNumber === event.eventNumber);
@@ -54,12 +58,16 @@ const MatchCard: React.FC<MatchCardProps> = ({
   const pickOptions: LocalPick[] = ["Home", "Draw", "Away"];
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 transition-colors">
+    <div
+      className={`px-4 py-4 cursor-pointer hover:bg-muted/30 transition-colors ${
+        !isLast ? "border-b border-border" : ""
+      }`}
+    >
       <div className="flex justify-between items-start mb-3">
         <div className="text-sm font-semibold text-muted-foreground">
           Match {event.eventNumber}
         </div>
-        <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+        <div className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
           {event.competition}
         </div>
       </div>
