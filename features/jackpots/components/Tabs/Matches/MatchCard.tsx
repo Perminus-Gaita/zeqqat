@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
-import { AtSign } from "lucide-react";
 import { usePicksStore } from "@/lib/stores/picks-store";
 import type { JackpotEvent, LocalPick } from "@/features/jackpots/types";
 
@@ -19,7 +17,6 @@ const MatchCard: React.FC<MatchCardProps> = ({
   onSelect,
   isFinished = false,
 }) => {
-  const router = useRouter();
   const { picks, addPick, removePickByEvent } = usePicksStore();
 
   const existingPick = picks.find((p) => p.eventNumber === event.eventNumber);
@@ -29,7 +26,6 @@ const MatchCard: React.FC<MatchCardProps> = ({
     e.stopPropagation();
     if (isFinished) return;
 
-    // Toggle: if same pick is already selected, unselect it
     if (currentSelection === pick) {
       removePickByEvent(event.eventNumber);
       if (onSelect) onSelect(event.eventNumber, pick);
@@ -55,19 +51,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
     if (onSelect) onSelect(event.eventNumber, pick);
   };
 
-  const h2hUrl = `/h2h/${jackpotId}/${event.eventNumber}`;
-
-  const handleCardClick = () => {
-    router.push(h2hUrl);
-  };
-
   const pickOptions: LocalPick[] = ["Home", "Draw", "Away"];
 
   return (
-    <div
-      onClick={handleCardClick}
-      className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/30 transition-colors relative"
-    >
+    <div className="bg-card border border-border rounded-xl p-4 transition-colors">
       <div className="flex justify-between items-start mb-3">
         <div className="text-sm font-semibold text-muted-foreground">
           Match {event.eventNumber}
@@ -111,20 +98,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
         })}
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
-          {new Date(event.kickoffTime).toLocaleString()}
-        </div>
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push(h2hUrl);
-          }}
-          className="flex items-center gap-0.5 text-xs text-primary hover:text-primary/80 cursor-pointer transition-colors"
-        >
-          <AtSign className="w-3 h-3" />
-          <span className="font-semibold">h2h</span>
-        </div>
+      <div className="text-xs text-muted-foreground">
+        {new Date(event.kickoffTime).toLocaleString()}
       </div>
     </div>
   );

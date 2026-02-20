@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { tag } = await params;
   return {
     title: `Articles tagged "${tag}"`,
-    description: `Browse all articles tagged with "${tag}" on App Nyumbani.`,
+    description: `Browse all articles tagged with "${tag}" on Zeqqat.`,
   };
 }
 

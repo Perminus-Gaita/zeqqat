@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import AdminClient from "./client";
 
 export const metadata: Metadata = {
-  title: "Admin - App Nyumbani",
+  title: "Admin - Zeqqat",
   description: "Admin panel for managing jackpot games and results",
 };
 

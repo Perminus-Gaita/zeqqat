@@ -72,4 +72,4 @@ export interface LocalPicks {
   [eventNumber: number]: LocalPick;
 }
 
-export type TabType = 'matches' | 'predictions' | 'stats' | 'comments' | 'strategies';
+export type TabType = 'matches' | 'predictions' | 'comments';

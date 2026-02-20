@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
   return {
     title: `${categoryName} Articles`,
-    description: `Browse all ${category} articles on App Nyumbani.`,
+    description: `Browse all ${category} articles on Zeqqat.`,
   };
 }
 

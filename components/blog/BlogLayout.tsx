@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import BlogNavbar from "@/components/blog/BlogNavbar";
+import MainNavbar from "@/components/navigation/main-navbar/index";
 import LeftSideBar from "@/components/navigation/LeftSideBar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -25,9 +25,6 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
   const isMobile = useMediaQuery("(max-width:639px)");
   const isTablet = useMediaQuery("(min-width:640px) and (max-width:1023px)");
 
-  // Sidebar stays closed by default on all devices
-
-  // Set dark theme as default
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (!savedTheme) {
@@ -50,7 +47,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen flex flex-col">
-      <BlogNavbar openLeftSidebar={openLeftSidebar} onToggleSidebar={toggleSidebar} />
+      <MainNavbar openLeftSidebar={openLeftSidebar} onToggleSidebar={toggleSidebar} />
 
       <div className="flex relative flex-1">
         {openLeftSidebar && (isMobile || isTablet) && (
@@ -69,63 +66,46 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
             ${isMobile || isTablet ? "shadow-xl" : ""}
           `}
         >
-          <LeftSideBar openLeftSidebar={openLeftSidebar} onClose={() => setOpenLeftSidebar(false)} />
+          <LeftSideBar
+            openLeftSidebar={openLeftSidebar}
+            onClose={() => setOpenLeftSidebar(false)}
+          />
         </aside>
 
-        <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${getSidebarStyles().content}`}>
-          <main className="flex-1 pt-12 px-4 pb-8">
+        <div className={`
+          flex-1 transition-all duration-300
+          ${getSidebarStyles().content}
+        `}>
+          <div className="max-w-4xl mx-auto px-4 pt-14 pb-12">
             {children}
-          </main>
+          </div>
 
-          <footer className="border-t border-gray-200 dark:border-gray-800">
-            <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-8">
+          <footer className="border-t border-gray-200 dark:border-gray-800 mt-8">
+            <div className="max-w-4xl mx-auto px-4 py-12">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Strategies</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Guides</h3>
                   <nav className="flex flex-col gap-2">
-                    <Link href="/i/ultimate-guide-sportpesa-jackpot" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Ultimate Guide</Link>
-                    <Link href="/i/how-to-predict-draws" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Predict Draws</Link>
-                    <Link href="/i/how-to-predict-home-win" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Predict Home Wins</Link>
-                    <Link href="/i/how-to-predict-away-win" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Predict Away Wins</Link>
-                    <Link href="/i/increase-chances-winning-sportpesa-jackpot" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Improve Your Odds</Link>
-                  </nav>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Tools</h3>
-                  <nav className="flex flex-col gap-2">
-                    <Link href="/i/jackpot-win-probability" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Win Calculator</Link>
-                    <Link href="/i/what-is-value-betting" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Value Betting</Link>
-                    <Link href="/i/sportpesa-jackpot-prediction-websites" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Prediction Sites Review</Link>
+                    <Link href="/i" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">All Articles</Link>
                   </nav>
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Resources</h3>
                   <nav className="flex flex-col gap-2">
-                    <Link href="/i/reputable-online-jackpot-games-kenya" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Reputable Sites</Link>
-                    <Link href="/i/jackpot-betting-sites-kenya-reviews" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Site Reviews</Link>
-                    <Link href="/i/best-apps-jackpot-results-kenya" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Best Apps</Link>
-                    <Link href="/i/buy-lottery-tickets-jackpot-kenya" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">How to Buy Tickets</Link>
-                    <Link href="/support" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Support</Link>
-                  </nav>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Company</h3>
-                  <nav className="flex flex-col gap-2">
-                    <Link href="/" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">About</Link>
                     <Link href="/support" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Support</Link>
                   </nav>
                 </div>
               </div>
 
               <div className="border-t border-gray-200 dark:border-gray-800 pt-6 text-center">
-                <Link href="/i" className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  zeqqat
+                <Link href="/" className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Zeqqat
                 </Link>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Data-driven betting research tools. Define your logic, test it with data.
+                  Test your jackpot picks risk free.
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-                  &copy; $(date +%Y) zeqqat. All rights reserved.
+                  &copy; {new Date().getFullYear()} Zeqqat. All rights reserved.
                 </p>
               </div>
             </div>

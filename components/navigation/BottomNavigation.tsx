@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Home, BookOpen, Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { usePicksStore } from "@/lib/stores/picks-store";
+import { Home, User, Menu } from "lucide-react";
 
 interface BottomNavigationProps {
   openLeftSidebar: boolean;
@@ -14,44 +13,36 @@ export default function BottomNavigation({ openLeftSidebar, onToggleSidebar }: B
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-40">
-      <div className="flex items-center justify-around h-16">
-        <Link
-          href="/jackpots"
-          className={`flex flex-col items-center justify-center flex-1 h-full ${
-            pathname === "/jackpots"
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-gray-600 dark:text-gray-400"
-          }`}
-        >
-          <Home className="w-6 h-6 mb-1" />
-          <span className="text-xs font-medium">Nyumbani</span>
-        </Link>
+    <div className="fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex items-center justify-around md:hidden z-10">
+      <Link
+        href="/"
+        className={`flex flex-col items-center justify-center w-1/3 ${
+          pathname === "/" ? "text-blue-600" : "text-gray-600 dark:text-gray-400"
+        }`}
+      >
+        <Home className="h-5 w-5" />
+        <span className="text-xs mt-1">Nyumbani</span>
+      </Link>
 
-        <Link
-          href="/i"
-          className={`flex flex-col items-center justify-center flex-1 h-full ${
-            pathname?.startsWith("/i")
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-gray-600 dark:text-gray-400"
-          }`}
-        >
-          <BookOpen className="w-6 h-6 mb-1" />
-          <span className="text-xs font-medium">Blogs</span>
-        </Link>
+      <Link
+        href="/profile"
+        className={`flex flex-col items-center justify-center w-1/3 ${
+          pathname === "/profile" ? "text-blue-600" : "text-gray-600 dark:text-gray-400"
+        }`}
+      >
+        <User className="h-5 w-5" />
+        <span className="text-xs mt-1">Profile</span>
+      </Link>
 
-        <button
-          onClick={onToggleSidebar}
-          className={`flex flex-col items-center justify-center flex-1 h-full ${
-            openLeftSidebar
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-gray-600 dark:text-gray-400"
-          }`}
-        >
-          <Menu className="w-6 h-6 mb-1" />
-          <span className="text-xs font-medium">More</span>
-        </button>
-      </div>
-    </nav>
+      <button
+        onClick={onToggleSidebar}
+        className={`flex flex-col items-center justify-center w-1/3 ${
+          openLeftSidebar ? "text-blue-600" : "text-gray-600 dark:text-gray-400"
+        }`}
+      >
+        <Menu className="h-5 w-5" />
+        <span className="text-xs mt-1">More</span>
+      </button>
+    </div>
   );
 }

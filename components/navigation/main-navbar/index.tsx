@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Menu, X, Sun, Moon, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -76,14 +75,17 @@ export default function MainNavbar({ openLeftSidebar, onToggleSidebar }: MainNav
           {openLeftSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
 
-        {!isMobile && (
-          <Link href="/">
-            <Image src="/logo.png" alt="Logo" width={32} height={32} />
-          </Link>
-        )}
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-7 h-7 bg-blue-600 rounded-md flex items-center justify-center">
+            <span className="text-white text-sm font-extrabold">Z</span>
+          </div>
+          {!isMobile && (
+            <span className="text-sm font-bold text-gray-900 dark:text-white">Zeqqat</span>
+          )}
+        </Link>
       </div>
 
-      <h1 className="text-sm font-semibold">My App</h1>
+      
 
       <div className="flex items-center gap-2">
         {/* Picks Button - Only show on desktop */}

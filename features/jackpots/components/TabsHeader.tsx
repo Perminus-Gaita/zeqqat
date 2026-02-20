@@ -11,19 +11,17 @@ interface TabsHeaderProps {
 const TabsHeader: React.FC<TabsHeaderProps> = ({ activeTab, setActiveTab }) => {
   const tabs: { id: TabType; label: string }[] = [
     { id: 'matches', label: 'Matches' },
-    { id: 'strategies', label: 'Strategies' },
-    { id: 'stats', label: 'Stats' },
     { id: 'predictions', label: 'Predictions' },
     { id: 'comments', label: 'Comments' },
   ];
 
   return (
-    <div className="flex border-b border-border bg-card sticky top-0 z-10 overflow-x-auto scrollbar-none">
+    <div className="flex border-b border-border sticky top-0 z-10">
       {tabs.map(tab => (
         <button
           key={tab.id}
           onClick={() => setActiveTab(tab.id)}
-          className={`flex-1 min-w-fit py-4 px-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
+          className={`flex-1 py-4 text-sm font-medium transition-colors relative ${
             activeTab === tab.id
               ? 'text-foreground'
               : 'text-muted-foreground hover:text-foreground'

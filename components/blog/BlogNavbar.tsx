@@ -50,7 +50,7 @@ export default function BlogNavbar({ openLeftSidebar, onToggleSidebar }: BlogNav
         </Button>
 
         <Link href="/jackpots" className="text-lg font-bold text-gray-900 dark:text-white">
-          App Nyumbani
+          Zeqqat
         </Link>
       </div>
 

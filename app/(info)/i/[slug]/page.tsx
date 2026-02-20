@@ -83,7 +83,7 @@ export default async function ArticlePage({ params }: PageProps) {
     description: article.description,
     datePublished: article.date,
     dateModified: article.updated || article.date,
-    author: { "@type": "Organization", name: "App Nyumbani" },
+    author: { "@type": "Organization", name: "Zeqqat" },
     ...(article.image && { image: article.image }),
   };
 
