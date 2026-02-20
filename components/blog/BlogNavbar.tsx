@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { useAuthModal } from "@/lib/stores/auth-modal-store";
-import { authClient } from "@/lib/auth/client";
+import { usePicksStore } from "@/lib/stores/picks-store";
 
 interface BlogNavbarProps {
   openLeftSidebar: boolean;
@@ -15,22 +14,16 @@ interface BlogNavbarProps {
 type Theme = "light" | "dark";
 
 export default function BlogNavbar({ openLeftSidebar, onToggleSidebar }: BlogNavbarProps) {
-  const [theme, setTheme] = useState<Theme>("light");
-  const { openAuthModal } = useAuthModal();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  // Picks store
+  const { picks, isDrawerOpen, toggleDrawer } = usePicksStore();
+  const picksCount = picks.length;
 
   useEffect(() => {
-    const savedTheme = (localStorage.getItem("theme") as Theme) || "light";
+    const savedTheme = (localStorage.getItem("theme") as Theme) || "dark";
     setTheme(savedTheme);
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
-  }, []);
-
-  useEffect(() => {
-    authClient.getSession().then(session => {
-      setUser(session?.data?.user || null);
-      setLoading(false);
-    });
   }, []);
 
   const toggleTheme = () => {
@@ -42,60 +35,54 @@ export default function BlogNavbar({ openLeftSidebar, onToggleSidebar }: BlogNav
 
   return (
     <header className="fixed top-0 w-full h-12 flex items-center justify-between px-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggleSidebar}
           className="h-8 w-8"
         >
-          {openLeftSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {openLeftSidebar ? (
+            <X className="h-5 w-5 text-gray-900 dark:text-white" />
+          ) : (
+            <Menu className="h-5 w-5 text-gray-900 dark:text-white" />
+          )}
         </Button>
 
-        <Link
-          href="/"
-          className="flex items-center gap-2"
-        >
-          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm leading-none">Z</span>
-          </div>
-          <span className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">
-            zeqqat
-          </span>
+        <Link href="/jackpots" className="text-lg font-bold text-gray-900 dark:text-white">
+          App Nyumbani
         </Link>
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-8 w-8">
-          {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+        {/* Picks Betslip Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleDrawer}
+          className="h-8 w-8 relative"
+        >
+          <ScrollText className="h-5 w-5 text-gray-900 dark:text-white" />
+          {picksCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {picksCount > 99 ? "99+" : picksCount}
+            </span>
+          )}
         </Button>
 
-        {!loading && !user && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => openAuthModal()}
-            className="h-8 text-sm font-medium"
-          >
-            Sign In / Up
-          </Button>
-        )}
-
-        {!loading && user && (
-          <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center">
-            {user.image ? (
-              <img
-                src={user.image}
-                alt={user.name || "User"}
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              <span className="text-white text-xs font-bold">
-                {user.name?.charAt(0) || "?"}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Theme Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="h-8 w-8"
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5 text-gray-900 dark:text-white" />
+          ) : (
+            <Moon className="h-5 w-5 text-gray-900 dark:text-white" />
+          )}
+        </Button>
       </div>
     </header>
   );

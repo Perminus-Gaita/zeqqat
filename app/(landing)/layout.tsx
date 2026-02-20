@@ -1,10 +1,5 @@
-import { ReactNode } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
 
-interface AppLayoutWrapperProps {
-  children: ReactNode;
-}
-
-export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
+export default function LandingLayout({ children }: { children: React.ReactNode }) {
   return <AppLayout>{children}</AppLayout>;
 }

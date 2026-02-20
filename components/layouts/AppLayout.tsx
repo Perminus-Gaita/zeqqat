@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import LeftSideBar from "@/components/navigation/LeftSideBar";
 import BlogNavbar from "@/components/blog/BlogNavbar";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
+import PicksDrawer from "@/components/navigation/PicksDrawer";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface DeviceWidths {
@@ -30,9 +31,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const isMobile = useMediaQuery("(max-width:639px)");
   const isTablet = useMediaQuery("(min-width:640px) and (max-width:1023px)");
-
-  // Check if current page is a chat page (needs full height, no extra padding)
-  const isChatPage = pathname?.startsWith("/chat");
 
   const toggleSidebar = () => setOpenLeftSidebar(!openLeftSidebar);
 
@@ -86,21 +84,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </aside>
 
         <main className={`
-          flex-1 pt-12 min-h-screen relative
+          flex-1 pt-14 px-4 pb-20 md:pb-4 min-h-screen
           transition-all duration-300
           ${getSidebarStyles().content}
-          ${isChatPage ? "" : "px-4 pb-20 md:pb-4"}
         `}>
           {children}
         </main>
       </div>
 
-      {!isChatPage && (
-        <BottomNavigation
-          openLeftSidebar={openLeftSidebar}
-          onToggleSidebar={toggleSidebar}
-        />
-      )}
+      <BottomNavigation
+        openLeftSidebar={openLeftSidebar}
+        onToggleSidebar={toggleSidebar}
+      />
+      <PicksDrawer />
     </div>
   );
 }
