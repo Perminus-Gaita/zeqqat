@@ -52,7 +52,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
     <div style={{ paddingLeft: depth > 0 ? 28 : 0 }}>
       <div style={{ display: 'flex', gap: 10, padding: '10px 0', alignItems: 'flex-start' }}>
         {/* Left: avatar + collapse */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
           <img
             data-avatar={comment._id}
             src={getDiceBearAvatar(comment.username || 'anon')}
