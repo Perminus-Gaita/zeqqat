@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, Info, Settings, Headset, LucideIcon } from "lucide-react";
+import { Home, BookOpen, Info, User, Settings, Headset, LucideIcon } from "lucide-react";
 
 interface NavItemType {
   href: string;
@@ -69,6 +69,7 @@ export default function LeftSideBar({ openLeftSidebar, onClose }: LeftSideBarPro
     { href: "/", icon: Home, label: "Nyumbani" },
     { href: "/i", icon: BookOpen, label: "Blogs" },
     { href: "/about", icon: Info, label: "About" },
+    { href: "/profile", icon: User, label: "Profile" },
   ];
 
   const bottomNavItems: NavItemType[] = [
